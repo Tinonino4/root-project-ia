@@ -1,0 +1,6 @@
+# Mapa de Documentación Externa
+
+- [Documentación de Spring Boot](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
+- [Documentación de Vue.js](https://vuejs.org/guide/introduction.html)
+- [Documentación de React Native](https://reactnative.dev/docs/getting-started)
+- [Documentación de PostgreSQL](https://www.postgresql.org/docs/)
