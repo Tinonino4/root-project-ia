@@ -1,0 +1,42 @@
+# Test profile: overrides for integration tests
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-google-client-id
+            client-secret: test-google-client-secret
+            scope: email, profile
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          github:
+            client-id: test-github-client-id
+            client-secret: test-github-client-secret
+            scope: user:email, read:user
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          linkedin:
+            client-id: test-linkedin-client-id
+            client-secret: test-linkedin-client-secret
+            scope: openid, profile, email
+            client-name: LinkedIn
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          linkedin:
+            authorization-uri: https://www.linkedin.com/oauth/v2/authorization
+            token-uri: https://www.linkedin.com/oauth/v2/accessToken
+            user-info-uri: https://api.linkedin.com/v2/userinfo
+            user-name-attribute: sub
+
+  # Mail: disable in tests
+  mail:
+    host: localhost
+    port: 25
+
+# JWT test secret
+app:
+  jwt:
+    secret: "3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b"
+    expiration-ms: 86400000
