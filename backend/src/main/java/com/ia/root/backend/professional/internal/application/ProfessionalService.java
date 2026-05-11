@@ -32,19 +32,15 @@ public class ProfessionalService {
     @Transactional
     public UserProfile updateProfile(UUID userId, UserProfileRequest request) {
         UserProfile profile = getProfile(userId);
-        
-        if (request.name() != null) profile.setName(request.name());
-        if (request.surname() != null) profile.setSurname(request.surname());
-        if (request.contactEmail() != null) profile.setContactEmail(request.contactEmail());
-        if (request.aboutMe() != null) profile.setAboutMe(request.aboutMe());
-        if (request.city() != null) profile.setCity(request.city());
-        if (request.birthday() != null) profile.setBirthday(request.birthday());
-        if (request.zipcode() != null) profile.setZipcode(request.zipcode());
-        if (request.phoneNumber() != null) profile.setPhoneNumber(request.phoneNumber());
-        if (request.photoUrl() != null) profile.setPhotoUrl(request.photoUrl());
-        if (request.jobTitle() != null) profile.setJobTitle(request.jobTitle());
-        if (request.education() != null) profile.setEducation(request.education());
-        
+
+        profile.updatePersonalInfo(
+            request.name(), request.surname(), request.city(),
+            request.birthday(), request.zipcode(), request.phoneNumber()
+        );
+        profile.updateProfessionalInfo(request.jobTitle(), request.education(), request.aboutMe());
+        profile.updateContactEmail(request.contactEmail());
+        profile.updatePhotoUrl(request.photoUrl());
+
         return userProfileRepository.save(profile);
     }
 

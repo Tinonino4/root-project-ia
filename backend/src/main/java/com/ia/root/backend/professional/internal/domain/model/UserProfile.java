@@ -3,6 +3,7 @@ package com.ia.root.backend.professional.internal.domain.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -46,53 +47,61 @@ public class UserProfile {
     @Column(name = "updated_at", insertable = false, updatable = false)
     private ZonedDateTime updatedAt;
 
-    public UserProfile() {}
+    protected UserProfile() {}
 
     public UserProfile(UUID userId, String name, String contactEmail) {
-        this.userId = userId;
-        this.name = name;
+        this.userId = Objects.requireNonNull(userId, "userId must not be null");
+        this.name = Objects.requireNonNull(name, "name must not be null");
         this.contactEmail = contactEmail;
     }
 
+    public void updatePersonalInfo(String name, String surname, String city,
+                                   LocalDate birthday, String zipcode, String phoneNumber) {
+        if (name != null) this.name = name;
+        if (surname != null) this.surname = surname;
+        if (city != null) this.city = city;
+        if (birthday != null) this.birthday = birthday;
+        if (zipcode != null) this.zipcode = zipcode;
+        if (phoneNumber != null) this.phoneNumber = phoneNumber;
+    }
+
+    public void updateProfessionalInfo(String jobTitle, String education, String aboutMe) {
+        if (jobTitle != null) this.jobTitle = jobTitle;
+        if (education != null) this.education = education;
+        if (aboutMe != null) this.aboutMe = aboutMe;
+    }
+
+    public void updateContactEmail(String contactEmail) {
+        if (contactEmail != null) this.contactEmail = contactEmail;
+    }
+
+    public void updatePhotoUrl(String photoUrl) {
+        if (photoUrl != null) this.photoUrl = photoUrl;
+    }
+
+    public void updateName(String name) { this.name = Objects.requireNonNull(name); }
+    public void updateSurname(String surname) { this.surname = surname; }
+    public void updateCity(String city) { this.city = city; }
+    public void updateBirthday(LocalDate birthday) { this.birthday = birthday; }
+    public void updateZipcode(String zipcode) { this.zipcode = zipcode; }
+    public void updatePhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public void updateJobTitle(String jobTitle) { this.jobTitle = jobTitle; }
+    public void updateEducation(String education) { this.education = education; }
+    public void updateAboutMe(String aboutMe) { this.aboutMe = aboutMe; }
+
     public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-
     public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
-
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
     public String getSurname() { return surname; }
-    public void setSurname(String surname) { this.surname = surname; }
-
     public String getContactEmail() { return contactEmail; }
-    public void setContactEmail(String contactEmail) { this.contactEmail = contactEmail; }
-
     public String getAboutMe() { return aboutMe; }
-    public void setAboutMe(String aboutMe) { this.aboutMe = aboutMe; }
-
     public String getCity() { return city; }
-    public void setCity(String city) { this.city = city; }
-
     public LocalDate getBirthday() { return birthday; }
-    public void setBirthday(LocalDate birthday) { this.birthday = birthday; }
-
     public String getZipcode() { return zipcode; }
-    public void setZipcode(String zipcode) { this.zipcode = zipcode; }
-
     public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-
     public String getPhotoUrl() { return photoUrl; }
-    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
-
     public String getJobTitle() { return jobTitle; }
-    public void setJobTitle(String jobTitle) { this.jobTitle = jobTitle; }
-
     public String getEducation() { return education; }
-    public void setEducation(String education) { this.education = education; }
-
     public ZonedDateTime getCreatedAt() { return createdAt; }
     public ZonedDateTime getUpdatedAt() { return updatedAt; }
 }

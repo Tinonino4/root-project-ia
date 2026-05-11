@@ -1,7 +1,7 @@
 # Constitución del Proyecto (AGENTS)
 
 ## Stack Tecnológico
-- Backend: Java 21+ / Spring Boot 4.0.2 (Ecosistema Spring 7, Clean Architecture)
+- Backend: Java 21+ / Spring Boot 4.0.5 (Ecosistema Spring 7, Clean Architecture)
 - Frontend: Vue3 o React Native
 - Base de Datos: PostgreSQL
 

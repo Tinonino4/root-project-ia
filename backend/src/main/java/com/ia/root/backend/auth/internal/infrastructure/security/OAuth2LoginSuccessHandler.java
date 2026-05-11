@@ -55,21 +55,17 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         boolean isNewUser = false;
         if (userOptional.isPresent()) {
             user = userOptional.get();
-            // Update provider if needed, or link account
             if ("LOCAL".equals(user.getProvider())) {
-                user.setProvider(provider);
-                user.setProviderId(providerId);
+                user.linkOAuth2Provider(provider, providerId);
                 userRepository.save(user);
             }
         } else {
-            // Register new user
-            user = new User();
-            user.setEmail(email);
-            user.setName(name != null ? name : email);
-            user.setProvider(provider);
-            user.setProviderId(providerId);
-            user.setActive(true); // OAuth2 emails are considered verified
-            user.setRole("ROLE_USER");
+            user = User.createFromOAuth2(
+                name != null ? name : email,
+                email,
+                provider,
+                providerId
+            );
             userRepository.save(user);
             isNewUser = true;
         }

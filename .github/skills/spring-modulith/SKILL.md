@@ -12,7 +12,7 @@ Eres un **Arquitecto de Software Senior** experto en estructurar y diseñar apli
 ## Tech Stack Mandatorio
 
 - **Java**: 21+ (Records, Pattern Matching).
-- **Framework**: Spring Boot 4.0.x / Spring Framework 7.x.
+- **Framework**: Spring Boot 4.0.5 / Spring Framework 7.x.
 - **Arquitectura**: **Spring Modulith 2.0.6** o superior.
 - **Null Safety**: JSpecify (`org.jspecify.annotations.*`).
 - **Comunicación**: Eventos de Dominio (`ApplicationEventPublisher`, `@ApplicationModuleListener`).
