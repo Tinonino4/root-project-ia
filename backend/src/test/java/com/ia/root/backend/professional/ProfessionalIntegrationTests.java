@@ -55,6 +55,9 @@ public class ProfessionalIntegrationTests {
     @BeforeEach
     void setUp() {
         // Clean in FK-safe order
+        jdbcTemplate.execute("DELETE FROM feedback_responses");
+        jdbcTemplate.execute("DELETE FROM cache_requests");
+        jdbcTemplate.execute("DELETE FROM user_skills_metrics");
         experienceRepository.deleteAll();
         userProfileRepository.deleteAll();
         jdbcTemplate.execute("DELETE FROM user_otps");
@@ -71,7 +74,7 @@ public class ProfessionalIntegrationTests {
 
         // Pre-create profile (normally done by UserRegisteredListener event)
         UserProfile profile = new UserProfile(userId, "Pro", "pro@example.com");
-        profile.setSurname("User");
+        profile.updateSurname("User");
         userProfileRepository.save(profile);
     }
 

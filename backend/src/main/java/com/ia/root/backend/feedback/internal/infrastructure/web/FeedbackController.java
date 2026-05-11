@@ -1,0 +1,72 @@
+package com.ia.root.backend.feedback.internal.infrastructure.web;
+
+import com.ia.root.backend.feedback.internal.application.FeedbackService;
+import com.ia.root.backend.feedback.internal.domain.model.CacheRequest;
+import com.ia.root.backend.feedback.internal.domain.model.SkillCategory;
+import com.ia.root.backend.feedback.internal.infrastructure.web.dto.CacheRequestViewDTO;
+import com.ia.root.backend.feedback.internal.infrastructure.web.dto.CreateCacheRequestDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping(path = "/api/feedback", version = "1")
+@Tag(name = "Feedback", description = "Gestión de solicitudes de feedback (cache requests)")
+public class FeedbackController {
+
+    private final FeedbackService feedbackService;
+
+    public FeedbackController(FeedbackService feedbackService) {
+        this.feedbackService = feedbackService;
+    }
+
+    @GetMapping("/categories")
+    @Operation(summary = "Obtener catálogo de categorías de skills con sus preguntas")
+    public ResponseEntity<List<SkillCategory>> getCategories() {
+        return ResponseEntity.ok(feedbackService.getCategories());
+    }
+
+    @PostMapping("/requests")
+    @Operation(summary = "Crear una solicitud de feedback para una experiencia")
+    public ResponseEntity<CacheRequestViewDTO> createRequest(
+            @AuthenticationPrincipal(expression = "id") UUID userId,
+            @RequestBody @Valid CreateCacheRequestDTO dto) {
+        CacheRequest cr = feedbackService.createCacheRequest(userId, dto);
+        CacheRequestViewDTO view = new CacheRequestViewDTO(
+            cr.getId(), cr.getExperienceId(), cr.getRelationshipId(),
+            cr.isStillWorksThere(), cr.getTargetName(), cr.getTargetSurname(),
+            cr.getTargetEmail(), cr.getTargetPhone(), cr.isFinished(), cr.getCreatedAt()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(view);
+    }
+
+    @GetMapping("/requests")
+    @Operation(summary = "Listar todas las solicitudes de feedback del usuario")
+    public ResponseEntity<List<CacheRequestViewDTO>> getRequests(
+            @AuthenticationPrincipal(expression = "id") UUID userId) {
+        return ResponseEntity.ok(feedbackService.getCacheRequests(userId));
+    }
+
+    @GetMapping("/requests/experience/{experienceId}")
+    @Operation(summary = "Listar solicitudes de feedback de una experiencia específica")
+    public ResponseEntity<List<CacheRequestViewDTO>> getRequestsByExperience(
+            @AuthenticationPrincipal(expression = "id") UUID userId,
+            @PathVariable UUID experienceId) {
+        return ResponseEntity.ok(feedbackService.getCacheRequestsByExperience(userId, experienceId));
+    }
+
+    @GetMapping("/requests/experience/{experienceId}/count")
+    @Operation(summary = "Obtener número de feedbacks completados para una experiencia")
+    public ResponseEntity<Long> getCompletedCount(
+            @AuthenticationPrincipal(expression = "id") UUID userId,
+            @PathVariable UUID experienceId) {
+        return ResponseEntity.ok(feedbackService.getCompletedCount(userId, experienceId));
+    }
+}
