@@ -2,6 +2,7 @@ package com.ia.root.backend.auth.internal.domain.model;
 
 import jakarta.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -24,7 +25,7 @@ public class User {
     private boolean isActive = false;
 
     @Column(nullable = false)
-    private String provider = "LOCAL"; // LOCAL, GOOGLE, GITHUB
+    private String provider = "LOCAL";
 
     private String providerId;
 
@@ -37,30 +38,51 @@ public class User {
     @Column(name = "updated_at", insertable = false, updatable = false)
     private ZonedDateTime updatedAt;
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-    
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    
-    public String getPasswordHash() { return passwordHash; }
-    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
-    
-    public boolean isActive() { return isActive; }
-    public void setActive(boolean isActive) { this.isActive = isActive; }
-    
-    public String getProvider() { return provider; }
-    public void setProvider(String provider) { this.provider = provider; }
-    
-    public String getProviderId() { return providerId; }
-    public void setProviderId(String providerId) { this.providerId = providerId; }
-    
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    protected User() {}
 
+    public static User createLocal(String name, String email, String passwordHash, String role) {
+        User user = new User();
+        user.name = Objects.requireNonNull(name, "name must not be null");
+        user.email = Objects.requireNonNull(email, "email must not be null");
+        user.passwordHash = Objects.requireNonNull(passwordHash, "passwordHash must not be null");
+        user.role = Objects.requireNonNull(role, "role must not be null");
+        user.provider = "LOCAL";
+        user.isActive = false;
+        return user;
+    }
+
+    public static User createFromOAuth2(String name, String email, String provider, String providerId) {
+        User user = new User();
+        user.name = Objects.requireNonNull(name, "name must not be null");
+        user.email = Objects.requireNonNull(email, "email must not be null");
+        user.provider = Objects.requireNonNull(provider, "provider must not be null");
+        user.providerId = providerId;
+        user.role = "ROLE_USER";
+        user.isActive = true;
+        return user;
+    }
+
+    public void activate() {
+        this.isActive = true;
+    }
+
+    public void linkOAuth2Provider(String provider, String providerId) {
+        this.provider = Objects.requireNonNull(provider, "provider must not be null");
+        this.providerId = providerId;
+    }
+
+    public void updatePassword(String passwordHash) {
+        this.passwordHash = Objects.requireNonNull(passwordHash, "passwordHash must not be null");
+    }
+
+    public UUID getId() { return id; }
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+    public String getPasswordHash() { return passwordHash; }
+    public boolean isActive() { return isActive; }
+    public String getProvider() { return provider; }
+    public String getProviderId() { return providerId; }
+    public String getRole() { return role; }
     public ZonedDateTime getCreatedAt() { return createdAt; }
     public ZonedDateTime getUpdatedAt() { return updatedAt; }
 }

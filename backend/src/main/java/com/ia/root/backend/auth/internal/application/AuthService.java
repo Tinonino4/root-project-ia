@@ -48,18 +48,17 @@ public class AuthService {
             throw new IllegalArgumentException("El email ya está registrado");
         }
 
-        User user = new User();
-        user.setName(request.name());
-        user.setEmail(request.email());
-        user.setPasswordHash(passwordEncoder.encode(request.password()));
-        user.setActive(false);
-        user.setProvider("LOCAL");
-
         String requestedRole = request.role() != null ? request.role().toUpperCase() : "ROLE_USER";
         if (!requestedRole.equals("ROLE_USER") && !requestedRole.equals("ROLE_COMPANY")) {
             throw new IllegalArgumentException("Rol no válido. Debe ser ROLE_USER o ROLE_COMPANY");
         }
-        user.setRole(requestedRole);
+
+        User user = User.createLocal(
+            request.name(),
+            request.email(),
+            passwordEncoder.encode(request.password()),
+            requestedRole
+        );
 
         User savedUser = userRepository.save(user);
 
@@ -87,7 +86,7 @@ public class AuthService {
         }
 
         User user = userOtp.getUser();
-        user.setActive(true);
+        user.activate();
         userRepository.save(user);
 
         // Delete all OTPs for this user since account is now verified
@@ -109,6 +108,41 @@ public class AuthService {
         String jwt = jwtProvider.generateToken(authentication);
 
         return new AuthResponse(jwt, user.getId(), user.getName(), user.getRole());
+    }
+
+    @Transactional
+    public void requestPasswordReset(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un usuario con ese email"));
+
+        if (!user.isActive()) {
+            throw new IllegalArgumentException("La cuenta no está activada. Por favor verifica tu email primero.");
+        }
+
+        // Delete any existing OTPs for this user before creating a new one
+        userOtpRepository.deleteByUser_Id(user.getId());
+
+        String otp = generateOtp();
+        UserOtp userOtp = new UserOtp(otp, user, ZonedDateTime.now().plusMinutes(15));
+        userOtpRepository.save(userOtp);
+
+        events.publishEvent(new UserRequiresOtpEvent(user.getEmail(), otp));
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        UserOtp userOtp = userOtpRepository.findByCodeAndUser_Email(request.code(), request.email())
+                .orElseThrow(() -> new IllegalArgumentException("Código OTP inválido o usuario incorrecto"));
+
+        if (userOtp.getExpiresAt().isBefore(ZonedDateTime.now())) {
+            throw new IllegalArgumentException("El código OTP ha expirado");
+        }
+
+        User user = userOtp.getUser();
+        user.updatePassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        userOtpRepository.deleteByUser_Id(user.getId());
     }
 
     private String generateOtp() {

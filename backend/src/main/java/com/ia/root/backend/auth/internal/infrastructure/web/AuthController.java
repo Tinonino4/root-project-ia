@@ -41,4 +41,18 @@ public class AuthController {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Solicitar restablecimiento de contraseña (envía código OTP por email)")
+    public ResponseEntity<MessageResponse> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
+        authService.requestPasswordReset(request);
+        return ResponseEntity.ok(new MessageResponse("Se ha enviado un código de verificación a tu email."));
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Restablecer contraseña usando código OTP")
+    public ResponseEntity<MessageResponse> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(new MessageResponse("Contraseña actualizada exitosamente."));
+    }
 }
