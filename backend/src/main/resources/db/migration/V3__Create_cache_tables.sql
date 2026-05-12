@@ -40,6 +40,25 @@ CREATE TABLE experiences (
 );
 
 /* =========================================================
+   CATÁLOGO DE TIPOS DE RELACIÓN
+   ========================================================= */
+
+CREATE TABLE relationship_types (
+    id INT PRIMARY KEY,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    position INT NOT NULL DEFAULT 0
+);
+
+INSERT INTO relationship_types (id, code, name, description, position) VALUES
+    (0, 'DIRECT_MANAGER', 'Jefe directo', 'Superior jerárquico directo del usuario', 1),
+    (1, 'COLLEAGUE', 'Compañero/a', 'Compañero/a del mismo nivel o equipo', 2),
+    (2, 'SUBORDINATE', 'Subordinado/a', 'Persona a cargo del usuario', 3),
+    (3, 'CLIENT', 'Cliente', 'Cliente interno o externo', 4),
+    (4, 'OTHER', 'Otro', 'Otra relación profesional no especificada', 5);
+
+/* =========================================================
    MODULE: FEEDBACK (Cache Requests)
    ========================================================= */
 
@@ -58,7 +77,8 @@ CREATE TABLE cache_requests (
     extra_answers JSONB,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_request_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_request_experience FOREIGN KEY (experience_id) REFERENCES experiences(id) ON DELETE CASCADE
+    CONSTRAINT fk_request_experience FOREIGN KEY (experience_id) REFERENCES experiences(id) ON DELETE CASCADE,
+    CONSTRAINT fk_request_relationship FOREIGN KEY (relationship_id) REFERENCES relationship_types(id)
 );
 
 /* =========================================================

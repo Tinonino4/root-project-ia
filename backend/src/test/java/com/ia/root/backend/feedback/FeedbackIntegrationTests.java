@@ -106,6 +106,23 @@ public class FeedbackIntegrationTests {
     }
 
     // ------------------------------------------------------------------ 
+    // Catálogo de tipos de relación
+    // ------------------------------------------------------------------ 
+
+    @Test
+    void shouldGetRelationshipTypes() throws Exception {
+        mockMvc.perform(get("/api/feedback/relationships")
+                .with(user(securityUser)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(5))
+                .andExpect(jsonPath("$[0].code").value("DIRECT_MANAGER"))
+                .andExpect(jsonPath("$[1].code").value("COLLEAGUE"))
+                .andExpect(jsonPath("$[2].code").value("SUBORDINATE"))
+                .andExpect(jsonPath("$[3].code").value("CLIENT"))
+                .andExpect(jsonPath("$[4].code").value("OTHER"));
+    }
+
+    // ------------------------------------------------------------------ 
     // Crear solicitud de feedback
     // ------------------------------------------------------------------ 
 

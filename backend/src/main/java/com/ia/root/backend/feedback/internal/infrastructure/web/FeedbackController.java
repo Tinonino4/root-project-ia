@@ -2,10 +2,14 @@ package com.ia.root.backend.feedback.internal.infrastructure.web;
 
 import com.ia.root.backend.feedback.internal.application.FeedbackService;
 import com.ia.root.backend.feedback.internal.domain.model.CacheRequest;
+import com.ia.root.backend.feedback.internal.domain.model.RelationshipType;
 import com.ia.root.backend.feedback.internal.domain.model.SkillCategory;
 import com.ia.root.backend.feedback.internal.infrastructure.web.dto.CacheRequestViewDTO;
 import com.ia.root.backend.feedback.internal.infrastructure.web.dto.CreateCacheRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,13 +32,26 @@ public class FeedbackController {
     }
 
     @GetMapping("/categories")
-    @Operation(summary = "Obtener catálogo de categorías de skills con sus preguntas")
+    @Operation(summary = "Obtener catálogo de categorías de skills con sus preguntas",
+        responses = @ApiResponse(responseCode = "200", description = "Lista de 5 categorías con 5 preguntas cada una"))
     public ResponseEntity<List<SkillCategory>> getCategories() {
         return ResponseEntity.ok(feedbackService.getCategories());
     }
 
+    @GetMapping("/relationships")
+    @Operation(summary = "Obtener catálogo de tipos de relación profesional",
+        responses = @ApiResponse(responseCode = "200", description = "Lista de tipos de relación (jefe, compañero, subordinado, cliente, otro)"))
+    public ResponseEntity<List<RelationshipType>> getRelationshipTypes() {
+        return ResponseEntity.ok(feedbackService.getRelationshipTypes());
+    }
+
     @PostMapping("/requests")
-    @Operation(summary = "Crear una solicitud de feedback para una experiencia")
+    @Operation(summary = "Crear una solicitud de feedback para una experiencia",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Solicitud creada. Se envía email al referente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content),
+            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+        })
     public ResponseEntity<CacheRequestViewDTO> createRequest(
             @AuthenticationPrincipal(expression = "id") UUID userId,
             @RequestBody @Valid CreateCacheRequestDTO dto) {
@@ -48,25 +65,37 @@ public class FeedbackController {
     }
 
     @GetMapping("/requests")
-    @Operation(summary = "Listar todas las solicitudes de feedback del usuario")
+    @Operation(summary = "Listar todas las solicitudes de feedback del usuario",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Lista de solicitudes del usuario"),
+            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+        })
     public ResponseEntity<List<CacheRequestViewDTO>> getRequests(
             @AuthenticationPrincipal(expression = "id") UUID userId) {
         return ResponseEntity.ok(feedbackService.getCacheRequests(userId));
     }
 
     @GetMapping("/requests/experience/{experienceId}")
-    @Operation(summary = "Listar solicitudes de feedback de una experiencia específica")
+    @Operation(summary = "Listar solicitudes de feedback de una experiencia específica",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Lista de solicitudes de la experiencia"),
+            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+        })
     public ResponseEntity<List<CacheRequestViewDTO>> getRequestsByExperience(
             @AuthenticationPrincipal(expression = "id") UUID userId,
-            @PathVariable UUID experienceId) {
+            @Parameter(description = "ID de la experiencia laboral") @PathVariable UUID experienceId) {
         return ResponseEntity.ok(feedbackService.getCacheRequestsByExperience(userId, experienceId));
     }
 
     @GetMapping("/requests/experience/{experienceId}/count")
-    @Operation(summary = "Obtener número de feedbacks completados para una experiencia")
+    @Operation(summary = "Obtener número de feedbacks completados para una experiencia",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Número de feedbacks completados"),
+            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+        })
     public ResponseEntity<Long> getCompletedCount(
             @AuthenticationPrincipal(expression = "id") UUID userId,
-            @PathVariable UUID experienceId) {
+            @Parameter(description = "ID de la experiencia laboral") @PathVariable UUID experienceId) {
         return ResponseEntity.ok(feedbackService.getCompletedCount(userId, experienceId));
     }
 }

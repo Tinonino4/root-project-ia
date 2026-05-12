@@ -4,9 +4,11 @@ import com.ia.root.backend.feedback.FeedbackCompletedEvent;
 import com.ia.root.backend.feedback.FeedbackRequestCreatedEvent;
 import com.ia.root.backend.feedback.internal.domain.model.CacheRequest;
 import com.ia.root.backend.feedback.internal.domain.model.FeedbackResponse;
+import com.ia.root.backend.feedback.internal.domain.model.RelationshipType;
 import com.ia.root.backend.feedback.internal.domain.model.SkillCategory;
 import com.ia.root.backend.feedback.internal.domain.repository.CacheRequestRepository;
 import com.ia.root.backend.feedback.internal.domain.repository.FeedbackResponseRepository;
+import com.ia.root.backend.feedback.internal.domain.repository.RelationshipTypeRepository;
 import com.ia.root.backend.feedback.internal.domain.repository.SkillCategoryRepository;
 import com.ia.root.backend.feedback.internal.infrastructure.web.dto.CacheRequestViewDTO;
 import com.ia.root.backend.feedback.internal.infrastructure.web.dto.CreateCacheRequestDTO;
@@ -27,25 +29,32 @@ public class FeedbackService {
     private final CacheRequestRepository cacheRequestRepository;
     private final FeedbackResponseRepository feedbackResponseRepository;
     private final SkillCategoryRepository skillCategoryRepository;
+    private final RelationshipTypeRepository relationshipTypeRepository;
     private final ApplicationEventPublisher events;
     private final JdbcTemplate jdbcTemplate;
 
     public FeedbackService(CacheRequestRepository cacheRequestRepository,
                            FeedbackResponseRepository feedbackResponseRepository,
                            SkillCategoryRepository skillCategoryRepository,
+                           RelationshipTypeRepository relationshipTypeRepository,
                            ApplicationEventPublisher events,
                            JdbcTemplate jdbcTemplate) {
         this.cacheRequestRepository = cacheRequestRepository;
         this.feedbackResponseRepository = feedbackResponseRepository;
         this.skillCategoryRepository = skillCategoryRepository;
+        this.relationshipTypeRepository = relationshipTypeRepository;
         this.events = events;
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // ── Catálogo ──────────────────────────────────────────────
+    // ── Catálogos ─────────────────────────────────────────────
 
     public List<SkillCategory> getCategories() {
         return skillCategoryRepository.findAllByOrderByPositionAsc();
+    }
+
+    public List<RelationshipType> getRelationshipTypes() {
+        return relationshipTypeRepository.findAllByOrderByPositionAsc();
     }
 
     // ── Crear solicitud de feedback ──────────────────────────
