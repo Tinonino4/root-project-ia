@@ -1,12 +1,22 @@
-<template>
-  <RouterView />
-</template>
+<script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import AuthLayout from '@/layouts/AuthLayout.vue'
+import PublicLayout from '@/layouts/PublicLayout.vue'
 
-<style>
-body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  background-color: #1e1e2f;
+const layouts = {
+  DefaultLayout,
+  AuthLayout,
+  PublicLayout
 }
-</style>
+
+const route = useRoute()
+const currentLayout = computed(() => {
+  return layouts[route.meta.layout || 'DefaultLayout'] || DefaultLayout
+})
+</script>
+
+<template>
+  <component :is="currentLayout" />
+</template>
