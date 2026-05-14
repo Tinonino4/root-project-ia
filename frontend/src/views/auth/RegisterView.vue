@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 const name = ref('');
 const email = ref('');
 const password = ref('');
-const role = ref('PROFESSIONAL');
+const role = ref('ROLE_USER');
 const router = useRouter();
 const authStore = useAuthStore();
 
