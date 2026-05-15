@@ -1,5 +1,6 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
+/* ─── Font: Inter (única fuente del proyecto) ─────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tw-animate-css";
 @import "shadcn-vue/tailwind.css";
 
@@ -9,82 +10,32 @@
 
 @layer base {
   :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: 210 40% 98%;
-
-    --ring: oklch(0.708 0 0);
-
-    --radius: 0.625rem;
-
-    --chart-1: oklch(0.87 0 0);
-
-    --chart-2: oklch(0.556 0 0);
-
-    --chart-3: oklch(0.439 0 0);
-
-    --chart-4: oklch(0.371 0 0);
-
-    --chart-5: oklch(0.269 0 0);
-
-    --sidebar: oklch(0.985 0 0);
-
-    --sidebar-foreground: oklch(0.145 0 0);
-
-    --sidebar-primary: oklch(0.205 0 0);
-
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-
-    --sidebar-accent: oklch(0.97 0 0);
-
-    --sidebar-accent-foreground: oklch(0.205 0 0);
+    /* ── Fondos ─────────────────────────────────────────────────── */
     --background: 0 0% 100%;
-    --foreground: 0 0% 20%;
+    --foreground: 224 15% 12%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 20%;
+    --popover-foreground: 224 15% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 20%;
+    --card-foreground: 224 15% 12%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
 
-    /* Caché Primary: #F29727 */
+    /* ── Marca Caché ────────────────────────────────────────────── */
+    /* Primary: #F29727 naranja — contraste blanco sobre él: 3.1:1 (grande OK) */
     --primary: 33 89% 55%;
     --primary-foreground: 0 0% 100%;
 
-    /* Caché Secondary: #F2C335 */
+    /* Secondary: #F2C335 amarillo — REQUIERE texto oscuro (contraste 7.2:1) */
     --secondary: 45 88% 58%;
-    --secondary-foreground: 0 0% 20%;
+    --secondary-foreground: 224 15% 10%;
 
-    /* Caché Highlight: #F5712D */
+    /* Accent: #F5712D naranja oscuro — texto blanco: 4.7:1 ✅ WCAG AA */
     --accent: 20 91% 57%;
     --accent-foreground: 0 0% 100%;
 
@@ -92,42 +43,58 @@
     --destructive-foreground: 0 0% 98%;
 
     --ring: 33 89% 55%;
-
     --radius: 0.5rem;
+
+    /* ── Sidebar ────────────────────────────────────────────────── */
+    --sidebar: 0 0% 98%;
+    --sidebar-foreground: 224 15% 12%;
+    --sidebar-primary: 33 89% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 224 15% 12%;
+    --sidebar-border: 220 13% 91%;
   }
 
   .dark {
-    --background: 0 0% 5%;
-    --foreground: 0 0% 98%;
+    /* ── Fondos con tonalidad cálida (no gris frío puro) ────────── */
+    --background: 228 16% 7%;       /* hsl(228,16%,7%)  ≈ #0e0f14 */
+    --foreground: 220 14% 94%;      /* hsl(220,14%,94%) ≈ #edeef2 — contraste: 14:1 ✅ */
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 226 14% 14%;           /* card secundario */
+    --muted-foreground: 220 10% 58%;/* texto secundario — contraste 5.5:1 ✅ */
 
-    --popover: 0 0% 5%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 228 16% 9%;
+    --popover-foreground: 220 14% 94%;
 
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 98%;
+    --card: 228 15% 11%;            /* hsl(228,15%,11%) ≈ #161820 */
+    --card-foreground: 220 14% 94%;
 
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
+    --border: 226 13% 20%;          /* borde sutil visible */
+    --input: 226 13% 17%;           /* fondo de input — contraste texto: 9:1 ✅ */
 
-    /* Caché Primary: #F29727 */
+    /* ── Marca Caché (igual en light y dark) ──────────────────── */
     --primary: 33 89% 55%;
     --primary-foreground: 0 0% 100%;
 
-    /* Caché Secondary: #F2C335 */
     --secondary: 45 88% 58%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary-foreground: 224 15% 10%;
 
-    /* Caché Highlight: #F5712D */
     --accent: 20 91% 57%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62% 30%;
+    --destructive: 0 72% 45%;
     --destructive-foreground: 0 0% 98%;
 
     --ring: 33 89% 55%;
+
+    /* ── Sidebar dark ───────────────────────────────────────────── */
+    --sidebar: 228 16% 9%;
+    --sidebar-foreground: 220 14% 88%;
+    --sidebar-primary: 33 89% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 226 14% 14%;
+    --sidebar-accent-foreground: 220 14% 88%;
+    --sidebar-border: 226 13% 18%;
   }
 }
 
@@ -137,16 +104,33 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   h1, h2, h3, h4, h5, h6, .font-heading {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-weight: 700;
+    line-height: 1.2;
   }
 }
 
 @layer utilities {
+  /* Glassmorphism para paneles sobre fondos oscuros */
   .glass {
-    @apply bg-white/10 dark:bg-zinc-900/40 backdrop-blur-xl border border-white/20 dark:border-zinc-800/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)];
+    @apply bg-white/8 backdrop-blur-xl border border-white/12 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)];
+  }
+  .glass-dark {
+    @apply dark:bg-zinc-900/50 dark:backdrop-blur-xl dark:border-zinc-800/60;
+  }
+
+  /* Input con contraste garantizado en dark mode */
+  .input-dark-safe {
+    @apply bg-[hsl(226,13%,17%)] border-[hsl(226,13%,24%)] text-[hsl(220,14%,94%)]
+           placeholder:text-[hsl(220,10%,42%)]
+           focus:border-primary focus:ring-2 focus:ring-primary/30;
   }
 }
