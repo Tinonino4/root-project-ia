@@ -12,7 +12,7 @@ import {
   LogOut
 } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
-import logoUrl from '@/assets/images/PNGs/Logo e Iconos/Caché-02.png';
+import logoUrl from '@/assets/images/logo-cache.png';
 
 const router = useRouter();
 const route = useRoute();
@@ -70,14 +70,14 @@ const handleLogout = () => {
             :key="item.name" 
             :to="{ name: item.routeName }"
             @click="isMobileMenuOpen = false"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium text-sm group"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 font-medium text-sm group relative"
             :class="[
               route.name === item.routeName || (route.name?.startsWith('Profile') && item.routeName === 'Profile')
-                ? 'bg-primary/10 text-primary' 
-                : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100'
+                ? 'bg-primary/10 text-primary border-l-[3px] border-primary pl-[10px]' 
+                : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100 border-l-[3px] border-transparent pl-[10px]'
             ]"
           >
-            <component :is="item.icon" class="w-5 h-5 transition-colors" 
+            <component :is="item.icon" class="w-5 h-5 transition-colors flex-shrink-0"
               :class="[
                 route.name === item.routeName || (route.name?.startsWith('Profile') && item.routeName === 'Profile')
                   ? 'text-primary' 
