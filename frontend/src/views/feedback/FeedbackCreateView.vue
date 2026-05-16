@@ -55,7 +55,7 @@ const handleSubmit = async () => {
     const data = {
       ...form.value,
       relationshipId: parseInt(form.value.relationshipId),
-      experienceId: parseInt(form.value.experienceId)
+      experienceId: form.value.experienceId
     };
     
     await feedbackStore.createRequest(data);
