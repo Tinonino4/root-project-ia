@@ -1,6 +1,6 @@
 export default [
   {
-    path: '/q/:token',
+    path: '/questionnaire/:token',
     name: 'Questionnaire',
     component: () => import('@/views/questionnaire/QuestionnaireView.vue'),
     meta: { layout: 'PublicLayout' }
