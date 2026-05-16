@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { feedbackApi } from '@/api/feedback.api';
 
 export const useFeedbackStore = defineStore('feedback', () => {
   const requests = ref([]);
@@ -10,27 +11,81 @@ export const useFeedbackStore = defineStore('feedback', () => {
 
   // Actions
   async function fetchCategories() {
-    // Implementation
+    loading.value = true;
+    error.value = null;
+    try {
+      const response = await feedbackApi.getCategories();
+      categories.value = response.data;
+    } catch (err) {
+      error.value = err.message || 'Error al cargar categorías';
+    } finally {
+      loading.value = false;
+    }
   }
 
   async function fetchRelationships() {
-    // Implementation
+    loading.value = true;
+    error.value = null;
+    try {
+      const response = await feedbackApi.getRelationships();
+      relationships.value = response.data;
+    } catch (err) {
+      error.value = err.message || 'Error al cargar relaciones';
+    } finally {
+      loading.value = false;
+    }
   }
 
   async function fetchRequests() {
-    // Implementation
+    loading.value = true;
+    error.value = null;
+    try {
+      const response = await feedbackApi.getRequests();
+      requests.value = response.data;
+    } catch (err) {
+      error.value = err.message || 'Error al cargar solicitudes';
+    } finally {
+      loading.value = false;
+    }
   }
 
-  async function fetchRequestsByExperience(id) {
-    // Implementation
+  async function fetchRequestsByExperience(experienceId) {
+    loading.value = true;
+    error.value = null;
+    try {
+      const response = await feedbackApi.getRequestsByExperience(experienceId);
+      return response.data;
+    } catch (err) {
+      error.value = err.message || 'Error al cargar solicitudes de la experiencia';
+      return [];
+    } finally {
+      loading.value = false;
+    }
   }
 
   async function createRequest(data) {
-    // Implementation
+    loading.value = true;
+    error.value = null;
+    try {
+      const response = await feedbackApi.createRequest(data);
+      requests.value.push(response.data);
+      return response.data;
+    } catch (err) {
+      error.value = err.message || 'Error al crear solicitud';
+      throw err;
+    } finally {
+      loading.value = false;
+    }
   }
 
   async function getCompletedCount(expId) {
-    // Implementation
+    try {
+      const response = await feedbackApi.getCompletedCountByExperience(expId);
+      return response.data;
+    } catch (err) {
+      console.error('Error getting completed count', err);
+      return 0;
+    }
   }
 
   return {

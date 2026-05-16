@@ -3,7 +3,7 @@ import { onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useProfileStore } from '@/stores/profile.store';
 import { useExperienceStore } from '@/stores/experience.store';
-import { ChevronDown, Menu, User as UserIcon, Briefcase } from 'lucide-vue-next';
+import { ChevronDown, Menu, User as UserIcon, Briefcase, Star } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 
 const router = useRouter();
@@ -141,6 +141,17 @@ const loading = computed(() => profileStore.loading || experienceStore.loading);
                     <p v-if="exp.functions" class="text-zinc-600 dark:text-zinc-400/90 text-[14.5px] leading-relaxed">
                       {{ exp.functions }}
                     </p>
+
+                    <!-- Action Button: Request Feedback -->
+                    <div class="mt-4 flex justify-start">
+                      <button 
+                        @click="router.push(`/feedback/new?experienceId=${exp.id}`)" 
+                        class="text-xs font-semibold h-8 bg-primary/10 hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30 text-primary dark:text-primary/90 rounded-lg flex items-center px-3 transition-colors"
+                      >
+                        <Star class="w-3.5 h-3.5 mr-1.5 fill-current" />
+                        Solicitar Feedback
+                      </button>
+                    </div>
                   </div>
                   
                   <!-- Action Icon -->
