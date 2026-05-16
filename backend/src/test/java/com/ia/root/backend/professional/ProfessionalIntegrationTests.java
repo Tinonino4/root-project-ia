@@ -84,7 +84,7 @@ public class ProfessionalIntegrationTests {
 
     @Test
     void shouldGetProfile() throws Exception {
-        mockMvc.perform(get("/api/v1/professional/profile")
+        mockMvc.perform(get("/api/professional/profile")
                 .with(user(securityUser)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Pro"))
@@ -99,7 +99,7 @@ public class ProfessionalIntegrationTests {
                 null, "28001", null, null, "Developer", null
         );
 
-        mockMvc.perform(put("/api/v1/professional/profile")
+        mockMvc.perform(put("/api/professional/profile")
                 .with(user(securityUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonMapper.writeValueAsString(updateRequest)))
@@ -114,7 +114,7 @@ public class ProfessionalIntegrationTests {
 
     @Test
     void shouldReturn401WhenNotAuthenticated() throws Exception {
-        mockMvc.perform(get("/api/v1/professional/profile"))
+        mockMvc.perform(get("/api/professional/profile"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -129,7 +129,7 @@ public class ProfessionalIntegrationTests {
                 LocalDate.of(2020, 1, 1), null, "Building stuff"
         );
 
-        mockMvc.perform(post("/api/v1/professional/experiences")
+        mockMvc.perform(post("/api/professional/experiences")
                 .with(user(securityUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonMapper.writeValueAsString(request)))
@@ -147,7 +147,7 @@ public class ProfessionalIntegrationTests {
         createExperience("Google", "Engineer", LocalDate.of(2020, 1, 1), null);
         createExperience("Meta", "Senior Engineer", LocalDate.of(2022, 6, 1), null);
 
-        mockMvc.perform(get("/api/v1/professional/experiences")
+        mockMvc.perform(get("/api/professional/experiences")
                 .with(user(securityUser)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
@@ -163,7 +163,7 @@ public class ProfessionalIntegrationTests {
                 LocalDate.of(2020, 1, 1), LocalDate.of(2023, 12, 31), "Leading team"
         );
 
-        mockMvc.perform(put("/api/v1/professional/experiences/" + expId)
+        mockMvc.perform(put("/api/professional/experiences/" + expId)
                 .with(user(securityUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonMapper.writeValueAsString(updateRequest)))
@@ -177,12 +177,12 @@ public class ProfessionalIntegrationTests {
     void shouldDeleteExperience() throws Exception {
         String expId = createExperienceAndGetId("Temporal Corp", "Intern", LocalDate.of(2019, 1, 1));
 
-        mockMvc.perform(delete("/api/v1/professional/experiences/" + expId)
+        mockMvc.perform(delete("/api/professional/experiences/" + expId)
                 .with(user(securityUser)))
                 .andExpect(status().isNoContent());
 
         // Verify it's gone
-        mockMvc.perform(get("/api/v1/professional/experiences")
+        mockMvc.perform(get("/api/professional/experiences")
                 .with(user(securityUser)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
@@ -198,7 +198,7 @@ public class ProfessionalIntegrationTests {
                 "", null, "Engineer", LocalDate.of(2020, 1, 1), null, null
         );
 
-        mockMvc.perform(post("/api/v1/professional/experiences")
+        mockMvc.perform(post("/api/professional/experiences")
                 .with(user(securityUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonMapper.writeValueAsString(request)))
@@ -211,7 +211,7 @@ public class ProfessionalIntegrationTests {
                 "Company", null, "Engineer", null, null, null
         );
 
-        mockMvc.perform(post("/api/v1/professional/experiences")
+        mockMvc.perform(post("/api/professional/experiences")
                 .with(user(securityUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonMapper.writeValueAsString(request)))
@@ -232,14 +232,14 @@ public class ProfessionalIntegrationTests {
         SecurityUser otherUser = new SecurityUser(otherUserId, "other@example.com", "x", "ROLE_USER");
 
         // Try to delete as different user
-        mockMvc.perform(delete("/api/v1/professional/experiences/" + expId)
+        mockMvc.perform(delete("/api/professional/experiences/" + expId)
                 .with(user(otherUser)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void shouldReturnEmptyExperiencesList() throws Exception {
-        mockMvc.perform(get("/api/v1/professional/experiences")
+        mockMvc.perform(get("/api/professional/experiences")
                 .with(user(securityUser)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
@@ -251,7 +251,7 @@ public class ProfessionalIntegrationTests {
 
     private void createExperience(String company, String position, LocalDate start, LocalDate end) throws Exception {
         ExperienceRequest request = new ExperienceRequest(company, null, position, start, end, null);
-        mockMvc.perform(post("/api/v1/professional/experiences")
+        mockMvc.perform(post("/api/professional/experiences")
                 .with(user(securityUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonMapper.writeValueAsString(request)))
@@ -260,7 +260,7 @@ public class ProfessionalIntegrationTests {
 
     private String createExperienceAndGetId(String company, String position, LocalDate start) throws Exception {
         ExperienceRequest request = new ExperienceRequest(company, null, position, start, null, null);
-        MvcResult result = mockMvc.perform(post("/api/v1/professional/experiences")
+        MvcResult result = mockMvc.perform(post("/api/professional/experiences")
                 .with(user(securityUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonMapper.writeValueAsString(request)))
