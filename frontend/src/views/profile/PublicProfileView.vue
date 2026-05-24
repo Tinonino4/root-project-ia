@@ -14,6 +14,7 @@ const profile = ref(null);
 const loading = ref(true);
 const error = ref(null);
 const isExporting = ref(false);
+const isGeneratingPDF = ref(false);
 
 onMounted(async () => {
   try {
@@ -37,27 +38,40 @@ const exportPDF = () => {
   if (isExporting.value || !profile.value) return;
   
   isExporting.value = true;
-  const element = document.getElementById('pdf-profile-template');
-  
-  const opt = {
-    margin:       [12, 12, 18, 12],
-    filename:     `informe_micache_${profile.value.name}_${profile.value.surname}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2.2, useCORS: true, logging: false },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
+  isGeneratingPDF.value = true;
 
-  html2pdf()
-    .from(element)
-    .set(opt)
-    .save()
-    .then(() => {
+  // Esperar a que Vue monte el elemento en el DOM usando la clase de posicionamiento absoluto
+  setTimeout(() => {
+    const element = document.getElementById('pdf-profile-template');
+    if (!element) {
+      console.error('El elemento PDF no se encontró en el DOM.');
       isExporting.value = false;
-    })
-    .catch((err) => {
-      console.error('Error al exportar PDF:', err);
-      isExporting.value = false;
-    });
+      isGeneratingPDF.value = false;
+      return;
+    }
+    
+    const opt = {
+      margin:       [12, 12, 18, 12],
+      filename:     `informe_micache_${profile.value.name}_${profile.value.surname}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2.0, useCORS: true, logging: false },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf()
+      .from(element)
+      .set(opt)
+      .save()
+      .then(() => {
+        isExporting.value = false;
+        isGeneratingPDF.value = false;
+      })
+      .catch((err) => {
+        console.error('Error al exportar PDF:', err);
+        isExporting.value = false;
+        isGeneratingPDF.value = false;
+      });
+  }, 150);
 };
 </script>
 
@@ -165,8 +179,8 @@ const exportPDF = () => {
       </div>
     </div>
 
-    <!-- Hidden Premium PDF Template (styled perfectly for A4 printing at 794px width) -->
-    <div v-if="profile" class="fixed left-[-9999px] top-[-9999px]">
+    <!-- Premium PDF Template (only rendered when generating PDF to prevent position fixed rendering issues) -->
+    <div v-if="isGeneratingPDF" class="absolute left-[-9999px] top-0">
       <div 
         id="pdf-profile-template" 
         class="bg-white text-zinc-900 p-12 font-sans relative overflow-hidden flex flex-col justify-between" 
