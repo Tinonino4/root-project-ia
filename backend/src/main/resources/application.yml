@@ -61,3 +61,17 @@ app:
   jwt:
     secret: "3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b"
     expiration-ms: 86400000 # 24 hours
+
+# Brevo Transactional Email
+brevo:
+  api-key: ${BREVO_API_KEY:}
+  enabled: ${BREVO_ENABLED:false}
+  sender:
+    name: ${BREVO_SENDER_NAME:Caché}
+    email: ${BREVO_SENDER_EMAIL:noreply@micache.com}
+  template-ids:
+    otp-verification: ${BREVO_TPL_OTP:1}
+    password-reset: ${BREVO_TPL_PASSWORD:2}
+    feedback-request: ${BREVO_TPL_FEEDBACK:3}
+    feedback-reminder: ${BREVO_TPL_REMINDER:4}
+  frontend-base-url: ${FRONTEND_BASE_URL:http://localhost:5173}

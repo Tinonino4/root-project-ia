@@ -5,32 +5,31 @@ import com.ia.root.backend.feedback.FeedbackRequestCreatedEvent;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @Service
 class EmailNotificationListener {
 
-    private static final Logger log = LoggerFactory.getLogger(EmailNotificationListener.class);
+    private final BrevoEmailService brevoEmailService;
+
+    EmailNotificationListener(BrevoEmailService brevoEmailService) {
+        this.brevoEmailService = brevoEmailService;
+    }
 
     @ApplicationModuleListener
     void onUserRequiresOtp(UserRequiresOtpEvent event) {
-        // En producción aquí iría la integración real con JavaMailSender, SendGrid, AWS SES, etc.
-        log.info("==========================================================");
-        log.info("MOCK EMAIL SERVICE (Modulith Async Event)");
-        log.info("To: {}", event.email());
-        log.info("Subject: Tu código de verificación");
-        log.info("Body: Tu código OTP es: {}", event.otp());
-        log.info("==========================================================");
+        switch (event.purpose()) {
+            case ACCOUNT_VERIFICATION -> brevoEmailService.sendOtpVerification(event.email(), event.otp());
+            case PASSWORD_RESET -> brevoEmailService.sendPasswordReset(event.email(), event.otp());
+        }
     }
 
     @ApplicationModuleListener
     void onFeedbackRequestCreated(FeedbackRequestCreatedEvent event) {
-        log.info("==========================================================");
-        log.info("MOCK EMAIL SERVICE - Solicitud de Feedback");
-        log.info("To: {} ({} {})", event.targetEmail(), event.targetName(), event.targetSurname());
-        log.info("Subject: {} te ha pedido una referencia sobre su experiencia en {}", event.userName(), event.companyName());
-        log.info("Body: Completa el cuestionario en: /questionnaire/{}", event.questionnaireUrl());
-        log.info("==========================================================");
+        brevoEmailService.sendFeedbackRequest(
+            event.targetEmail(),
+            event.targetName(),
+            event.userName(),
+            event.companyName(),
+            event.questionnaireUrl()
+        );
     }
 }

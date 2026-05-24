@@ -68,7 +68,7 @@ public class AuthService {
         userOtpRepository.save(userOtp);
 
         // Publish Domain Event for decoupled email sending
-        events.publishEvent(new UserRequiresOtpEvent(savedUser.getEmail(), otp));
+        events.publishEvent(new UserRequiresOtpEvent(savedUser.getEmail(), otp, UserRequiresOtpEvent.OtpPurpose.ACCOUNT_VERIFICATION));
         
         // Publish Domain Event for cross-module profile creation
         events.publishEvent(new com.ia.root.backend.auth.UserRegisteredEvent(
@@ -126,7 +126,7 @@ public class AuthService {
         UserOtp userOtp = new UserOtp(otp, user, ZonedDateTime.now().plusMinutes(15));
         userOtpRepository.save(userOtp);
 
-        events.publishEvent(new UserRequiresOtpEvent(user.getEmail(), otp));
+        events.publishEvent(new UserRequiresOtpEvent(user.getEmail(), otp, UserRequiresOtpEvent.OtpPurpose.PASSWORD_RESET));
     }
 
     @Transactional
