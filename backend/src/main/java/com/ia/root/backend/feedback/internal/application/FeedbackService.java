@@ -160,13 +160,35 @@ public class FeedbackService {
         );
     }
 
+    // ── Toggle Visibility ───────────────────────────────────
+
+    @Transactional
+    public CacheRequestViewDTO toggleVisibility(UUID userId, UUID cacheRequestId, boolean visible) {
+        CacheRequest cr = cacheRequestRepository.findById(cacheRequestId)
+            .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada"));
+
+        if (!cr.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("No tienes permiso para modificar esta solicitud");
+        }
+
+        cr.setVisible(visible);
+        CacheRequest saved = cacheRequestRepository.save(cr);
+
+        // If the request was finished, we MUST trigger recalculation of metrics!
+        if (cr.isFinished()) {
+            events.publishEvent(new com.ia.root.backend.feedback.FeedbackCompletedEvent(cr.getId(), cr.getUserId(), cr.getExperienceId()));
+        }
+
+        return toViewDTO(saved);
+    }
+
     // ── Mapping ─────────────────────────────────────────────
 
     private CacheRequestViewDTO toViewDTO(CacheRequest cr) {
         return new CacheRequestViewDTO(
             cr.getId(), cr.getExperienceId(), cr.getRelationshipId(),
             cr.isStillWorksThere(), cr.getTargetName(), cr.getTargetSurname(),
-            cr.getTargetEmail(), cr.getTargetPhone(), cr.isFinished(), cr.getCreatedAt()
+            cr.getTargetEmail(), cr.getTargetPhone(), cr.isFinished(), cr.isVisible(), cr.getCreatedAt()
         );
     }
 }

@@ -77,7 +77,7 @@ public class SkillsMetricsService {
             JOIN skill_questions sq ON sq.id = fr.question_id
             JOIN skill_categories sc ON sc.id = sq.category_id
             JOIN cache_requests cr ON cr.id = fr.cache_request_id
-            WHERE cr.user_id = ? AND cr.finished = true
+            WHERE cr.user_id = ? AND cr.finished = true AND cr.is_visible = true
             GROUP BY sc.code
         """;
 

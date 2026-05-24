@@ -59,7 +59,7 @@ public class FeedbackController {
         CacheRequestViewDTO view = new CacheRequestViewDTO(
             cr.getId(), cr.getExperienceId(), cr.getRelationshipId(),
             cr.isStillWorksThere(), cr.getTargetName(), cr.getTargetSurname(),
-            cr.getTargetEmail(), cr.getTargetPhone(), cr.isFinished(), cr.getCreatedAt()
+            cr.getTargetEmail(), cr.getTargetPhone(), cr.isFinished(), cr.isVisible(), cr.getCreatedAt()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(view);
     }
@@ -98,4 +98,21 @@ public class FeedbackController {
             @Parameter(description = "ID de la experiencia laboral") @PathVariable UUID experienceId) {
         return ResponseEntity.ok(feedbackService.getCompletedCount(userId, experienceId));
     }
+
+    @PatchMapping("/requests/{requestId}/visibility")
+    @Operation(summary = "Cambiar la visibilidad pública de una referencia",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Visibilidad cambiada exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Solicitud no encontrada", content = @Content),
+            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+        })
+    public ResponseEntity<CacheRequestViewDTO> toggleVisibility(
+            @AuthenticationPrincipal(expression = "id") UUID userId,
+            @PathVariable UUID requestId,
+            @RequestBody @Valid VisibilityToggleRequest request) {
+        CacheRequestViewDTO updated = feedbackService.toggleVisibility(userId, requestId, request.visible());
+        return ResponseEntity.ok(updated);
+    }
+
+    public record VisibilityToggleRequest(boolean visible) {}
 }

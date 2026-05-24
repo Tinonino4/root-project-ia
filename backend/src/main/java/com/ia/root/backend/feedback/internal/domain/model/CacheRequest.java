@@ -44,6 +44,9 @@ public class CacheRequest {
     @Column(nullable = false)
     private boolean finished = false;
 
+    @Column(name = "is_visible", nullable = false)
+    private boolean isVisible = true;
+
     @Column(name = "target_phone")
     private String targetPhone;
 
@@ -89,6 +92,8 @@ public class CacheRequest {
     public String getTargetEmail() { return targetEmail; }
     public String getUrlToken() { return urlToken; }
     public boolean isFinished() { return finished; }
+    public boolean isVisible() { return isVisible; }
+    public void setVisible(boolean visible) { this.isVisible = visible; }
     public String getTargetPhone() { return targetPhone; }
     public Map<String, Object> getExtraAnswers() { return extraAnswers; }
     public ZonedDateTime getCreatedAt() { return createdAt; }

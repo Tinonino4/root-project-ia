@@ -1,0 +1,2 @@
+ALTER TABLE cache_requests
+ADD COLUMN is_visible BOOLEAN DEFAULT TRUE NOT NULL;
