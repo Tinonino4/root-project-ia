@@ -4,6 +4,7 @@ import { authApi } from '@/api/auth.api';
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token') || null);
+  const refreshToken = ref(localStorage.getItem('refreshToken') || null);
   const user = ref(JSON.parse(localStorage.getItem('user')) || null);
   const loading = ref(false);
   const error = ref(null);
@@ -12,11 +13,15 @@ export const useAuthStore = defineStore('auth', () => {
   const userName = computed(() => user.value?.name || '');
   const userRole = computed(() => user.value?.role || '');
 
-  function setAuth(userData, authToken) {
+  function setAuth(userData, authToken, refreshAuthToken) {
     token.value = authToken;
     user.value = userData;
     if (authToken) {
       localStorage.setItem('token', authToken);
+    }
+    if (refreshAuthToken) {
+      refreshToken.value = refreshAuthToken;
+      localStorage.setItem('refreshToken', refreshAuthToken);
     }
     if (userData) {
       localStorage.setItem('user', JSON.stringify(userData));
@@ -25,8 +30,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   function logout() {
     token.value = null;
+    refreshToken.value = null;
     user.value = null;
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
   }
 
@@ -35,7 +42,11 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
     try {
       const response = await authApi.login({ email, password });
-      setAuth({ id: response.data.id, name: response.data.name, role: response.data.role }, response.data.token);
+      setAuth(
+        { id: response.data.id, name: response.data.name, role: response.data.role },
+        response.data.token,
+        response.data.refreshToken
+      );
       return response.data;
     } catch (e) {
       error.value = e.response?.data?.message || 'Error de inicio de sesión';
@@ -101,8 +112,31 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function refreshSession() {
+    if (!refreshToken.value) {
+      logout();
+      throw new Error('No refresh token available');
+    }
+    try {
+      const response = await authApi.refreshToken({ refreshToken: refreshToken.value });
+      const newAccessToken = response.data.accessToken;
+      const newRefreshToken = response.data.refreshToken;
+      
+      token.value = newAccessToken;
+      refreshToken.value = newRefreshToken;
+      localStorage.setItem('token', newAccessToken);
+      localStorage.setItem('refreshToken', newRefreshToken);
+      
+      return response.data;
+    } catch (e) {
+      logout();
+      throw e;
+    }
+  }
+
   return {
     token,
+    refreshToken,
     user,
     loading,
     error,
@@ -114,6 +148,7 @@ export const useAuthStore = defineStore('auth', () => {
     confirmAccount,
     forgotPassword,
     resetPassword,
+    refreshToken: refreshSession,
     logout,
   };
 });

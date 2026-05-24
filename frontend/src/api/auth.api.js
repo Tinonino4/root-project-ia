@@ -6,4 +6,5 @@ export const authApi = {
   login: (data) => client.post('/auth/login', data),
   forgotPassword: (data) => client.post('/auth/forgot-password', data),
   resetPassword: (data) => client.post('/auth/reset-password', data),
+  refreshToken: (data) => client.post('/auth/refresh-token', data),
 };
