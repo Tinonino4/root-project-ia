@@ -1,4 +1,4 @@
-package com.ia.root.backend.analytics.internal.application;
+package com.ia.root.backend.analytics;
 
 import com.ia.root.backend.analytics.internal.domain.model.UserSkillsMetrics;
 import com.ia.root.backend.analytics.internal.domain.repository.UserSkillsMetricsRepository;
@@ -25,6 +25,19 @@ public class SkillsMetricsService {
 
     public UserSkillsMetrics getMetrics(UUID userId) {
         return metricsRepository.findByUserId(userId).orElse(null);
+    }
+
+    public SkillsData getSkillsData(UUID userId) {
+        return metricsRepository.findByUserId(userId)
+            .map(m -> new SkillsData(
+                m.getTeamwork(),
+                m.getSelfConfidence(),
+                m.getProactivity(),
+                m.getIntegrity(),
+                m.getFlexibility(),
+                m.getAverageScore()
+            ))
+            .orElse(null);
     }
 
     @EventListener

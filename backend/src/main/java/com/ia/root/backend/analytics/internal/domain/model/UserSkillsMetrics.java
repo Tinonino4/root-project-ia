@@ -49,12 +49,13 @@ public class UserSkillsMetrics {
 
     public void recalculate(float teamwork, float selfConfidence, float proactivity,
                             float integrity, float flexibility) {
-        this.teamwork = teamwork;
-        this.selfConfidence = selfConfidence;
-        this.proactivity = proactivity;
-        this.integrity = integrity;
-        this.flexibility = flexibility;
-        this.averageScore = (teamwork + selfConfidence + proactivity + integrity + flexibility) / 5f;
+        this.teamwork = Math.round(teamwork * 100.0f) / 100.0f;
+        this.selfConfidence = Math.round(selfConfidence * 100.0f) / 100.0f;
+        this.proactivity = Math.round(proactivity * 100.0f) / 100.0f;
+        this.integrity = Math.round(integrity * 100.0f) / 100.0f;
+        this.flexibility = Math.round(flexibility * 100.0f) / 100.0f;
+        float sum = this.teamwork + this.selfConfidence + this.proactivity + this.integrity + this.flexibility;
+        this.averageScore = Math.round((sum / 5f) * 100.0f) / 100.0f;
     }
 
     public UUID getId() { return id; }

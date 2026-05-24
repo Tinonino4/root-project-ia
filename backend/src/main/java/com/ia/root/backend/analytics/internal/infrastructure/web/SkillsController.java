@@ -1,6 +1,6 @@
 package com.ia.root.backend.analytics.internal.infrastructure.web;
 
-import com.ia.root.backend.analytics.internal.application.SkillsMetricsService;
+import com.ia.root.backend.analytics.SkillsMetricsService;
 import com.ia.root.backend.analytics.internal.domain.model.UserSkillsMetrics;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
