@@ -32,7 +32,7 @@ export const useExperienceStore = defineStore('experience', () => {
       return experiences.value;
     } catch (err) {
       error.value = err.response?.data?.message || 'Error al cargar las experiencias';
-      throw err;
+      console.error('fetchExperiences:', error.value);
     } finally {
       loading.value = false;
     }

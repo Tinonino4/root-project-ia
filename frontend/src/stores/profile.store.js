@@ -16,7 +16,7 @@ export const useProfileStore = defineStore('profile', () => {
       return profile.value;
     } catch (err) {
       error.value = err.response?.data?.message || 'Error al cargar el perfil';
-      throw err;
+      console.error('fetchProfile:', error.value);
     } finally {
       loading.value = false;
     }
