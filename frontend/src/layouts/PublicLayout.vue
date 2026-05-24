@@ -13,6 +13,9 @@ const navLinks = [
 </script>
 
 <template>
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:font-bold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary">
+    Saltar al contenido principal
+  </a>
   <div class="min-h-screen bg-[hsl(228,16%,7%)] text-[hsl(220,14%,94%)] font-sans">
     
     <!-- ─── NAVBAR ──────────────────────────────────────────────────────── -->
@@ -96,7 +99,9 @@ const navLinks = [
     </header>
 
     <!-- ─── PAGE CONTENT ────────────────────────────────────────────────── -->
-    <router-view />
+    <main id="main-content">
+      <router-view />
+    </main>
 
     <!-- ─── FOOTER ──────────────────────────────────────────────────────── -->
     <footer class="border-t border-white/5 py-10 mt-20">

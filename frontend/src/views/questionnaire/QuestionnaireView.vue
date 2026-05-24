@@ -83,6 +83,28 @@ const prevStep = () => {
   }
 };
 
+const handleRadioKeyDown = (event, questionId, ratingValue) => {
+  const key = event.key;
+  let nextRating = null;
+
+  if (key === 'ArrowRight' || key === 'ArrowDown') {
+    event.preventDefault();
+    nextRating = ratingValue < 5 ? ratingValue + 1 : 1;
+  } else if (key === 'ArrowLeft' || key === 'ArrowUp') {
+    event.preventDefault();
+    nextRating = ratingValue > 1 ? ratingValue - 1 : 5;
+  }
+
+  if (nextRating !== null) {
+    answers.value[questionId] = nextRating;
+    // Focus the next button using dynamic element ID after Vue renders
+    setTimeout(() => {
+      const btn = document.getElementById(`btn-${questionId}-${nextRating}`);
+      if (btn) btn.focus();
+    }, 10);
+  }
+};
+
 const handleSubmit = async () => {
   if (!isFormValid.value) return;
   
@@ -223,7 +245,10 @@ const handleSubmit = async () => {
                   <button 
                     v-for="rating in 5" 
                     :key="rating"
+                    :id="'btn-' + question.id + '-' + rating"
                     @click="setRating(question.id, rating)"
+                    @keydown="handleRadioKeyDown($event, question.id, rating)"
+                    :tabindex="(answers[question.id] === rating || (answers[question.id] === null && rating === 1)) ? 0 : -1"
                     type="button"
                     role="radio"
                     :aria-checked="answers[question.id] === rating"

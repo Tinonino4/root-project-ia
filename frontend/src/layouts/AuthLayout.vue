@@ -10,6 +10,9 @@ const testimonials = [
 </script>
 
 <template>
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:font-bold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary">
+    Saltar al contenido principal
+  </a>
   <div class="min-h-screen flex flex-col bg-[hsl(228,16%,7%)] font-sans selection:bg-primary/30 text-[hsl(220,14%,94%)]">
 
     <!-- ─── MOBILE HEADER ─────────────────────────────────────────────────── -->
@@ -108,11 +111,11 @@ const testimonials = [
       </div>
 
       <!-- ─── RIGHT PANEL: Forms Area ──────────────────────────────────── -->
-      <div class="w-full md:w-1/2 lg:w-2/5 flex items-center justify-center px-6 py-8 sm:p-12 relative bg-[hsl(228,16%,7%)]">
+      <main id="main-content" class="w-full md:w-1/2 lg:w-2/5 flex items-center justify-center px-6 py-8 sm:p-12 relative bg-[hsl(228,16%,7%)]">
         <div class="w-full max-w-[420px] animate-in fade-in slide-in-from-bottom-4 duration-700">
           <router-view />
         </div>
-      </div>
+      </main>
 
     </div>
   </div>

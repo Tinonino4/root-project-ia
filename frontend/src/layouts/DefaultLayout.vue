@@ -48,6 +48,9 @@ const displayRole = computed(() => {
 </script>
 
 <template>
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:font-bold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary">
+    Saltar al contenido principal
+  </a>
   <div class="min-h-screen md:h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col md:flex-row md:overflow-hidden">
     
     <!-- Mobile Header (Navbar) -->
@@ -125,7 +128,7 @@ const displayRole = computed(() => {
     ></div>
 
     <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <main id="main-content" class="flex-1 flex flex-col min-h-0 overflow-hidden">
       <!-- Content scroll inside container, clean, no redundant header -->
       <div class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
         <div class="mx-auto w-full max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500">
