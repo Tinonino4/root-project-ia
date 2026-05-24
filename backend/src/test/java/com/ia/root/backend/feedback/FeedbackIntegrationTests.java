@@ -408,4 +408,65 @@ public class FeedbackIntegrationTests {
             String.class, userId, email
         );
     }
+
+    // ------------------------------------------------------------------ 
+    // Visibility Toggling Tests
+    // ------------------------------------------------------------------ 
+
+    @Test
+    void shouldToggleRequestVisibility() throws Exception {
+        String urlToken = createCacheRequestAndGetUrlToken("Juan", "Gómez", "juan@ref.com");
+        
+        // Find cacheRequestId in DB
+        UUID requestId = jdbcTemplate.queryForObject(
+            "SELECT id FROM cache_requests WHERE url_token = ?",
+            UUID.class, urlToken
+        );
+
+        // Submit questionnaire first so it is marked finished
+        SubmitQuestionnaireDTO.SkillAnswer ans = new SubmitQuestionnaireDTO.SkillAnswer(
+            jdbcTemplate.queryForObject("SELECT id FROM skill_questions LIMIT 1", UUID.class), 4
+        );
+        SubmitQuestionnaireDTO submitDto = new SubmitQuestionnaireDTO(List.of(ans), Map.of());
+
+        mockMvc.perform(post("/api/questionnaire/" + urlToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(submitDto)))
+                .andExpect(status().isOk());
+
+        // Toggle visibility to false (visible = false)
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch("/api/feedback/requests/" + requestId + "/visibility")
+                .with(user(securityUser))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"visible\":false}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.visible").value(false));
+
+        // Toggle visibility back to true (visible = true)
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch("/api/feedback/requests/" + requestId + "/visibility")
+                .with(user(securityUser))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"visible\":true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.visible").value(true));
+    }
+
+    @Test
+    void shouldFailToToggleRequestVisibilityForOtherUser() throws Exception {
+        String urlToken = createCacheRequestAndGetUrlToken("Pedro", "Gómez", "pedro@ref.com");
+        
+        UUID requestId = jdbcTemplate.queryForObject(
+            "SELECT id FROM cache_requests WHERE url_token = ?",
+            UUID.class, urlToken
+        );
+
+        // Try to toggle visibility with a different user
+        SecurityUser otherUser = new SecurityUser(UUID.randomUUID(), "other@example.com", "irrelevant", "ROLE_USER");
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch("/api/feedback/requests/" + requestId + "/visibility")
+                .with(user(otherUser))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"visible\":false}"))
+                .andExpect(status().isBadRequest());
+    }
 }

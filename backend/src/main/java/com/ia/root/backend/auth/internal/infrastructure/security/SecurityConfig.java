@@ -23,9 +23,9 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final com.ia.root.backend.infrastructure.web.CorsProperties corsProperties;
+    private final CorsProperties corsProperties;
 
-    public SecurityConfig(com.ia.root.backend.infrastructure.web.CorsProperties corsProperties) {
+    public SecurityConfig(CorsProperties corsProperties) {
         this.corsProperties = corsProperties;
     }
 
