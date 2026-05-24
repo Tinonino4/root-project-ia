@@ -5,6 +5,19 @@
 - Frontend: Vue3 o React Native
 - Base de Datos: PostgreSQL
 
+## Base de Datos (Entorno Local)
+Para consultar la base de datos local según los requerimientos del prompt, utiliza la herramienta de ejecución de comandos (`run_command`) con `psql` usando las siguientes credenciales:
+- **URL JDBC:** `jdbc:postgresql://localhost:5432/root_ia_db`
+- **Host:** `localhost`
+- **Puerto:** `5432`
+- **Base de datos:** `root_ia_db`
+- **Usuario:** `postgres`
+- **Contraseña:** `postgrespassword`
+
+*Ejemplo de acceso por terminal:*
+```bash
+PGPASSWORD="postgrespassword" psql -U postgres -h localhost -p 5432 -d root_ia_db -c "TU_CONSULTA_SQL;"
+```
 ## Comandos de Construcción (Deterministas)
 - Backend: `mvn clean install`
 - Frontend: `npm run build`
