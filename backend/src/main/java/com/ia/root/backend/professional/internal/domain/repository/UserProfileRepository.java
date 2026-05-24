@@ -10,4 +10,13 @@ import java.util.UUID;
 @Repository
 public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> {
     Optional<UserProfile> findByUserId(UUID userId);
+
+    @org.springframework.data.jpa.repository.Query("""
+        SELECT u FROM UserProfile u WHERE 
+        LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%')) OR 
+        LOWER(u.surname) LIKE LOWER(CONCAT('%', :query, '%')) OR 
+        LOWER(u.jobTitle) LIKE LOWER(CONCAT('%', :query, '%')) OR 
+        LOWER(u.city) LIKE LOWER(CONCAT('%', :query, '%'))
+    """)
+    java.util.List<UserProfile> searchByKeyword(@org.springframework.data.repository.query.Param("query") String query);
 }

@@ -272,4 +272,59 @@ public class ProfessionalIntegrationTests {
                 .readTree(result.getResponse().getContentAsString())
                 .get("id").asText();
     }
+
+    // ------------------------------------------------------------------ 
+    // Recruiter Candidates Search
+    // ------------------------------------------------------------------ 
+
+    @Test
+    void shouldSearchCandidatesByName() throws Exception {
+        mockMvc.perform(get("/api/recruiter/candidates")
+                .with(user(securityUser))
+                .param("query", "Pro"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].userId").value(userId.toString()))
+                .andExpect(jsonPath("$[0].name").value("Pro"))
+                .andExpect(jsonPath("$[0].surname").value("User"));
+    }
+
+    @Test
+    void shouldSearchCandidatesByJobTitle() throws Exception {
+        // Update profile first to have a job title "Software Specialist"
+        UserProfileRequest updateRequest = new UserProfileRequest(
+                "Pro", "User", null, "Bio", "Madrid",
+                null, "28001", null, null, "Software Specialist", null
+        );
+
+        mockMvc.perform(put("/api/professional/profile")
+                .with(user(securityUser))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isOk());
+
+        // Search by "Specialist"
+        mockMvc.perform(get("/api/recruiter/candidates")
+                .with(user(securityUser))
+                .param("query", "Specialist"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].jobTitle").value("Software Specialist"));
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoCandidatesMatch() throws Exception {
+        mockMvc.perform(get("/api/recruiter/candidates")
+                .with(user(securityUser))
+                .param("query", "Astronaut"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    void shouldReturn401ForSearchWithoutAuth() throws Exception {
+        mockMvc.perform(get("/api/recruiter/candidates")
+                .param("query", "Pro"))
+                .andExpect(status().isUnauthorized());
+    }
 }

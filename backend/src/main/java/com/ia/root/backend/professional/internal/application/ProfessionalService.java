@@ -92,4 +92,15 @@ public class ProfessionalService {
         
         experienceRepository.delete(experience);
     }
+
+    public List<com.ia.root.backend.professional.internal.infrastructure.web.dto.CandidateSearchDTO> searchCandidates(String query) {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+        return userProfileRepository.searchByKeyword(query).stream()
+                .map(p -> new com.ia.root.backend.professional.internal.infrastructure.web.dto.CandidateSearchDTO(
+                    p.getUserId(), p.getName(), p.getSurname(), p.getJobTitle(), p.getPhotoUrl(), p.getCity()
+                ))
+                .toList();
+    }
 }

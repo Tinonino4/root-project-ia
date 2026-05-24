@@ -7,6 +7,7 @@ import {
   User, 
   BriefcaseBusiness, 
   MessageSquareQuote,
+  Search,
   Menu,
   X,
   LogOut
@@ -21,6 +22,7 @@ const isMobileMenuOpen = ref(false);
 
 const navigation = [
   { name: 'Dashboard', routeName: 'Dashboard', icon: LayoutDashboard },
+  { name: 'Buscador de Talento', routeName: 'RecruiterSearch', icon: Search },
   { name: 'Mi Perfil', routeName: 'Profile', icon: User },
   { name: 'Mis Experiencias', routeName: 'ExperienceList', icon: BriefcaseBusiness },
   { name: 'Solicitudes de Feedback', routeName: 'FeedbackList', icon: MessageSquareQuote },

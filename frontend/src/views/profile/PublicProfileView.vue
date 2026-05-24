@@ -1,16 +1,19 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import client from '@/api/client';
 import SkillsRadarChart from '@/components/dashboard/SkillsRadarChart.vue';
-import { Briefcase, Calendar, Award } from 'lucide-vue-next';
+import { Briefcase, Calendar, Award, ArrowLeft, Download } from 'lucide-vue-next';
+import html2pdf from 'html2pdf.js';
 
 const route = useRoute();
+const router = useRouter();
 const userId = route.params.userId;
 
 const profile = ref(null);
 const loading = ref(true);
 const error = ref(null);
+const isExporting = ref(false);
 
 onMounted(async () => {
   try {
@@ -29,10 +32,37 @@ const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
 };
+
+const exportPDF = () => {
+  if (isExporting.value || !profile.value) return;
+  
+  isExporting.value = true;
+  const element = document.getElementById('pdf-profile-template');
+  
+  const opt = {
+    margin:       [12, 12, 18, 12],
+    filename:     `informe_micache_${profile.value.name}_${profile.value.surname}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2.2, useCORS: true, logging: false },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf()
+    .from(element)
+    .set(opt)
+    .save()
+    .then(() => {
+      isExporting.value = false;
+    })
+    .catch((err) => {
+      console.error('Error al exportar PDF:', err);
+      isExporting.value = false;
+    });
+};
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 min-h-screen">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 min-h-screen">
     <!-- Loading State -->
     <div v-if="loading" class="text-center py-20">
       <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
@@ -42,10 +72,36 @@ const formatDate = (dateString) => {
     <!-- Error State -->
     <div v-else-if="error" class="text-center py-20">
       <p class="text-red-500 font-medium">{{ error }}</p>
+      <button 
+        @click="router.back()"
+        class="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 transition-colors"
+      >
+        <ArrowLeft class="w-4 h-4" /> Volver
+      </button>
     </div>
 
     <!-- Profile Content -->
     <div v-else-if="profile" class="space-y-8 animate-in fade-in-50 duration-500">
+      <!-- Header Actions -->
+      <div class="flex items-center justify-between gap-4">
+        <button 
+          @click="router.back()"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[hsl(228,15%,9%)] border border-white/5 text-zinc-400 hover:text-white hover:bg-[hsl(228,15%,12%)] transition-all duration-200 text-sm font-semibold"
+        >
+          <ArrowLeft class="w-4 h-4" />
+          Volver
+        </button>
+        
+        <button 
+          @click="exportPDF"
+          :disabled="isExporting"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-200 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5"
+        >
+          <Download class="w-4 h-4" :class="{'animate-bounce': isExporting}" />
+          {{ isExporting ? 'Generando PDF...' : 'Exportar Informe PDF' }}
+        </button>
+      </div>
+
       <!-- Hero Section -->
       <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-8 backdrop-blur-xl shadow-2xl">
         <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
@@ -105,6 +161,199 @@ const formatDate = (dateString) => {
           <div v-else class="text-center py-20 text-[hsl(220,10%,40%)]">
             No se ha registrado experiencia profesional.
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden Premium PDF Template (styled perfectly for A4 printing at 794px width) -->
+    <div v-if="profile" class="fixed left-[-9999px] top-[-9999px]">
+      <div 
+        id="pdf-profile-template" 
+        class="bg-white text-zinc-900 p-12 font-sans relative overflow-hidden flex flex-col justify-between" 
+        style="width: 794px; min-height: 1120px;"
+      >
+        <!-- Tilted Diagonal Corporate Watermark -->
+        <div class="absolute inset-0 pointer-events-none select-none z-0 flex flex-col justify-around items-center overflow-hidden">
+          <div 
+            class="text-6xl font-black uppercase tracking-[0.25em] transform -rotate-45 select-none"
+            style="color: rgba(24, 24, 27, 0.035);"
+          >
+            Verificado por MiCaché
+          </div>
+          <div 
+            class="text-6xl font-black uppercase tracking-[0.25em] transform -rotate-45 select-none"
+            style="color: rgba(24, 24, 27, 0.035);"
+          >
+            Verificado por MiCaché
+          </div>
+        </div>
+
+        <div class="relative z-10 flex-1 flex flex-col justify-between">
+          <!-- Content Wrap -->
+          <div class="space-y-8">
+            
+            <!-- PDF Header Banner -->
+            <div class="flex items-center justify-between border-b pb-6" style="border-color: #e4e4e7;">
+              <div>
+                <h2 class="text-2xl font-black tracking-tight" style="color: #f29727;">MiCaché</h2>
+                <p class="text-xs font-semibold text-zinc-500 uppercase tracking-widest mt-0.5">Informe Profesional Certificado</p>
+              </div>
+              <div class="text-right">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 border border-green-200 text-[10px] font-bold text-green-700 uppercase tracking-wider">
+                  ✓ Verificado
+                </div>
+                <p class="text-[10px] text-zinc-400 mt-1.5">Emitido: {{ new Date().toLocaleDateString('es-ES') }}</p>
+              </div>
+            </div>
+
+            <!-- Candidate Info block -->
+            <div class="flex gap-6 items-start bg-zinc-50 border rounded-2xl p-6" style="border-color: #e4e4e7;">
+              <!-- Initials Avatar -->
+              <div 
+                class="w-20 h-20 rounded-full flex items-center justify-center font-bold text-2xl flex-shrink-0 shadow-inner"
+                style="background-color: rgba(242, 151, 39, 0.1); color: #f29727; border: 1px solid rgba(242, 151, 39, 0.2);"
+              >
+                <span>{{ profile.name?.charAt(0) }}{{ profile.surname?.charAt(0) }}</span>
+              </div>
+              <div class="space-y-1.5 flex-1 min-w-0">
+                <h3 class="text-xl font-extrabold text-zinc-950 truncate">{{ profile.name }} {{ profile.surname }}</h3>
+                <p class="text-sm font-bold" style="color: #f29727;">{{ profile.jobTitle }}</p>
+                <p class="text-xs text-zinc-600 leading-relaxed pt-1">{{ profile.aboutMe }}</p>
+              </div>
+            </div>
+
+            <!-- Soft Skills Metrics Section -->
+            <div class="space-y-4">
+              <h3 class="text-sm font-black uppercase tracking-wider text-zinc-400 border-b pb-2 flex items-center gap-2" style="border-color: #e4e4e7;">
+                <Award class="w-4 h-4" style="color: #f29727;" />
+                Soft-Skills y Habilidades Blandas
+              </h3>
+              
+              <div v-if="profile.skills" class="grid grid-cols-2 gap-x-8 gap-y-4">
+                <!-- Teamwork -->
+                <div class="space-y-1.5">
+                  <div class="flex justify-between items-center text-xs font-bold text-zinc-800">
+                    <span>Trabajo en equipo</span>
+                    <span>{{ (profile.skills.teamwork || 0).toFixed(1) }} / 5.0</span>
+                  </div>
+                  <div class="w-full bg-zinc-100 rounded-full h-2" style="background-color: #f4f4f5;">
+                    <div 
+                      class="h-2 rounded-full" 
+                      :style="{ width: `${((profile.skills.teamwork || 0) / 5) * 100}%` }"
+                      style="background-color: #f29727;"
+                    ></div>
+                  </div>
+                </div>
+
+                <!-- Proactivity -->
+                <div class="space-y-1.5">
+                  <div class="flex justify-between items-center text-xs font-bold text-zinc-800">
+                    <span>Proactividad</span>
+                    <span>{{ (profile.skills.proactivity || 0).toFixed(1) }} / 5.0</span>
+                  </div>
+                  <div class="w-full bg-zinc-100 rounded-full h-2" style="background-color: #f4f4f5;">
+                    <div 
+                      class="h-2 rounded-full" 
+                      :style="{ width: `${((profile.skills.proactivity || 0) / 5) * 100}%` }"
+                      style="background-color: #f29727;"
+                    ></div>
+                  </div>
+                </div>
+
+                <!-- Integrity -->
+                <div class="space-y-1.5">
+                  <div class="flex justify-between items-center text-xs font-bold text-zinc-800">
+                    <span>Integridad</span>
+                    <span>{{ (profile.skills.integrity || 0).toFixed(1) }} / 5.0</span>
+                  </div>
+                  <div class="w-full bg-zinc-100 rounded-full h-2" style="background-color: #f4f4f5;">
+                    <div 
+                      class="h-2 rounded-full" 
+                      :style="{ width: `${((profile.skills.integrity || 0) / 5) * 100}%` }"
+                      style="background-color: #f29727;"
+                    ></div>
+                  </div>
+                </div>
+
+                <!-- Confidence -->
+                <div class="space-y-1.5">
+                  <div class="flex justify-between items-center text-xs font-bold text-zinc-800">
+                    <span>Confianza en sí mismo</span>
+                    <span>{{ (profile.skills.selfConfidence || 0).toFixed(1) }} / 5.0</span>
+                  </div>
+                  <div class="w-full bg-zinc-100 rounded-full h-2" style="background-color: #f4f4f5;">
+                    <div 
+                      class="h-2 rounded-full" 
+                      :style="{ width: `${((profile.skills.selfConfidence || 0) / 5) * 100}%` }"
+                      style="background-color: #f29727;"
+                    ></div>
+                  </div>
+                </div>
+
+                <!-- Flexibility -->
+                <div class="space-y-1.5">
+                  <div class="flex justify-between items-center text-xs font-bold text-zinc-800">
+                    <span>Flexibilidad</span>
+                    <span>{{ (profile.skills.flexibility || 0).toFixed(1) }} / 5.0</span>
+                  </div>
+                  <div class="w-full bg-zinc-100 rounded-full h-2" style="background-color: #f4f4f5;">
+                    <div 
+                      class="h-2 rounded-full" 
+                      :style="{ width: `${((profile.skills.flexibility || 0) / 5) * 100}%` }"
+                      style="background-color: #f29727;"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-else class="text-center py-8 text-zinc-400 text-xs border border-dashed rounded-xl" style="border-color: #e4e4e7;">
+                No hay puntuaciones de habilidades blandas certificadas públicamente.
+              </div>
+            </div>
+
+            <!-- Professional Experience Section -->
+            <div class="space-y-4">
+              <h3 class="text-sm font-black uppercase tracking-wider text-zinc-400 border-b pb-2 flex items-center gap-2" style="border-color: #e4e4e7;">
+                <Briefcase class="w-4 h-4" style="color: #f29727;" />
+                Trayectoria Profesional Certificada
+              </h3>
+              
+              <div v-if="profile.experiences && profile.experiences.length > 0" class="space-y-4">
+                <div 
+                  v-for="exp in profile.experiences" 
+                  :key="exp.id" 
+                  class="border-l-2 pl-4 py-1 space-y-1 relative" 
+                  style="border-color: #f29727;"
+                >
+                  <h4 class="text-sm font-bold text-zinc-900">{{ exp.position }}</h4>
+                  <p class="text-xs font-semibold text-zinc-600">{{ exp.companyName }} <span v-if="exp.department">· {{ exp.department }}</span></p>
+                  <p class="text-[10px] text-zinc-400 font-medium">
+                    {{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Presente' }}
+                  </p>
+                  <p class="text-xs text-zinc-500 mt-1 leading-relaxed">{{ exp.functions }}</p>
+                </div>
+              </div>
+              <div v-else class="text-center py-8 text-zinc-400 text-xs border border-dashed rounded-xl" style="border-color: #e4e4e7;">
+                No se ha registrado experiencia profesional.
+              </div>
+            </div>
+            
+          </div>
+
+          <!-- PDF Footer Certification details -->
+          <div class="pt-8 border-t mt-12 flex justify-between items-end text-[9px] text-zinc-400" style="border-color: #e4e4e7;">
+            <div class="space-y-1 max-w-[70%]">
+              <p class="font-bold text-zinc-500 uppercase tracking-wide">Garantía de Autenticidad MiCaché B2B</p>
+              <p class="leading-relaxed">
+                Este reporte ha sido certificado mediante el protocolo de feedback seguro de MiCaché. La valoración de habilidades blandas es el resultado de opiniones anonimizadas de compañeros y superiores validados.
+              </p>
+            </div>
+            <div class="text-right">
+              <p class="font-semibold text-zinc-500">ID Candidato:</p>
+              <p class="font-mono">{{ userId.substring(0, 8) }}...{{ userId.substring(userId.length - 8) }}</p>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
