@@ -20,7 +20,7 @@ const goBack = () => {
 };
 
 const goToCreate = () => {
-  router.push('/feedback/create');
+  router.push('/feedback/new');
 };
 
 const formatDate = (dateString) => {

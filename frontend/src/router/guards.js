@@ -1,16 +1,15 @@
 import { useAuthStore } from '@/stores/auth.store';
 
 export function setupGuards(router) {
-  router.beforeEach((to, from, next) => {
+  router.beforeEach((to) => {
     const authStore = useAuthStore();
     const isAuthenticated = authStore.isAuthenticated;
 
     if (to.meta.auth && !isAuthenticated) {
-      next({ name: 'Login' });
-    } else if (to.meta.guest && isAuthenticated) {
-      next({ name: 'Dashboard' });
-    } else {
-      next();
+      return { name: 'Login' };
+    }
+    if (to.meta.guest && isAuthenticated) {
+      return { name: 'Dashboard' };
     }
   });
 }
