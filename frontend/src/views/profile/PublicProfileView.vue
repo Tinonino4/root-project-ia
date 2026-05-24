@@ -54,7 +54,13 @@ const exportPDF = () => {
       margin:       [12, 12, 18, 12],
       filename:     `informe_micache_${profile.value.name}_${profile.value.surname}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2.0, useCORS: true, logging: false },
+      html2canvas:  { 
+        scale: 2.0, 
+        useCORS: true, 
+        logging: false,
+        scrollY: 0,
+        scrollX: 0
+      },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
@@ -71,7 +77,7 @@ const exportPDF = () => {
         isExporting.value = false;
         isGeneratingPDF.value = false;
       });
-  }, 150);
+  }, 200);
 };
 </script>
 
@@ -179,8 +185,28 @@ const exportPDF = () => {
       </div>
     </div>
 
-    <!-- Premium PDF Template (only rendered when generating PDF to prevent position fixed rendering issues) -->
-    <div v-if="isGeneratingPDF" class="absolute left-[-9999px] top-0">
+    <!-- Premium Fullscreen Loading Overlay -->
+    <div v-if="isGeneratingPDF" class="fixed inset-0 z-[10000] bg-zinc-950/90 backdrop-blur-md flex flex-col items-center justify-center space-y-6 text-white select-none pointer-events-auto">
+      <div class="relative w-20 h-20 flex items-center justify-center">
+        <!-- Glowing outer ring -->
+        <div class="absolute inset-0 rounded-full border-4 border-primary/10 border-t-primary animate-spin"></div>
+        <!-- Inner orange pulse -->
+        <div class="w-10 h-10 rounded-full bg-orange-500/20 animate-pulse flex items-center justify-center text-primary">
+          <Award class="w-6 h-6" />
+        </div>
+      </div>
+      <div class="text-center space-y-2">
+        <h3 class="text-xl font-bold tracking-tight bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">
+          Generando Informe Certificado...
+        </h3>
+        <p class="text-xs text-zinc-400 max-w-xs leading-relaxed">
+          MiCaché B2B está compilando las referencias y habilidades blandas del candidato.
+        </p>
+      </div>
+    </div>
+
+    <!-- Premium PDF Template (only rendered when generating PDF, positioned absolute top-left behind the overlay) -->
+    <div v-if="isGeneratingPDF" class="absolute left-0 top-0 z-[9999] bg-white">
       <div 
         id="pdf-profile-template" 
         class="bg-white text-zinc-900 p-12 font-sans relative overflow-hidden flex flex-col justify-between" 
