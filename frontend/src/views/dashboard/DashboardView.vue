@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useProfileStore } from '@/stores/profile.store';
 import { useExperienceStore } from '@/stores/experience.store';
@@ -66,16 +66,53 @@ const mockMetrics = {
   flexibility: 4.5
 };
 
+const isExporting = ref(false);
+const isGeneratingPDF = ref(false);
+
 const exportToPDF = () => {
-  const element = document.getElementById('pdf-template');
-  const opt = {
-    margin:       10,
-    filename:     `${profile.value?.name || 'perfil'}_cache.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2 },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-  html2pdf().set(opt).from(element).save();
+  if (isExporting.value || !profile.value) return;
+
+  isExporting.value = true;
+  isGeneratingPDF.value = true;
+
+  // Esperar a que Vue monte el elemento en el DOM usando la clase de posicionamiento absoluto
+  setTimeout(() => {
+    const element = document.getElementById('pdf-template');
+    if (!element) {
+      console.error('El elemento PDF no se encontró en el DOM.');
+      isExporting.value = false;
+      isGeneratingPDF.value = false;
+      return;
+    }
+
+    const opt = {
+      margin:       12,
+      filename:     `${profile.value?.name || 'perfil'}_cache.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { 
+        scale: 2.0, 
+        useCORS: true, 
+        logging: false,
+        scrollY: 0,
+        scrollX: 0
+      },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf()
+      .from(element)
+      .set(opt)
+      .save()
+      .then(() => {
+        isExporting.value = false;
+        isGeneratingPDF.value = false;
+      })
+      .catch((err) => {
+        console.error('Error al exportar PDF:', err);
+        isExporting.value = false;
+        isGeneratingPDF.value = false;
+      });
+  }, 200);
 };
 </script>
 
@@ -409,18 +446,38 @@ const exportToPDF = () => {
       </div>
     </template>
 
-    <!-- Hidden Template for PDF Export (Always Light Mode) -->
-    <div id="pdf-template" class="absolute -left-[9999px] top-0 w-[800px]">
-      <div class="p-10 bg-white text-zinc-900 font-sans">
+    <!-- Premium Fullscreen Loading Overlay -->
+    <div v-if="isGeneratingPDF" class="fixed inset-0 z-[10000] bg-zinc-950/90 backdrop-blur-md flex flex-col items-center justify-center space-y-6 text-white select-none pointer-events-auto">
+      <div class="relative w-20 h-20 flex items-center justify-center">
+        <!-- Glowing outer ring -->
+        <div class="absolute inset-0 rounded-full border-4 border-primary/10 border-t-primary animate-spin"></div>
+        <!-- Inner orange pulse -->
+        <div class="w-10 h-10 rounded-full bg-orange-500/20 animate-pulse flex items-center justify-center text-primary">
+          <Award class="w-6 h-6" />
+        </div>
+      </div>
+      <div class="text-center space-y-2">
+        <h3 class="text-xl font-bold tracking-tight bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">
+          Generando Informe Personal...
+        </h3>
+        <p class="text-xs text-zinc-400 max-w-xs leading-relaxed">
+          MiCaché B2B está compilando tu informe personal con habilidades y radar chart verificado.
+        </p>
+      </div>
+    </div>
+
+    <!-- Premium PDF Template (only rendered when generating PDF, positioned absolute top-left behind the overlay) -->
+    <div v-if="isGeneratingPDF" class="absolute left-0 top-0 z-[9999] bg-white">
+      <div id="pdf-template" class="p-10 bg-white text-zinc-900 font-sans" style="width: 794px; min-height: 1120px; box-sizing: border-box;">
         <!-- Header -->
-        <div class="flex items-center gap-6 mb-8 border-b pb-6">
+        <div class="flex items-center gap-6 mb-8 border-b pb-6" style="border-color: #e4e4e7;">
           <div class="w-24 h-24 rounded-full overflow-hidden bg-zinc-100 flex items-center justify-center border-2 border-zinc-200">
             <img v-if="profile?.photoUrl" :src="profile.photoUrl" alt="Foto" class="w-full h-full object-cover" />
             <UserIcon v-else class="w-12 h-12 text-zinc-400" />
           </div>
           <div>
             <h1 class="text-2xl font-bold text-zinc-900">{{ profile?.name }} {{ profile?.surname }}</h1>
-            <p class="text-lg text-primary font-semibold">{{ profile?.jobTitle }}</p>
+            <p class="text-lg text-primary font-semibold" style="color: #f29727;">{{ profile?.jobTitle }}</p>
             <p class="text-sm text-zinc-500">{{ profile?.education }}</p>
           </div>
         </div>
@@ -429,7 +486,7 @@ const exportToPDF = () => {
         <div class="grid grid-cols-2 gap-8">
           <!-- Skills -->
           <div>
-            <h2 class="text-lg font-bold text-zinc-800 mb-4 uppercase border-b pb-2">Habilidades Blandas</h2>
+            <h2 class="text-lg font-bold text-zinc-800 mb-4 uppercase border-b pb-2" style="border-color: #e4e4e7;">Habilidades Blandas</h2>
             <div class="w-full h-64">
               <SkillsRadarChart v-if="metrics" :metrics="metrics" />
             </div>
@@ -437,11 +494,11 @@ const exportToPDF = () => {
 
           <!-- Experience -->
           <div>
-            <h2 class="text-lg font-bold text-zinc-800 mb-4 uppercase border-b pb-2">Experiencia</h2>
+            <h2 class="text-lg font-bold text-zinc-800 mb-4 uppercase border-b pb-2" style="border-color: #e4e4e7;">Experiencia</h2>
             <div class="space-y-4">
               <div v-for="exp in experiences" :key="exp.id">
                 <h3 class="text-md font-bold text-zinc-900">{{ exp.position }}</h3>
-                <p class="text-primary text-sm font-semibold">{{ exp.companyName }}</p>
+                <p class="text-sm font-semibold" style="color: #f29727;">{{ exp.companyName }}</p>
                 <p class="text-xs text-zinc-500">{{ formatDate(exp.startDate) }} - {{ formatDate(exp.finishDate) }}</p>
                 <p class="text-sm text-zinc-600 mt-1">{{ exp.functions }}</p>
               </div>
