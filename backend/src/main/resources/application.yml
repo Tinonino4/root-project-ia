@@ -71,7 +71,7 @@ brevo:
     email: ${BREVO_SENDER_EMAIL:noreply@micache.com}
   template-ids:
     otp-verification: ${BREVO_TPL_OTP:1}
-    password-reset: ${BREVO_TPL_PASSWORD:2}
-    feedback-request: ${BREVO_TPL_FEEDBACK:3}
+    password-reset: ${BREVO_TPL_PASSWORD:3}
+    feedback-request: ${BREVO_TPL_FEEDBACK:2}
     feedback-reminder: ${BREVO_TPL_REMINDER:4}
   frontend-base-url: ${FRONTEND_BASE_URL:http://localhost:5173}

@@ -1,0 +1,8 @@
+# Environment variables
+.env
+
+# Build outputs
+build/
+
+# IDE configurations
+.idea/
