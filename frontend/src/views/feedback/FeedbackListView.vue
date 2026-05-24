@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useFeedbackStore } from '@/stores/feedback.store';
 import { ArrowLeft, Plus, Mail, Clock, CheckCircle2, XCircle } from 'lucide-vue-next';
@@ -14,6 +14,31 @@ onMounted(async () => {
 
 const requests = computed(() => feedbackStore.requests);
 const loading = computed(() => feedbackStore.loading);
+
+const toast = ref({
+  show: false,
+  message: ''
+});
+
+const triggerToast = (message) => {
+  toast.value.message = message;
+  toast.value.show = true;
+  setTimeout(() => {
+    toast.value.show = false;
+  }, 4000);
+};
+
+const handleToggleVisibility = async (requestId, visible) => {
+  try {
+    await feedbackStore.toggleRequestVisibility(requestId, visible);
+    triggerToast(visible 
+      ? 'Referencia visible. Tus soft-skills se han recalculado.' 
+      : 'Referencia oculta. Tus soft-skills se han recalculado.'
+    );
+  } catch (err) {
+    triggerToast('Error al cambiar la visibilidad');
+  }
+};
 
 const goBack = () => {
   router.back();
@@ -134,27 +159,56 @@ const formatDate = (dateString) => {
             </div>
           </div>
 
-          <div class="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end">
-            <Button 
-              v-if="!req.finished"
-              variant="outline"
-              class="text-xs border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg h-9"
-              @click="() => {}"
-            >
-              Recordar
-            </Button>
-            <Button 
-              v-else
-              variant="ghost"
-              class="text-xs text-primary hover:text-primary-hover rounded-lg h-9"
-              @click="() => {}"
-            >
-              Ver Respuestas
-            </Button>
+          <div class="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+            <!-- Toggle switch for visibility (only shown if finished) -->
+            <div v-if="req.finished" class="flex items-center space-x-2">
+              <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Perfil Público:</span>
+              <label :for="'toggle-' + req.id" class="inline-flex relative items-center cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  :id="'toggle-' + req.id" 
+                  class="sr-only peer"
+                  :checked="req.visible"
+                  @change="handleToggleVisibility(req.id, $event.target.checked)"
+                >
+                <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+            <div v-else class="text-xs text-zinc-400 dark:text-zinc-500 italic">
+              Esperando respuesta...
+            </div>
+
+            <div>
+              <Button 
+                v-if="!req.finished"
+                variant="outline"
+                class="text-xs border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg h-9"
+                @click="() => {}"
+              >
+                Recordar
+              </Button>
+              <Button 
+                v-else
+                variant="ghost"
+                class="text-xs text-primary hover:text-primary-hover rounded-lg h-9"
+                @click="() => {}"
+              >
+                Ver Respuestas
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div 
+      v-if="toast.show" 
+      class="fixed bottom-6 right-6 z-50 flex items-center p-4 space-x-3 text-white bg-zinc-900 dark:bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
+    >
+      <div class="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-xs font-bold text-white">✓</div>
+      <p class="text-sm font-medium">{{ toast.message }}</p>
     </div>
   </div>
 </template>

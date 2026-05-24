@@ -88,6 +88,24 @@ export const useFeedbackStore = defineStore('feedback', () => {
     }
   }
 
+  async function toggleRequestVisibility(requestId, visible) {
+    loading.value = true;
+    error.value = null;
+    try {
+      const response = await feedbackApi.toggleVisibility(requestId, visible);
+      const index = requests.value.findIndex(r => r.id === requestId);
+      if (index !== -1) {
+        requests.value[index] = response.data;
+      }
+      return response.data;
+    } catch (err) {
+      error.value = err.message || 'Error al cambiar la visibilidad';
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     requests,
     categories,
@@ -100,5 +118,6 @@ export const useFeedbackStore = defineStore('feedback', () => {
     fetchRequestsByExperience,
     createRequest,
     getCompletedCount,
+    toggleRequestVisibility,
   };
 });
