@@ -45,7 +45,7 @@ public class CacheRequest {
     private boolean finished = false;
 
     @Column(name = "is_visible", nullable = false)
-    private boolean isVisible = true;
+    private boolean isVisible = false;
 
     @Column(name = "target_phone")
     private String targetPhone;

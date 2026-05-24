@@ -281,7 +281,31 @@ public class FeedbackIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(1));
 
-        // 6. Verify skills metrics were recalculated
+        // 6. Verify skills metrics are still 0 because the new reference is PRIVATE by default
+        mockMvc.perform(get("/api/skills/metrics")
+                .with(user(securityUser)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.teamwork").value(0.0))
+                .andExpect(jsonPath("$.proactivity").value(0.0))
+                .andExpect(jsonPath("$.integrity").value(0.0))
+                .andExpect(jsonPath("$.selfConfidence").value(0.0))
+                .andExpect(jsonPath("$.flexibility").value(0.0))
+                .andExpect(jsonPath("$.averageScore").value(0.0));
+
+        // 7. Find cacheRequestId in DB and toggle visibility to true
+        UUID requestId = jdbcTemplate.queryForObject(
+            "SELECT id FROM cache_requests WHERE url_token = ?",
+            UUID.class, urlToken
+        );
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch("/api/feedback/requests/" + requestId + "/visibility")
+                .with(user(securityUser))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"visible\":true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.visible").value(true));
+
+        // 8. Verify skills metrics are now recalculated and show 4.0
         mockMvc.perform(get("/api/skills/metrics")
                 .with(user(securityUser)))
                 .andExpect(status().isOk())

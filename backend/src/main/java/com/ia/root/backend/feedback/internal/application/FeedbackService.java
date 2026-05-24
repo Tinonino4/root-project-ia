@@ -172,7 +172,7 @@ public class FeedbackService {
         }
 
         cr.setVisible(visible);
-        CacheRequest saved = cacheRequestRepository.save(cr);
+        CacheRequest saved = cacheRequestRepository.saveAndFlush(cr);
 
         // If the request was finished, we MUST trigger recalculation of metrics!
         if (cr.isFinished()) {

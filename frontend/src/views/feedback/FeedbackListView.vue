@@ -163,7 +163,7 @@ const formatDate = (dateString) => {
             <!-- Toggle switch for visibility (only shown if finished) -->
             <div v-if="req.finished" class="flex items-center space-x-2">
               <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Perfil Público:</span>
-              <label :for="'toggle-' + req.id" class="inline-flex relative items-center cursor-pointer select-none">
+              <label :for="'toggle-' + req.id" class="inline-flex items-center cursor-pointer select-none">
                 <input 
                   type="checkbox" 
                   :id="'toggle-' + req.id" 
@@ -171,7 +171,7 @@ const formatDate = (dateString) => {
                   :checked="req.visible"
                   @change="handleToggleVisibility(req.id, $event.target.checked)"
                 >
-                <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-800 rounded-full relative peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
             <div v-else class="text-xs text-zinc-400 dark:text-zinc-500 italic">
