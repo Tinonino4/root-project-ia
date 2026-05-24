@@ -7,6 +7,9 @@ public record AuthResponse(
     @Schema(description = "Token de acceso JWT")
     String token,
     
+    @Schema(description = "Token de refresco")
+    String refreshToken,
+    
     @Schema(description = "ID del usuario")
     UUID id,
     

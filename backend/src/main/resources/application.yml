@@ -56,11 +56,16 @@ spring:
             user-info-uri: https://api.linkedin.com/v2/userinfo
             user-name-attribute: sub
 
-# JWT Custom Properties
+# JWT & Security Custom Properties
 app:
   jwt:
     secret: "3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b"
-    expiration-ms: 86400000 # 24 hours
+    expiration-ms: 900000 # 15 minutes
+    refresh-expiration-ms: 604800000 # 7 days
+  cors:
+    allowed-origins:
+      - "http://localhost:5173"
+      - "http://localhost:3000"
 
 # Brevo Transactional Email
 brevo:

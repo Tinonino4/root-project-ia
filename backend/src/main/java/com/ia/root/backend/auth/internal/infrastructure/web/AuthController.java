@@ -79,4 +79,16 @@ public class AuthController {
         authService.resetPassword(request);
         return ResponseEntity.ok(new MessageResponse("Contraseña actualizada exitosamente."));
     }
+
+    @PostMapping("/refresh-token")
+    @Operation(summary = "Refrescar el token de acceso JWT usando un Refresh Token",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Tokens refrescados exitosamente",
+                content = @Content(schema = @Schema(implementation = TokenRefreshResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Refresh Token inválido o expirado", content = @Content)
+        })
+    public ResponseEntity<TokenRefreshResponse> refreshToken(@RequestBody @Valid TokenRefreshRequest request) {
+        TokenRefreshResponse response = authService.refreshToken(request);
+        return ResponseEntity.ok(response);
+    }
 }

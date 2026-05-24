@@ -5,6 +5,7 @@ import com.ia.root.backend.auth.internal.domain.repository.*;
 import com.ia.root.backend.auth.internal.infrastructure.security.JwtProvider;
 
 import com.ia.root.backend.auth.UserRequiresOtpEvent;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,23 +25,29 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final UserOtpRepository userOtpRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final ApplicationEventPublisher events;
+    private final long refreshExpirationMs;
 
     public AuthService(UserRepository userRepository,
                        UserOtpRepository userOtpRepository,
+                       RefreshTokenRepository refreshTokenRepository,
                        PasswordEncoder passwordEncoder,
                        AuthenticationManager authenticationManager,
                        JwtProvider jwtProvider,
-                       ApplicationEventPublisher events) {
+                       ApplicationEventPublisher events,
+                       @Value("${app.jwt.refresh-expiration-ms}") long refreshExpirationMs) {
         this.userRepository = userRepository;
         this.userOtpRepository = userOtpRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
         this.events = events;
+        this.refreshExpirationMs = refreshExpirationMs;
     }
 
     @Transactional
@@ -93,6 +101,7 @@ public class AuthService {
         userOtpRepository.deleteByUser_Id(user.getId());
     }
 
+    @Transactional
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new IllegalArgumentException("Credenciales inválidas"));
@@ -106,8 +115,9 @@ public class AuthService {
         );
 
         String jwt = jwtProvider.generateToken(authentication);
+        String refreshToken = createRefreshToken(user);
 
-        return new AuthResponse(jwt, user.getId(), user.getName(), user.getRole());
+        return new AuthResponse(jwt, refreshToken, user.getId(), user.getName(), user.getRole());
     }
 
     @Transactional
@@ -143,6 +153,49 @@ public class AuthService {
         userRepository.save(user);
 
         userOtpRepository.deleteByUser_Id(user.getId());
+    }
+
+    @Transactional
+    public String createRefreshToken(User user) {
+        refreshTokenRepository.deleteByUser_Id(user.getId());
+
+        String token = UUID.randomUUID().toString();
+        RefreshToken refreshToken = new RefreshToken(
+            token,
+            user,
+            ZonedDateTime.now().plus(java.time.Duration.ofMillis(refreshExpirationMs))
+        );
+        refreshTokenRepository.save(refreshToken);
+        return token;
+    }
+
+    @Transactional
+    public TokenRefreshResponse refreshToken(TokenRefreshRequest request) {
+        String requestRefreshToken = request.refreshToken();
+
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(requestRefreshToken)
+                .orElseThrow(() -> new IllegalArgumentException("Refresh token no encontrado"));
+
+        if (refreshToken.isRevoked()) {
+            refreshTokenRepository.deleteByUser_Id(refreshToken.getUser().getId());
+            throw new IllegalArgumentException("Este token ha sido revocado. Posible brecha de seguridad. Inicie sesión de nuevo.");
+        }
+
+        if (refreshToken.getExpiresAt().isBefore(ZonedDateTime.now())) {
+            refreshTokenRepository.delete(refreshToken);
+            throw new IllegalArgumentException("El refresh token ha expirado. Inicie sesión de nuevo.");
+        }
+
+        User user = refreshToken.getUser();
+
+        // Complete rotation: revoke/delete the old refresh token
+        refreshTokenRepository.delete(refreshToken);
+
+        // Generate a new Access Token and a new Refresh Token
+        String accessToken = jwtProvider.generateTokenFromEmail(user.getEmail());
+        String newRefreshToken = createRefreshToken(user);
+
+        return new TokenRefreshResponse(accessToken, newRefreshToken);
     }
 
     private String generateOtp() {
