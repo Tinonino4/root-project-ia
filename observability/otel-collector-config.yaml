@@ -1,0 +1,47 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    send_batch_size: 8192
+    timeout: 5s
+    send_batch_max_size: 10240
+
+extensions:
+  basicauth/grafana:
+    client_auth:
+      username: ${GRAFANA_CLOUD_INSTANCE_ID}
+      password: ${GRAFANA_CLOUD_API_KEY}
+
+exporters:
+  otlphttp:
+    endpoint: ${GRAFANA_CLOUD_OTLP_ENDPOINT}
+    auth:
+      authenticator: basicauth/grafana
+  debug:
+    verbosity: basic
+
+service:
+  extensions: [basicauth/grafana]
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp, debug]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp, debug]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp, debug]
+
+  telemetry:
+    logs:
+      level: info

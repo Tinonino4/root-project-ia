@@ -1,0 +1,54 @@
+[Unit]
+Description=MiCaché Spring Boot Backend
+After=syslog.target network.target
+
+[Service]
+User=root
+WorkingDirectory=/var/web/micache
+ExecStart=/usr/bin/java -javaagent:/var/web/micache/opentelemetry-javaagent.jar -jar /var/web/micache/backend.jar
+SuccessExitStatus=143
+Restart=always
+RestartSec=10
+
+# Entorno de Producción
+Environment=SPRING_PROFILES_ACTIVE=prod
+Environment=SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/root_ia_db
+Environment=SPRING_DATASOURCE_USERNAME=postgres
+Environment=SPRING_DATASOURCE_PASSWORD=CHANGE_ME_DB_PASSWORD
+Environment=APP_UPLOAD_DIR=/var/web/micache/uploads
+
+# OpenTelemetry Java Agent
+Environment=OTEL_SERVICE_NAME=micache-backend
+Environment=OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+Environment=OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+Environment=OTEL_TRACES_EXPORTER=otlp
+Environment=OTEL_METRICS_EXPORTER=otlp
+Environment=OTEL_LOGS_EXPORTER=otlp
+
+# JWT y Seguridad
+Environment=APP_JWT_SECRET=CHANGE_ME_GENERATE_A_SECURE_256BIT_HEX_SECRET
+
+# Brevo Transactional Email
+Environment=BREVO_API_KEY=CHANGE_ME_BREVO_API_KEY
+Environment=BREVO_ENABLED=true
+Environment=BREVO_SENDER_NAME=Caché
+Environment=BREVO_SENDER_EMAIL=info@micache.es
+Environment=BREVO_TPL_OTP=1
+Environment=BREVO_TPL_FEEDBACK=2
+Environment=BREVO_TPL_PASSWORD=3
+Environment=BREVO_TPL_REMINDER=4
+
+# Enlaces Interactivos
+Environment=FRONTEND_BASE_URL=http://micache.es
+Environment=APP_CORS_ALLOWED_ORIGINS=http://micache.es,https://micache.es,http://www.micache.es,https://www.micache.es,http://37.27.197.244,http://localhost:5173,http://localhost:3000
+
+# OAuth2 (Configura con tus credenciales reales)
+Environment=GOOGLE_CLIENT_ID=CHANGE_ME
+Environment=GOOGLE_CLIENT_SECRET=CHANGE_ME
+Environment=GITHUB_CLIENT_ID=CHANGE_ME
+Environment=GITHUB_CLIENT_SECRET=CHANGE_ME
+Environment=LINKEDIN_CLIENT_ID=CHANGE_ME
+Environment=LINKEDIN_CLIENT_SECRET=CHANGE_ME
+
+[Install]
+WantedBy=multi-user.target
