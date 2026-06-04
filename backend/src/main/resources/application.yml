@@ -2,6 +2,11 @@ spring:
   application:
     name: backend
 
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+
   mvc:
     problem-details:
       enabled: true
@@ -62,10 +67,17 @@ app:
     secret: "3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b"
     expiration-ms: 900000 # 15 minutes
     refresh-expiration-ms: 604800000 # 7 days
+  upload:
+    dir: ${APP_UPLOAD_DIR:./uploads}
   cors:
     allowed-origins:
       - "http://localhost:5173"
       - "http://localhost:3000"
+      - "http://micache.es"
+      - "https://micache.es"
+      - "http://www.micache.es"
+      - "https://www.micache.es"
+      - "http://37.27.197.244"
 
 # Brevo Transactional Email
 brevo:

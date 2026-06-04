@@ -25,6 +25,9 @@ public class ProfessionalController {
 
     private final ProfessionalService professionalService;
 
+    @org.springframework.beans.factory.annotation.Value("${app.upload.dir}")
+    private String uploadDir;
+
     public ProfessionalController(ProfessionalService professionalService) {
         this.professionalService = professionalService;
     }
@@ -100,5 +103,52 @@ public class ProfessionalController {
             @PathVariable UUID id) {
         professionalService.deleteExperience(id, userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(path = "/profile/avatar", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Subir foto de avatar",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Avatar subido exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Archivo inválido o demasiado grande"),
+            @ApiResponse(responseCode = "401", description = "No autenticado")
+        })
+    public ResponseEntity<java.util.Map<String, String>> uploadAvatar(
+            @AuthenticationPrincipal(expression = "id") UUID userId,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("El archivo no puede estar vacío");
+        }
+        
+        String contentType = file.getContentType();
+        if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png") && !contentType.equals("image/webp"))) {
+            throw new IllegalArgumentException("Formato de archivo no válido. Solo se admiten imágenes JPEG, PNG o WEBP");
+        }
+        
+        try {
+            java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir).toAbsolutePath().normalize();
+            java.io.File directory = uploadPath.toFile();
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            
+            // Standard normalized filename
+            String filename = "avatar-" + userId + ".png";
+            java.nio.file.Path targetLocation = uploadPath.resolve(filename);
+            
+            // Overwrite existing cleanly
+            java.nio.file.Files.copy(file.getInputStream(), targetLocation, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            
+            // Path relative for static server serving
+            String photoUrl = "/uploads/" + filename;
+            professionalService.updateAvatar(userId, photoUrl);
+            
+            // Cache buster timestamp param
+            String cacheBusterUrl = photoUrl + "?t=" + System.currentTimeMillis();
+            
+            return ResponseEntity.ok(java.util.Map.of("photoUrl", cacheBusterUrl));
+        } catch (java.io.IOException ex) {
+            throw new RuntimeException("No se pudo almacenar el archivo en disco", ex);
+        }
     }
 }

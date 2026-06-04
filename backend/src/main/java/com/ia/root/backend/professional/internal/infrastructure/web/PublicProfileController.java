@@ -6,6 +6,8 @@ import com.ia.root.backend.professional.internal.application.ProfessionalService
 import com.ia.root.backend.professional.internal.domain.model.Experience;
 import com.ia.root.backend.professional.internal.domain.model.UserProfile;
 import com.ia.root.backend.professional.internal.infrastructure.web.dto.PublicProfileDTO;
+import com.ia.root.backend.feedback.ExperienceMetricsDTO;
+import com.ia.root.backend.feedback.ExperienceMetricsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +26,14 @@ public class PublicProfileController {
 
     private final ProfessionalService professionalService;
     private final SkillsMetricsService skillsMetricsService;
+    private final ExperienceMetricsService experienceMetricsService;
 
     public PublicProfileController(ProfessionalService professionalService,
-                                   SkillsMetricsService skillsMetricsService) {
+                                   SkillsMetricsService skillsMetricsService,
+                                   ExperienceMetricsService experienceMetricsService) {
         this.professionalService = professionalService;
         this.skillsMetricsService = skillsMetricsService;
+        this.experienceMetricsService = experienceMetricsService;
     }
 
     @GetMapping("/{userId}")
@@ -38,6 +43,8 @@ public class PublicProfileController {
             UserProfile profile = professionalService.getProfile(userId);
             List<Experience> experiences = professionalService.getExperiences(userId);
             SkillsData skillsData = skillsMetricsService.getSkillsData(userId);
+            long totalRefs = experienceMetricsService.getTotalReferencesCount(userId);
+            List<ExperienceMetricsDTO> experienceMetrics = experienceMetricsService.getExperienceMetrics(userId);
 
             PublicProfileDTO dto = new PublicProfileDTO(
                 profile.getName(),
@@ -46,7 +53,9 @@ public class PublicProfileController {
                 profile.getAboutMe(),
                 profile.getPhotoUrl(),
                 experiences,
-                skillsData
+                skillsData,
+                totalRefs,
+                experienceMetrics
             );
 
             return ResponseEntity.ok(dto);

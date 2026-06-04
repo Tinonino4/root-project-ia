@@ -44,6 +44,13 @@ public class ProfessionalService {
         return userProfileRepository.save(profile);
     }
 
+    @Transactional
+    public UserProfile updateAvatar(UUID userId, String photoUrl) {
+        UserProfile profile = getProfile(userId);
+        profile.updatePhotoUrl(photoUrl);
+        return userProfileRepository.save(profile);
+    }
+
     public List<Experience> getExperiences(UUID userId) {
         return experienceRepository.findByUserIdOrderByStartDateDesc(userId);
     }
