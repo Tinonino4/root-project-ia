@@ -4,7 +4,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref(localStorage.getItem('token') || null)
+  const storedToken = localStorage.getItem('token')
+  const token = ref(storedToken === 'null' || storedToken === 'undefined' ? null : storedToken)
   const user = ref(null)
   const router = useRouter()
 

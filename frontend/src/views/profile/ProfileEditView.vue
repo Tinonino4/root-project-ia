@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Save } from 'lucide-vue-next';
+import AvatarUploader from '@/components/profile/AvatarUploader.vue';
 
 const router = useRouter();
 const profileStore = useProfileStore();
@@ -69,15 +70,39 @@ const handleSave = async () => {
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="profileStore.loading && !profileStore.profile" class="flex flex-col items-center justify-center py-20 space-y-4">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      <p class="text-zinc-500">Cargando...</p>
+    <!-- Loading State with Shimmer Skeletons -->
+    <div v-if="profileStore.loading && !profileStore.profile" class="bg-white dark:bg-zinc-900 rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-8 animate-pulse">
+      <!-- Personal Info Section Shimmer -->
+      <div class="space-y-4">
+        <div class="h-6 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4 mb-4"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div v-for="i in 6" :key="i" class="space-y-2">
+            <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/5"></div>
+            <div class="h-10 bg-zinc-200 dark:bg-zinc-800 rounded w-full"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Location Section Shimmer -->
+      <div class="space-y-4">
+        <div class="h-6 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4 mb-4"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div v-for="i in 2" :key="i" class="space-y-2">
+            <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/5"></div>
+            <div class="h-10 bg-zinc-200 dark:bg-zinc-800 rounded w-full"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Edit Form -->
     <div v-else class="bg-white dark:bg-zinc-900 rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 shadow-sm">
       <form @submit.prevent="handleSave" class="space-y-8">
+        
+        <!-- Avatar Uploader Section -->
+        <div class="flex justify-center pb-6 border-b border-zinc-100 dark:border-zinc-800">
+          <AvatarUploader v-model="formData.photoUrl" />
+        </div>
         
         <!-- Personal Information Section -->
         <div class="space-y-4">
@@ -104,10 +129,6 @@ const handleSave = async () => {
             <div class="space-y-2">
               <Label for="birthday">Fecha de Nacimiento</Label>
               <Input id="birthday" type="date" v-model="formData.birthday" class="focus:ring-primary" />
-            </div>
-            <div class="space-y-2">
-              <Label for="photoUrl">URL Foto de Perfil</Label>
-              <Input id="photoUrl" type="url" placeholder="https://..." v-model="formData.photoUrl" class="focus:ring-primary" />
             </div>
           </div>
         </div>

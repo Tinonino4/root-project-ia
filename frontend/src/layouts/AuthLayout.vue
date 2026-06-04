@@ -112,8 +112,12 @@ const testimonials = [
 
       <!-- ─── RIGHT PANEL: Forms Area ──────────────────────────────────── -->
       <main id="main-content" class="w-full md:w-1/2 lg:w-2/5 flex items-center justify-center px-6 py-8 sm:p-12 relative bg-[hsl(228,16%,7%)]">
-        <div class="w-full max-w-[420px] animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <router-view />
+        <div class="w-full max-w-[420px] relative">
+          <router-view v-slot="{ Component, route: viewRoute }">
+            <Transition name="route-fade" mode="out-in">
+              <component :is="Component" :key="viewRoute.path" />
+            </Transition>
+          </router-view>
         </div>
       </main>
 

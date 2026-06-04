@@ -56,6 +56,7 @@ const loading = computed(() => profileStore.loading || experienceStore.loading |
 // Onboarding states
 const isNewUser = computed(() => !profile.value);
 const hasExperiences = computed(() => experiences.value.length > 0);
+const hasFeedback = computed(() => !!metrics.value);
 const showOnboarding = computed(() => !profile.value || experiences.value.length === 0);
 
 const mockMetrics = {
@@ -117,13 +118,49 @@ const exportToPDF = () => {
 </script>
 
 <template>
-  <!-- Main Container: Adaptable Light/Premium Dark -->
   <div class="min-h-screen bg-zinc-50 dark:bg-[hsl(228,16%,7%)] font-sans relative pb-24 transition-colors duration-300">
+    <!-- Main Container: Adaptable Light/Premium Dark -->
     
-    <!-- Loading State -->
-    <div v-if="loading && (!profile || experiences.length === 0)" class="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
-      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-      <p class="text-zinc-500 dark:text-zinc-400 font-medium tracking-wide animate-pulse">Cargando tu reputación...</p>
+    <!-- Loading State with Shimmer Skeletons -->
+    <div v-if="loading && (!profile || experiences.length === 0)" class="max-w-5xl mx-auto px-4 py-8 space-y-12 animate-pulse">
+      <!-- Welcome Hero Banner Shimmer -->
+      <div class="h-44 bg-zinc-200/50 dark:bg-white/[0.02] border border-zinc-200/50 dark:border-white/5 rounded-3xl p-8 shadow-sm">
+        <div class="space-y-4 max-w-3xl">
+          <div class="h-6 bg-zinc-200 dark:bg-zinc-800 rounded w-1/6"></div>
+          <div class="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2"></div>
+          <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4"></div>
+        </div>
+      </div>
+
+      <!-- 2 Column Layout Shimmer -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Steps Road Shimmer (Left Col) -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="h-6 bg-zinc-200 dark:bg-zinc-800 rounded w-1/3 mb-6"></div>
+          
+          <div class="space-y-6">
+            <div v-for="i in 3" :key="i" class="bg-zinc-200/30 dark:bg-white/[0.01] border border-zinc-200/50 dark:border-white/5 rounded-2xl p-6 space-y-3">
+              <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/12"></div>
+              <div class="h-6 bg-zinc-200 dark:bg-zinc-800 rounded w-1/3"></div>
+              <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-full"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Radar Demo Preview Shimmer (Right Col) -->
+        <div class="lg:col-span-5 bg-zinc-200/40 dark:bg-white/[0.02] border border-zinc-200/50 dark:border-white/5 rounded-3xl p-8 space-y-6">
+          <div class="space-y-3">
+            <div class="h-5 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4"></div>
+            <div class="h-7 bg-zinc-200 dark:bg-zinc-800 rounded w-2/3"></div>
+            <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-full"></div>
+          </div>
+          <div class="aspect-square bg-zinc-200 dark:bg-zinc-800/50 rounded-2xl flex items-center justify-center">
+            <div class="w-48 h-48 rounded-full border-4 border-zinc-300 dark:border-zinc-700/50 flex items-center justify-center">
+              <div class="w-32 h-32 rounded-full border-4 border-zinc-300 dark:border-zinc-700/50"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <template v-else>

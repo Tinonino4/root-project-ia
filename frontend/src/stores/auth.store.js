@@ -3,9 +3,15 @@ import { ref, computed } from 'vue';
 import { authApi } from '@/api/auth.api';
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref(localStorage.getItem('token') || null);
-  const refreshToken = ref(localStorage.getItem('refreshToken') || null);
-  const user = ref(JSON.parse(localStorage.getItem('user')) || null);
+  const storedToken = localStorage.getItem('token');
+  const token = ref(storedToken === 'null' || storedToken === 'undefined' ? null : storedToken);
+  
+  const storedRefreshToken = localStorage.getItem('refreshToken');
+  const refreshToken = ref(storedRefreshToken === 'null' || storedRefreshToken === 'undefined' ? null : storedRefreshToken);
+  
+  const storedUser = localStorage.getItem('user');
+  const user = ref(storedUser && storedUser !== 'null' && storedUser !== 'undefined' ? JSON.parse(storedUser) : null);
+  
   const loading = ref(false);
   const error = ref(null);
 
@@ -18,6 +24,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = userData;
     if (authToken) {
       localStorage.setItem('token', authToken);
+      localStorage.setItem('lastActivity', Date.now().toString());
     }
     if (refreshAuthToken) {
       refreshToken.value = refreshAuthToken;
@@ -35,6 +42,7 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
+    localStorage.removeItem('lastActivity');
   }
 
   async function login(email, password) {

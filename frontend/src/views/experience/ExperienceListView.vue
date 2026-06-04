@@ -40,10 +40,25 @@ const formatDate = (dateString) => {
       </Button>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="experienceStore.loading && experienceStore.experiences.length === 0" class="flex flex-col items-center justify-center py-20 space-y-4">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      <p class="text-zinc-500">Cargando experiencias...</p>
+    <!-- Loading State with Shimmer Skeletons -->
+    <div v-if="experienceStore.loading && experienceStore.experiences.length === 0" class="space-y-4">
+      <div 
+        v-for="i in 3" 
+        :key="i"
+        class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 space-y-4 animate-pulse"
+      >
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-xl bg-zinc-200 dark:bg-zinc-800 flex-shrink-0"></div>
+          <div class="space-y-2 flex-1">
+            <div class="h-5 bg-zinc-200 dark:bg-zinc-800 rounded w-1/3"></div>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <div class="h-3.5 bg-zinc-200 dark:bg-zinc-800 rounded w-24"></div>
+              <div class="h-3.5 bg-zinc-200 dark:bg-zinc-800 rounded w-32"></div>
+            </div>
+            <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-full pt-2"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Error State -->

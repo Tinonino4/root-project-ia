@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { questionnaireApi } from '@/api/questionnaire.api';
-import { Check, Star, AlertTriangle, ArrowLeft, ArrowRight, Award } from 'lucide-vue-next';
+import { Check, Star, AlertTriangle, ArrowLeft, ArrowRight, Award, MessageSquare } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 
 const route = useRoute();
@@ -16,6 +16,7 @@ const submitted = ref(false);
 
 const answers = ref({});
 const currentStep = ref(0);
+const additionalComments = ref('');
 
 onMounted(async () => {
   try {
@@ -119,7 +120,9 @@ const handleSubmit = async () => {
     
     const data = {
       skillAnswers,
-      extraAnswers: {} // Optional
+      extraAnswers: {
+        comments: additionalComments.value.trim()
+      }
     };
     
     await questionnaireApi.submitQuestionnaire(urlToken, data);
@@ -148,10 +151,41 @@ const handleSubmit = async () => {
     <!-- MAIN CONTENT -->
     <div class="max-w-3xl mx-auto px-6 -mt-12 relative z-20">
       
-      <!-- Loading State -->
-      <div v-if="loading" class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl p-12 text-center">
-        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
-        <p class="text-zinc-500 dark:text-zinc-400 font-medium mt-4">Cargando cuestionario...</p>
+      <!-- Loading State with Shimmer Skeletons -->
+      <div v-if="loading" class="space-y-6 animate-pulse">
+        <!-- Progress Stepper Header Shimmer -->
+        <div class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex items-center space-x-3 w-full md:w-auto">
+            <div class="w-10 h-10 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
+            <div class="space-y-2 flex-1">
+              <div class="h-5 bg-zinc-200 dark:bg-zinc-800 rounded w-24"></div>
+              <div class="h-3.5 bg-zinc-200 dark:bg-zinc-800 rounded w-32"></div>
+            </div>
+          </div>
+          <div class="w-full md:w-48 h-2 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+        </div>
+
+        <!-- Question Card Shimmer -->
+        <div class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl p-6 md:p-8 shadow-md space-y-8">
+          <div class="space-y-3">
+            <div class="h-6 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4"></div>
+            <div class="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4"></div>
+          </div>
+
+          <!-- Slider or Radio Choices Shimmer -->
+          <div class="space-y-4 pt-4">
+            <div v-for="i in 5" :key="i" class="flex items-center justify-between p-4 rounded-xl border border-zinc-100 dark:border-white/[0.02]">
+              <div class="h-5 bg-zinc-200 dark:bg-zinc-800 rounded w-1/3"></div>
+              <div class="w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-800"></div>
+            </div>
+          </div>
+
+          <!-- Bottom Actions Shimmer -->
+          <div class="flex justify-between items-center pt-6 border-t border-zinc-100 dark:border-white/5">
+            <div class="w-24 h-10 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
+            <div class="w-32 h-10 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Error State -->
@@ -270,6 +304,26 @@ const handleSubmit = async () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Comments block (only visible on the last step before submitting) -->
+        <div 
+          v-show="currentStep === questionnaire.categories.length - 1" 
+          class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl p-6 md:p-8 shadow-sm space-y-4 animate-fadeIn"
+        >
+          <div class="flex items-center gap-2.5 border-b border-zinc-100 dark:border-zinc-800 pb-3">
+            <MessageSquare class="w-5 h-5 text-primary" />
+            <h3 class="text-lg font-bold text-zinc-900 dark:text-white">Comentarios o opinión adicional (Opcional)</h3>
+          </div>
+          <p class="text-zinc-500 dark:text-zinc-400 text-xs">
+            ¿Hay algo más que quieras añadir sobre el desempeño profesional o cualidades de este candidato? Tu comentario se guardará como referencia confidencial.
+          </p>
+          <textarea
+            v-model="additionalComments"
+            rows="4"
+            placeholder="Ej. Es un excelente profesional con gran capacidad de aprendizaje, actitud proactiva ante los retos y gran compañerismo en el día a día..."
+            class="w-full p-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 resize-none"
+          ></textarea>
         </div>
 
         <!-- Navigation & Submit Footer -->

@@ -28,10 +28,62 @@ onMounted(async () => {
       </Button>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="profileStore.loading" class="flex flex-col items-center justify-center py-20 space-y-4">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      <p class="text-zinc-500">Cargando perfil...</p>
+    <!-- Loading State with Shimmer Skeletons -->
+    <div v-if="profileStore.loading" class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
+      <!-- Left Column: Avatar & Basic Info -->
+      <div class="md:col-span-1 space-y-6">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col items-center text-center space-y-4">
+          <div class="w-32 h-32 rounded-full bg-zinc-200 dark:bg-zinc-800"></div>
+          <div class="h-6 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4"></div>
+          <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2"></div>
+          <div class="h-3.5 bg-zinc-200 dark:bg-zinc-800 rounded w-2/3"></div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
+          <div class="h-5 bg-zinc-200 dark:bg-zinc-800 rounded w-1/3 mb-2"></div>
+          <div class="flex items-center gap-3">
+            <div class="w-5 h-5 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+            <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4"></div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-5 h-5 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+            <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Details -->
+      <div class="md:col-span-2 space-y-6">
+        <!-- About Me -->
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-3">
+          <div class="h-6 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4"></div>
+          <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-full"></div>
+          <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-full"></div>
+          <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-2/3"></div>
+        </div>
+
+        <!-- Education & Job Title Summary -->
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-6">
+          <div class="h-6 bg-zinc-200 dark:bg-zinc-800 rounded w-1/3"></div>
+          
+          <div class="flex gap-4 items-start">
+            <div class="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800"></div>
+            <div class="space-y-2 flex-1">
+              <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4"></div>
+              <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2"></div>
+            </div>
+          </div>
+
+          <div class="flex gap-4 items-start">
+            <div class="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800"></div>
+            <div class="space-y-2 flex-1">
+              <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4"></div>
+              <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Error State -->
