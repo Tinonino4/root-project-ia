@@ -1,6 +1,8 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { Toaster } from 'vue-sonner'
+import { useAuthStore } from '@/stores/auth.store'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import PublicLayout from '@/layouts/PublicLayout.vue'
@@ -13,6 +15,10 @@ const layouts = {
 
 const route = useRoute()
 const currentLayout = computed(() => {
+  const authStore = useAuthStore()
+  if (route.name === 'PublicProfile' && authStore.isAuthenticated) {
+    return DefaultLayout
+  }
   return layouts[route.meta.layout || 'DefaultLayout'] || DefaultLayout
 })
 
@@ -30,5 +36,16 @@ onMounted(() => {
 </script>
 
 <template>
+  <Toaster
+    position="top-right"
+    :duration="4000"
+    rich-colors
+    close-button
+    theme="system"
+    :toast-options="{
+      class: 'font-sans',
+      style: { fontFamily: 'Inter, sans-serif' },
+    }"
+  />
   <component :is="currentLayout" />
 </template>

@@ -1,0 +1,146 @@
+{
+  "navbar": {
+    "howItWorks": "Cómo funciona",
+    "skills": "Habilidades",
+    "verification": "Verificación",
+    "useCases": "Casos de Uso",
+    "forWhom": "Para quién",
+    "login": "Iniciar sesión",
+    "startFree": "Empieza gratis",
+    "dashboard": "Ir a mi Panel",
+    "skipToContent": "Saltar al contenido principal"
+  },
+  "footer": {
+    "tagline": "La plataforma de referencias profesionales. Todos los derechos reservados.",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "contact": "Contacto"
+  },
+  "home": {
+    "hero": {
+      "evolution": "La evolución del currículum",
+      "headlinePrefix": "Tu reputación profesional,",
+      "headlineHighlight": "tu mayor activo.",
+      "subheadline": "Caché es la plataforma donde los profesionales construyen confianza. Consigue referencias validadas de tu entorno laboral y demuestra lo que un CV no puede contar.",
+      "ctaBuild": "Empieza a construir tu Caché",
+      "ctaDiscover": "Descubre cómo funciona"
+    },
+    "features": {
+      "badge": "Más que recomendaciones en LinkedIn",
+      "tagline": "A diferencia de los endorsements genéricos, Caché recopila feedback estructurado y accionable sobre tus verdaderas competencias.",
+      "item1": {
+        "title": "Verificación 360°",
+        "desc": "Referencias cruzadas de ex-compañeros, managers y clientes para crear un perfil inquebrantable."
+      },
+      "item2": {
+        "title": "Match de Cultura",
+        "desc": "Encuentra empresas que se alineen no solo con tus habilidades, sino con tus valores de trabajo."
+      },
+      "item3": {
+        "title": "Destaca sobre el CV",
+        "desc": "Demuestra tus soft-skills reales validadas por profesionales con los que has colaborado."
+      }
+    },
+    "skillsSection": {
+      "title": "Las 5 Soft Skills Clave",
+      "subtitle": "Nuestros cuestionarios estructurados y seguros evalúan las competencias conductuales más demandadas en equipos de alto rendimiento.",
+      "items": {
+        "teamwork": {
+          "title": "Trabajo en Equipo",
+          "desc": "Colaboración activa, comunicación interpersonal fluida y aporte al clima grupal positivo."
+        },
+        "selfConfidence": {
+          "title": "Autoconfianza",
+          "desc": "Seguridad en la toma de decisiones, iniciativa personal y asertividad profesional."
+        },
+        "proactivity": {
+          "title": "Proactividad",
+          "desc": "Anticipación de necesidades, empuje ante obstáculos y búsqueda de mejora continua."
+        },
+        "integrity": {
+          "title": "Integridad",
+          "desc": "Responsabilidad, ética profesional, honestidad y cumplimiento de acuerdos."
+        },
+        "flexibility": {
+          "title": "Flexibilidad",
+          "desc": "Adaptabilidad ante cambios organizativos, apertura a nuevas ideas y aprendizaje rápido."
+        }
+      }
+    },
+    "howItWorks": {
+      "titlePrefix": "Diseñado para",
+      "titleHighlight": "impulsar tu carrera",
+      "desc": "El proceso es simple, transparente y está diseñado para extraer el máximo valor de tu red profesional sin incomodar a tus contactos.",
+      "steps": {
+        "step1": {
+          "title": "Crea tu perfil Caché",
+          "desc": "Regístrate y completa tu experiencia profesional."
+        },
+        "step2": {
+          "title": "Solicita Feedback",
+          "desc": "Envía peticiones estructuradas a tus contactos profesionales."
+        },
+        "step3": {
+          "title": "Aumenta tu Valor",
+          "desc": "Usa tu perfil validado para destacar en procesos de selección."
+        }
+      }
+    },
+    "trustProtocol": {
+      "securityBadge": "Seguridad Let's Trust",
+      "chartTitle": "Métricas de Fiabilidad de Referentes",
+      "metric1": "Email Corporativo / Profesional",
+      "metric2": "Coincidencia de Dominio con la Empresa",
+      "metric3": "Referente Registrado en la Plataforma",
+      "metric4": "Teléfono de Contacto Verificado",
+      "level1": "Excelente (>=80)",
+      "level2": "Alta (50-79)",
+      "level3": "Media (30-49)",
+      "level4": "Básica (<30)",
+      "titlePrefix": "Un Sistema de Confianza",
+      "titleHighlight": "100% Objetivo y Auditado",
+      "desc1": "En Caché, no creemos en las valoraciones vacías. Cada referencia recibida pasa por nuestro Algoritmo de Fiabilidad del Referenciador para comprobar su veracidad de forma completamente automatizada.",
+      "desc2": "Esto incentiva a los profesionales a proveer correos corporativos legítimos e información verificable, y le otorga a los reclutadores corporativos (B2B) una garantía absoluta contra autoevaluaciones o referencias falsificadas."
+    },
+    "audience": {
+      "title": "¿A quién ayuda Caché?",
+      "professionals": {
+        "title": "Profesionales",
+        "desc": "Valida tu experiencia real, destaca en entrevistas mostrando referencias previas y construye una marca personal sólida e independiente del CV tradicional.",
+        "bullet1": "Aumenta tu poder de negociación",
+        "bullet2": "Destaca soft skills comprobadas"
+      },
+      "recruiters": {
+        "title": "Reclutadores & Empresas",
+        "desc": "Reduce la fricción en la contratación, verifica referencias de forma estandarizada y asegúrate del encaje cultural antes de contratar.",
+        "bullet1": "Acorta el ciclo de contratación",
+        "bullet2": "Filtro de calidad transparente"
+      }
+    },
+    "useCases": {
+      "title": "Casos de Uso de MiCaché",
+      "desc": "Descubre cómo diferentes perfiles de la red sacan el máximo partido a nuestra plataforma.",
+      "case1": {
+        "title": "Candidato Activo",
+        "desc": "Sube tu valor en el mercado laboral al adjuntar un enlace a tu informe certificado de soft-skills a tu CV tradicional o perfil en portales de empleo."
+      },
+      "case2": {
+        "title": "Freelance & Consultor",
+        "desc": "Cierra nuevos contratos de consultoría demostrando una reputación inmaculada mediante opiniones auditadas y con un alto índice de confianza corporativa."
+      },
+      "case3": {
+        "title": "Reclutadores & Headhunters",
+        "desc": "Accede directamente al perfil completo en modo lectura, comprueba la veracidad del correo del jefe directo y optimiza la toma de decisiones previas."
+      },
+      "case4": {
+        "title": "HR & Managers",
+        "desc": "Estandariza y automatiza el proceso burocrático de pedir referencias de ex-colaboradores para los candidatos finalistas en un solo clic."
+      }
+    },
+    "bottomCta": {
+      "title": "Tu próximo empleo valora tu reputación",
+      "desc": "No dejes que tu talento quede oculto tras un PDF. Únete a Caché hoy.",
+      "cta": "Crear mi perfil gratis"
+    }
+  }
+}
