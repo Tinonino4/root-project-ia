@@ -32,19 +32,22 @@ public class FeedbackService {
     private final RelationshipTypeRepository relationshipTypeRepository;
     private final ApplicationEventPublisher events;
     private final JdbcTemplate jdbcTemplate;
+    private final ReferenceTrustCalculator trustCalculator;
 
     public FeedbackService(CacheRequestRepository cacheRequestRepository,
                            FeedbackResponseRepository feedbackResponseRepository,
                            SkillCategoryRepository skillCategoryRepository,
                            RelationshipTypeRepository relationshipTypeRepository,
                            ApplicationEventPublisher events,
-                           JdbcTemplate jdbcTemplate) {
+                           JdbcTemplate jdbcTemplate,
+                           ReferenceTrustCalculator trustCalculator) {
         this.cacheRequestRepository = cacheRequestRepository;
         this.feedbackResponseRepository = feedbackResponseRepository;
         this.skillCategoryRepository = skillCategoryRepository;
         this.relationshipTypeRepository = relationshipTypeRepository;
         this.events = events;
         this.jdbcTemplate = jdbcTemplate;
+        this.trustCalculator = trustCalculator;
     }
 
     // ── Catálogos ─────────────────────────────────────────────
@@ -140,6 +143,36 @@ public class FeedbackService {
 
         feedbackResponseRepository.saveAllAndFlush(responses);
 
+        // Calcular Trust Score
+        int score = 0;
+        String email = cr.getTargetEmail();
+        String company = lookupExperienceCompanyName(cr.getExperienceId());
+
+        if (trustCalculator.isCorporateDomain(email)) {
+            score += 30;
+        }
+        if (trustCalculator.matchesCompany(email, company)) {
+            score += 40;
+        }
+        if (trustCalculator.isUserRegistered(email)) {
+            score += 20;
+        }
+        if (cr.getTargetPhone() != null && !cr.getTargetPhone().isBlank()) {
+            score += 10;
+        }
+
+        String level = "BASICO";
+        if (score >= 80) {
+            level = "EXCELENTE";
+        } else if (score >= 50) {
+            level = "ALTO";
+        } else if (score >= 30) {
+            level = "MEDIO";
+        }
+
+        cr.setTrustScore(score);
+        cr.setTrustLevel(level);
+
         cr.markFinished(dto.extraAnswers());
         cacheRequestRepository.saveAndFlush(cr);
 
@@ -188,7 +221,8 @@ public class FeedbackService {
         return new CacheRequestViewDTO(
             cr.getId(), cr.getExperienceId(), cr.getRelationshipId(),
             cr.isStillWorksThere(), cr.getTargetName(), cr.getTargetSurname(),
-            cr.getTargetEmail(), cr.getTargetPhone(), cr.isFinished(), cr.isVisible(), cr.getCreatedAt()
+            cr.getTargetEmail(), cr.getTargetPhone(), cr.isFinished(), cr.isVisible(),
+            cr.getTrustScore(), cr.getTrustLevel(), cr.getCreatedAt()
         );
     }
 }

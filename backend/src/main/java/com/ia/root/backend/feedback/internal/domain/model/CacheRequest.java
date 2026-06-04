@@ -54,6 +54,12 @@ public class CacheRequest {
     @Column(name = "extra_answers", columnDefinition = "jsonb")
     private Map<String, Object> extraAnswers;
 
+    @Column(name = "trust_score", nullable = false)
+    private int trustScore = 0;
+
+    @Column(name = "trust_level", nullable = false)
+    private String trustLevel = "BASICO";
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private ZonedDateTime createdAt;
 
@@ -96,5 +102,9 @@ public class CacheRequest {
     public void setVisible(boolean visible) { this.isVisible = visible; }
     public String getTargetPhone() { return targetPhone; }
     public Map<String, Object> getExtraAnswers() { return extraAnswers; }
+    public int getTrustScore() { return trustScore; }
+    public void setTrustScore(int trustScore) { this.trustScore = trustScore; }
+    public String getTrustLevel() { return trustLevel; }
+    public void setTrustLevel(String trustLevel) { this.trustLevel = trustLevel; }
     public ZonedDateTime getCreatedAt() { return createdAt; }
 }

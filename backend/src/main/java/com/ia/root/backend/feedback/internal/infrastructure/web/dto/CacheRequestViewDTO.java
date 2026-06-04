@@ -16,5 +16,7 @@ public record CacheRequestViewDTO(
     @Schema(description = "Teléfono del referente") String targetPhone,
     @Schema(description = "Si el cuestionario ya fue completado") boolean finished,
     @Schema(description = "Si la valoración es visible públicamente en el perfil") boolean visible,
+    @Schema(description = "Puntuación de confianza (0-100)") int trustScore,
+    @Schema(description = "Nivel de confianza verificado") String trustLevel,
     @Schema(description = "Fecha de creación") ZonedDateTime createdAt
 ) {}

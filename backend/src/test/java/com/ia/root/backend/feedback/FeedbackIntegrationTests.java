@@ -493,4 +493,78 @@ public class FeedbackIntegrationTests {
                 .content("{\"visible\":false}"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void shouldCalculateTrustScoreAndExposeExperienceMetrics() throws Exception {
+        // 1. Crear solicitud de feedback con correo corporativo cuyo dominio coincide con "Acme Corp"
+        String urlToken = createCacheRequestAndGetUrlToken("Jefe", "Boss", "boss@acme.com");
+
+        // Registrar boss@acme.com como usuario para obtener los puntos de usuario registrado (+20)
+        UUID registeredRefererId = UUID.randomUUID();
+        jdbcTemplate.update(
+            "INSERT INTO users (id, name, email, password_hash, is_active, provider, role) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            registeredRefererId, "Jefe Boss", "boss@acme.com", "hash", true, "LOCAL", "ROLE_USER"
+        );
+
+        // 2. Cargar cuestionario público para obtener las preguntas
+        MvcResult questionnaireResult = mockMvc.perform(get("/api/questionnaire/" + urlToken))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String questionnaireJson = questionnaireResult.getResponse().getContentAsString();
+        tools.jackson.databind.json.JsonMapper mapper = tools.jackson.databind.json.JsonMapper.builder().build();
+        var tree = mapper.readTree(questionnaireJson);
+
+        // 3. Responder con puntuación máxima (5)
+        List<SubmitQuestionnaireDTO.SkillAnswer> skillAnswers = new java.util.ArrayList<>();
+        for (var category : tree.get("categories")) {
+            for (var question : category.get("questions")) {
+                UUID questionId = UUID.fromString(question.get("id").asText());
+                skillAnswers.add(new SubmitQuestionnaireDTO.SkillAnswer(questionId, 5));
+            }
+        }
+
+        SubmitQuestionnaireDTO submitDto = new SubmitQuestionnaireDTO(skillAnswers, Map.of());
+
+        // 4. Enviar respuestas
+        mockMvc.perform(post("/api/questionnaire/" + urlToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(submitDto)))
+                .andExpect(status().isOk());
+
+        // 5. Verificar que el cálculo de confianza es correcto:
+        // - Email Corporativo (boss@acme.com): +30
+        // - Dominio Coincidente con "Acme Corp": +40
+        // - Referente Registrado: +20
+        // - Teléfono no provisto: +0
+        // Total = 90% (Nivel EXCELENTE)
+        mockMvc.perform(get("/api/feedback/requests")
+                .with(user(securityUser)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].trustScore").value(90))
+                .andExpect(jsonPath("$[0].trustLevel").value("EXCELENTE"));
+
+        // 6. Hacer visible la referencia para recalculados
+        UUID requestId = jdbcTemplate.queryForObject(
+            "SELECT id FROM cache_requests WHERE url_token = ?",
+            UUID.class, urlToken
+        );
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch("/api/feedback/requests/" + requestId + "/visibility")
+                .with(user(securityUser))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"visible\":true}"))
+                .andExpect(status().isOk());
+
+        // 7. Verificar que el endpoint de perfil público expone la visualización desgranada
+        mockMvc.perform(get("/api/public/profile/" + userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalReferencesCount").value(1))
+                .andExpect(jsonPath("$.experienceMetrics.length()").value(1))
+                .andExpect(jsonPath("$.experienceMetrics[0].experienceId").value(experienceId.toString()))
+                .andExpect(jsonPath("$.experienceMetrics[0].averageScore").value(5.0))
+                .andExpect(jsonPath("$.experienceMetrics[0].referencesCount").value(1))
+                .andExpect(jsonPath("$.experienceMetrics[0].categoryAverages.TEAMWORK").value(5.0))
+                .andExpect(jsonPath("$.experienceMetrics[0].averageTrustScore").value(90.0))
+                .andExpect(jsonPath("$.experienceMetrics[0].relationshipCounts.DIRECT_MANAGER").value(1));
+    }
 }

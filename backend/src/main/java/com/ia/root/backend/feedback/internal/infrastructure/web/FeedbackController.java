@@ -59,7 +59,8 @@ public class FeedbackController {
         CacheRequestViewDTO view = new CacheRequestViewDTO(
             cr.getId(), cr.getExperienceId(), cr.getRelationshipId(),
             cr.isStillWorksThere(), cr.getTargetName(), cr.getTargetSurname(),
-            cr.getTargetEmail(), cr.getTargetPhone(), cr.isFinished(), cr.isVisible(), cr.getCreatedAt()
+            cr.getTargetEmail(), cr.getTargetPhone(), cr.isFinished(), cr.isVisible(),
+            cr.getTrustScore(), cr.getTrustLevel(), cr.getCreatedAt()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(view);
     }
