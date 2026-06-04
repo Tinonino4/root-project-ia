@@ -235,18 +235,6 @@ const goBack = () => {
                 ¿Sigue trabajando ahí?
               </Label>
             </div>
-
-            <div class="flex items-center space-x-3">
-              <input 
-                id="extraAnswers" 
-                type="checkbox" 
-                v-model="form.extraAnswers" 
-                class="w-5 h-5 rounded-md border-zinc-300 dark:border-zinc-700 text-primary focus:ring-primary dark:bg-zinc-800"
-              />
-              <Label for="extraAnswers" class="text-sm font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer">
-                Permitir respuestas extra (comentarios)
-              </Label>
-            </div>
           </div>
 
           <!-- Submit Button -->

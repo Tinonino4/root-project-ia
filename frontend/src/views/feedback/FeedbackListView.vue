@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useFeedbackStore } from '@/stores/feedback.store';
-import { ArrowLeft, Plus, Mail, Clock, CheckCircle2, XCircle } from 'lucide-vue-next';
+import { ArrowLeft, Plus, Mail, Clock, CheckCircle2, XCircle, ShieldCheck } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 
 const router = useRouter();
@@ -57,6 +57,40 @@ const formatDate = (dateString) => {
     day: 'numeric'
   });
 };
+
+const FREE_DOMAINS = [
+  'gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'icloud.com',
+  'proton.me', 'protonmail.com', 'aol.com', 'live.com', 'hotmail.es',
+  'yahoo.es', 'live.cl', 'yandex.com', 'mail.com', 'zoho.com', 'gmx.com', 'outlook.es'
+];
+
+const isCorporate = (email) => {
+  if (!email || !email.includes('@')) return false;
+  const domain = email.substring(email.indexOf('@') + 1).toLowerCase().trim();
+  return !FREE_DOMAINS.includes(domain);
+};
+
+const hasCorporate = (req) => isCorporate(req.targetEmail);
+const hasPhone = (req) => !!req.targetPhone;
+
+const hasRegistered = (req) => {
+  const base = (isCorporate(req.targetEmail) ? 30 : 0) + (req.targetPhone ? 10 : 0);
+  const diff = req.trustScore - base;
+  return diff === 20 || diff === 60;
+};
+
+const hasCompanyMatch = (req) => {
+  const base = (isCorporate(req.targetEmail) ? 30 : 0) + (req.targetPhone ? 10 : 0);
+  const diff = req.trustScore - base;
+  return diff === 40 || diff === 60;
+};
+
+const getTrustLabel = (score) => {
+  if (score >= 80) return 'Excelente';
+  if (score >= 50) return 'Alta';
+  if (score >= 30) return 'Media';
+  return 'Básica';
+};
 </script>
 
 <template>
@@ -94,9 +128,27 @@ const formatDate = (dateString) => {
     <!-- MAIN CONTENT -->
     <div class="max-w-5xl mx-auto px-6 -mt-10 relative z-20">
       
-      <!-- Loading State -->
-      <div v-if="loading" class="flex justify-center items-center py-20">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <!-- Loading State with Shimmer Skeletons -->
+      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div 
+          v-for="i in 4" 
+          :key="i"
+          class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 space-y-4 animate-pulse"
+        >
+          <div class="flex justify-between items-start">
+            <div class="space-y-2 flex-1">
+              <div class="h-5 bg-zinc-200 dark:bg-zinc-800 rounded w-2/3"></div>
+              <div class="h-3.5 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2"></div>
+            </div>
+            <div class="h-6 bg-zinc-200 dark:bg-zinc-800 rounded w-20"></div>
+          </div>
+          <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/3"></div>
+          <div class="h-px bg-zinc-100 dark:bg-zinc-800/60 my-4"></div>
+          <div class="flex justify-between items-center">
+            <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-24"></div>
+            <div class="h-6 bg-zinc-200 dark:bg-zinc-800 rounded w-12"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Empty State -->
@@ -155,6 +207,47 @@ const formatDate = (dateString) => {
               <div class="flex justify-between">
                 <span>Token:</span>
                 <span class="font-mono text-xs bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">{{ req.id.substring(0, 8) }}...</span>
+              </div>
+              <div v-if="req.finished" class="flex justify-between items-center pt-1.5 border-t border-zinc-100 dark:border-zinc-800/40 mt-1.5">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">Confianza del Referente:</span>
+                <div class="relative group cursor-help select-none">
+                  <span 
+                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border"
+                    :class="{
+                      'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20': req.trustScore >= 80,
+                      'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20': req.trustScore >= 50 && req.trustScore < 80,
+                      'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20': req.trustScore >= 30 && req.trustScore < 50,
+                      'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20': req.trustScore < 30
+                    }"
+                  >
+                    <ShieldCheck class="w-3.5 h-3.5 mr-1" />
+                    {{ getTrustLabel(req.trustScore) }} ({{ req.trustScore }}%)
+                  </span>
+                  
+                  <!-- Hover tooltip desglosando los puntos de confianza -->
+                  <div class="absolute bottom-full right-0 mb-2 w-64 p-3 rounded-xl bg-zinc-900 border border-white/10 text-white text-xs space-y-1.5 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-2xl z-50">
+                    <p class="font-bold text-zinc-300 mb-1 border-b border-white/10 pb-1 flex items-center gap-1.5">
+                      <ShieldCheck class="w-3.5 h-3.5 text-primary" />
+                      Desglose de Verificación
+                    </p>
+                    <div class="flex justify-between">
+                      <span class="text-zinc-400">Email Corporativo (+30%):</span>
+                      <span class="font-bold" :class="hasCorporate(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasCorporate(req) ? '✓ Sí' : '✗ No' }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-zinc-400">Coincide con Empresa (+40%):</span>
+                      <span class="font-bold" :class="hasCompanyMatch(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasCompanyMatch(req) ? '✓ Sí' : '✗ No' }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-zinc-400">Referente Registrado (+20%):</span>
+                      <span class="font-bold" :class="hasRegistered(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasRegistered(req) ? '✓ Sí' : '✗ No' }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-zinc-400">Teléfono Provisto (+10%):</span>
+                      <span class="font-bold" :class="hasPhone(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasPhone(req) ? '✓ Sí' : '✗ No' }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

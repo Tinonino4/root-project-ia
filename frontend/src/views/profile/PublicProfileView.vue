@@ -1,13 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import client from '@/api/client';
 import SkillsRadarChart from '@/components/dashboard/SkillsRadarChart.vue';
-import { Briefcase, Calendar, Award, ArrowLeft, Download } from 'lucide-vue-next';
+import { Briefcase, Calendar, Award, ArrowLeft, Download, Eye, ShieldCheck } from 'lucide-vue-next';
 import html2pdf from 'html2pdf.js';
+import { useAuthStore } from '@/stores/auth.store';
 
 const route = useRoute();
 const router = useRouter();
+const authStore = useAuthStore();
 const userId = route.params.userId;
 
 const profile = ref(null);
@@ -15,6 +17,40 @@ const loading = ref(true);
 const error = ref(null);
 const isExporting = ref(false);
 const isGeneratingPDF = ref(false);
+
+const expandedExperiences = ref({});
+
+const toggleExperienceBreakdown = (expId) => {
+  expandedExperiences.value[expId] = !expandedExperiences.value[expId];
+};
+
+const getMetricsForExperience = (expId) => {
+  if (!profile.value || !profile.value.experienceMetrics) return null;
+  return profile.value.experienceMetrics.find(m => m.experienceId === expId) || null;
+};
+
+const getTrustLevelLabel = (score) => {
+  if (score >= 80) return 'Excelente';
+  if (score >= 50) return 'Alta';
+  if (score >= 30) return 'Media';
+  return 'Básica';
+};
+
+const relationshipLabels = {
+  DIRECT_MANAGER: 'Jefe directo',
+  COLLEAGUE: 'Compañero/a',
+  SUBORDINATE: 'Subordinado/a',
+  CLIENT: 'Cliente',
+  OTHER: 'Otro/a'
+};
+
+const categoryLabels = {
+  TEAMWORK: 'Trabajo en equipo',
+  SELF_CONFIDENCE: 'Autoconfianza',
+  PROACTIVITY: 'Proactividad',
+  INTEGRITY: 'Integridad',
+  FLEXIBILITY: 'Flexibilidad'
+};
 
 onMounted(async () => {
   try {
@@ -82,11 +118,55 @@ const exportPDF = () => {
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 min-h-screen">
-    <!-- Loading State -->
-    <div v-if="loading" class="text-center py-20">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
-      <p class="mt-4 text-[hsl(220,10%,60%)]">Cargando perfil...</p>
+  <div :class="['max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen', authStore.isAuthenticated ? 'py-6' : 'py-20']">
+    <!-- Loading State with Shimmer Skeletons -->
+    <div v-if="loading" class="space-y-8 animate-pulse">
+      <!-- Back Action and Export Button Shimmer -->
+      <div class="flex items-center justify-between gap-4">
+        <div class="w-24 h-10 bg-white/5 border border-white/5 rounded-xl"></div>
+        <div class="w-44 h-10 bg-white/5 border border-white/5 rounded-xl"></div>
+      </div>
+
+      <!-- Hero Section Shimmer -->
+      <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-8 shadow-2xl">
+        <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
+          <div class="w-32 h-32 rounded-full bg-white/5 flex-shrink-0"></div>
+          <div class="flex-1 text-center md:text-left space-y-4 w-full">
+            <div class="h-8 bg-white/5 rounded w-1/3 mx-auto md:mx-0"></div>
+            <div class="h-5 bg-white/5 rounded w-1/4 mx-auto md:mx-0"></div>
+            <div class="space-y-2 pt-2">
+              <div class="h-4 bg-white/5 rounded w-full"></div>
+              <div class="h-4 bg-white/5 rounded w-5/6 mx-auto md:mx-0"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid: Skills and Experience -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Skills Shimmer -->
+        <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-6 shadow-xl space-y-6">
+          <div class="h-6 bg-white/5 rounded w-1/3"></div>
+          <div class="h-80 flex items-center justify-center">
+            <div class="w-56 h-56 rounded-full border-4 border-white/5 flex items-center justify-center">
+              <div class="w-36 h-36 rounded-full border-4 border-white/5"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience Timeline Shimmer -->
+        <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-6 shadow-xl space-y-6">
+          <div class="h-6 bg-white/5 rounded w-1/3"></div>
+          <div class="space-y-6">
+            <div v-for="i in 3" :key="i" class="space-y-2">
+              <div class="h-5 bg-white/5 rounded w-1/2"></div>
+              <div class="h-4 bg-white/5 rounded w-1/3"></div>
+              <div class="h-3.5 bg-white/5 rounded w-1/4"></div>
+              <div class="h-4 bg-white/5 rounded w-full pt-2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Error State -->
@@ -122,6 +202,27 @@ const exportPDF = () => {
         </button>
       </div>
 
+      <!-- Read-Only / Modo Lectura Banner -->
+      <div 
+        v-if="authStore.isAuthenticated && route.params.userId !== authStore.user?.id" 
+        class="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-5 rounded-2xl flex items-center justify-between shadow-lg"
+      >
+        <div class="flex items-center space-x-3.5">
+          <div class="p-2.5 bg-amber-500/10 dark:bg-amber-500/20 rounded-xl text-amber-500">
+            <Eye class="w-5 h-5" />
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Modo Lectura Activo</h4>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              Estás visualizando el perfil público de este candidato. Las opciones de edición están desactivadas.
+            </p>
+          </div>
+        </div>
+        <div class="hidden sm:block px-3 py-1 bg-amber-500/15 border border-amber-500/25 rounded-lg text-[10px] font-bold uppercase tracking-widest text-amber-500">
+          Vista Candidato
+        </div>
+      </div>
+
       <!-- Hero Section -->
       <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-8 backdrop-blur-xl shadow-2xl">
         <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
@@ -134,7 +235,13 @@ const exportPDF = () => {
           <!-- Info -->
           <div class="flex-1 text-center md:text-left space-y-2">
             <h1 class="text-3xl font-bold text-white tracking-tight">{{ profile.name }} {{ profile.surname }}</h1>
-            <p class="text-lg text-primary font-semibold">{{ profile.jobTitle }}</p>
+            <p class="text-lg text-primary font-semibold flex flex-wrap items-center justify-center md:justify-start gap-3">
+              <span>{{ profile.jobTitle }}</span>
+              <span v-if="profile.totalReferencesCount > 0" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-lg select-none">
+                <ShieldCheck class="w-3.5 h-3.5 mr-1 text-emerald-400" />
+                {{ profile.totalReferencesCount }} {{ profile.totalReferencesCount === 1 ? 'Referencia Certificada' : 'Referencias Certificadas' }}
+              </span>
+            </p>
             <p class="text-[hsl(220,10%,75%)] mt-4 max-w-2xl text-balance">{{ profile.aboutMe }}</p>
           </div>
         </div>
@@ -175,6 +282,87 @@ const exportPDF = () => {
                   <span>{{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Presente' }}</span>
                 </div>
                 <p class="text-sm text-[hsl(220,10%,60%)] mt-2 leading-relaxed">{{ exp.functions }}</p>
+
+                <!-- Experience Rating Breakdown (Showable/Hideable) -->
+                <div v-if="getMetricsForExperience(exp.id)" class="mt-4 p-4 rounded-xl bg-white/[0.01] border border-white/5 space-y-4">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <!-- Rating and Reference Count -->
+                    <div class="flex items-center gap-2">
+                      <div class="flex items-center text-amber-400">
+                        <span class="text-sm font-bold text-white mr-1.5">
+                          {{ getMetricsForExperience(exp.id).averageScore.toFixed(1) }}
+                        </span>
+                        <svg v-for="star in 5" :key="star" class="w-3.5 h-3.5" :class="star <= Math.round(getMetricsForExperience(exp.id).averageScore) ? 'fill-current' : 'text-zinc-700'" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      </div>
+                      <span class="text-xs text-[hsl(220,10%,55%)]">
+                        ({{ getMetricsForExperience(exp.id).referencesCount }} {{ getMetricsForExperience(exp.id).referencesCount === 1 ? 'referencia' : 'referencias' }})
+                      </span>
+                    </div>
+
+                    <!-- Trust Level Badge -->
+                    <div class="flex items-center gap-1.5">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold"
+                        :class="{
+                          'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': getMetricsForExperience(exp.id).averageTrustScore >= 80,
+                          'bg-amber-500/10 text-amber-400 border border-amber-500/20': getMetricsForExperience(exp.id).averageTrustScore >= 50 && getMetricsForExperience(exp.id).averageTrustScore < 80,
+                          'bg-orange-500/10 text-orange-400 border border-orange-500/20': getMetricsForExperience(exp.id).averageTrustScore >= 30 && getMetricsForExperience(exp.id).averageTrustScore < 50,
+                          'bg-rose-500/10 text-rose-400 border border-rose-500/20': getMetricsForExperience(exp.id).averageTrustScore < 30
+                        }"
+                      >
+                        <ShieldCheck class="w-3 h-3 mr-1" />
+                        Confianza: {{ getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }}
+                      </span>
+                    </div>
+
+                    <!-- Action Toggle -->
+                    <button 
+                      @click="toggleExperienceBreakdown(exp.id)"
+                      class="text-xs text-primary hover:text-primary-hover font-semibold flex items-center gap-1 transition-all duration-200"
+                    >
+                      <span>{{ expandedExperiences[exp.id] ? 'Ocultar detalles' : 'Ver detalles' }}</span>
+                      <Eye class="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <!-- Details Section (Accordion) -->
+                  <div v-if="expandedExperiences[exp.id]" class="mt-4 pt-4 border-t border-white/5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <!-- Soft Skills breakdown bars -->
+                    <div class="space-y-3">
+                      <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Habilidades Blandas en este Rol</h4>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                        <div v-for="(val, skill) in getMetricsForExperience(exp.id).categoryAverages" :key="skill" class="space-y-1">
+                          <div class="flex justify-between text-xs font-medium">
+                            <span class="text-zinc-400">{{ categoryLabels[skill] || skill }}</span>
+                            <span class="text-white font-bold">{{ val.toFixed(1) }}/5.0</span>
+                          </div>
+                          <div class="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                            <div 
+                              class="h-full bg-gradient-to-r from-primary to-orange-500 rounded-full transition-all duration-500" 
+                              :style="{ width: (val * 20) + '%' }"
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Evaluators roles distribution -->
+                    <div v-if="Object.keys(getMetricsForExperience(exp.id).relationshipCounts).length > 0" class="pt-3 border-t border-white/5">
+                      <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2.5">Distribución de Evaluadores</h4>
+                      <div class="flex flex-wrap gap-2">
+                        <span 
+                          v-for="(count, role) in getMetricsForExperience(exp.id).relationshipCounts" 
+                          :key="role" 
+                          class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs bg-white/[0.02] border border-white/5 text-zinc-300 font-medium select-none"
+                        >
+                          <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2 shadow-sm"></span>
+                          {{ relationshipLabels[role] || role }}: <strong class="text-white ml-1 font-bold">{{ count }}</strong>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
