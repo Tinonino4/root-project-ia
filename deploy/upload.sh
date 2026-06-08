@@ -21,7 +21,7 @@ scp backend/target/backend-0.0.1-SNAPSHOT.jar root@$VPS_IP:/var/web/micache/back
 
 # 4. Transferir archivos de configuración
 echo "⚙️ Copiando archivos de configuración de servicios..."
-scp deploy/micache-backend.service root@$VPS_IP:/etc/systemd/system/micache-backend.service
+#scp deploy/micache-backend.service root@$VPS_IP:/etc/systemd/system/micache-backend.service
 scp deploy/nginx-micache.conf root@$VPS_IP:/etc/nginx/sites-available/micache
 
 # 5. Transferir Frontend compilado
