@@ -1,6 +1,9 @@
 package com.ia.root.backend.auth.internal.infrastructure.web;
 import com.ia.root.backend.auth.internal.infrastructure.web.dto.*;
 import com.ia.root.backend.auth.internal.application.AuthService;
+import com.ia.root.backend.auth.internal.domain.model.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -90,5 +93,16 @@ public class AuthController {
     public ResponseEntity<TokenRefreshResponse> refreshToken(@RequestBody @Valid TokenRefreshRequest request) {
         TokenRefreshResponse response = authService.refreshToken(request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "Obtener detalles del usuario autenticado",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Datos del usuario actual"),
+            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+        })
+    public ResponseEntity<UserMeResponse> getMe(@AuthenticationPrincipal(expression = "id") UUID userId) {
+        User user = authService.getUserById(userId);
+        return ResponseEntity.ok(new UserMeResponse(user.getId(), user.getName(), user.getEmail(), user.getRole()));
     }
 }

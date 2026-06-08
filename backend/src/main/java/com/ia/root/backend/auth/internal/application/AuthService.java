@@ -198,6 +198,11 @@ public class AuthService {
         return new TokenRefreshResponse(accessToken, newRefreshToken);
     }
 
+    public User getUserById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+    }
+
     private String generateOtp() {
         SecureRandom random = new SecureRandom();
         int otp = 100000 + random.nextInt(900000);
