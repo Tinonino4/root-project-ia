@@ -142,6 +142,23 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function fetchCurrentUser() {
+    loading.value = true;
+    error.value = null;
+    try {
+      const response = await authApi.getMe();
+      user.value = response.data;
+      localStorage.setItem('user', JSON.stringify(response.data));
+      return response.data;
+    } catch (e) {
+      error.value = e.response?.data?.message || 'Error al obtener datos de usuario';
+      logout();
+      throw e;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     token,
     refreshToken,
@@ -157,6 +174,8 @@ export const useAuthStore = defineStore('auth', () => {
     forgotPassword,
     resetPassword,
     refreshToken: refreshSession,
+    fetchCurrentUser,
+    setAuth,
     logout,
   };
 });

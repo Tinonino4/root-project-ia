@@ -28,5 +28,11 @@ export default [
     name: 'ResetPassword',
     component: () => import('@/views/auth/ResetPasswordView.vue'),
     meta: { layout: 'AuthLayout', guest: true }
+  },
+  {
+    path: '/oauth2/redirect',
+    name: 'OAuth2Redirect',
+    component: () => import('@/views/auth/OAuth2RedirectView.vue'),
+    meta: { layout: 'AuthLayout', guest: true }
   }
 ];
