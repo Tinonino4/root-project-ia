@@ -64,6 +64,11 @@ public class FeedbackService {
 
     @Transactional
     public CacheRequest createCacheRequest(UUID userId, CreateCacheRequestDTO dto) {
+        String userEmail = lookupUserEmail(userId);
+        if (dto.targetEmail() != null && dto.targetEmail().trim().equalsIgnoreCase(userEmail.trim())) {
+            throw new IllegalArgumentException("No puedes solicitar feedback a tu propio correo electrónico");
+        }
+
         String urlToken = UUID.randomUUID().toString();
 
         CacheRequest cr = CacheRequest.create(
@@ -184,6 +189,12 @@ public class FeedbackService {
     private String lookupUserName(UUID userId) {
         return jdbcTemplate.queryForObject(
             "SELECT name FROM users WHERE id = ?", String.class, userId
+        );
+    }
+
+    private String lookupUserEmail(UUID userId) {
+        return jdbcTemplate.queryForObject(
+            "SELECT email FROM users WHERE id = ?", String.class, userId
         );
     }
 

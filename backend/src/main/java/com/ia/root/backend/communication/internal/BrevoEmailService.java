@@ -126,6 +126,9 @@ class BrevoEmailService {
             log.info("📧 Email sent via Brevo → to={}, templateId={}, messageId={}",
                 toEmail, templateId, response.getMessageId());
 
+        } catch (brevo.ApiException e) {
+            log.error("❌ Failed to send email via Brevo (API Error) → to={}, templateId={}, code={}, response={}, error={}",
+                toEmail, templateId, e.getCode(), e.getResponseBody(), e.getMessage(), e);
         } catch (Exception e) {
             log.error("❌ Failed to send email via Brevo → to={}, templateId={}, error={}",
                 toEmail, templateId, e.getMessage(), e);

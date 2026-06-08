@@ -171,6 +171,19 @@ public class FeedbackIntegrationTests {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void shouldRejectSelfReferencingRequest() throws Exception {
+        CreateCacheRequestDTO dto = new CreateCacheRequestDTO(
+            experienceId, 0, true, "Self", "Reference", "test@example.com", null
+        );
+
+        mockMvc.perform(post("/api/feedback/requests")
+                .with(user(securityUser))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
+
     // ------------------------------------------------------------------ 
     // Listar solicitudes
     // ------------------------------------------------------------------ 
