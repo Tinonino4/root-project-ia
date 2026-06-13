@@ -86,6 +86,7 @@ public class CacheRequest {
     public void markFinished(Map<String, Object> extraAnswers) {
         this.finished = true;
         this.extraAnswers = extraAnswers;
+        this.isVisible = true;
     }
 
     public UUID getId() { return id; }

@@ -276,7 +276,8 @@ public class FeedbackIntegrationTests {
             "question2", 2,
             "question4", "Excelente trabajo en equipo",
             "question5", "Mejorar comunicación escrita",
-            "question6", 1
+            "question6", 1,
+            "comments", "Es un gran profesional y compañero"
         );
 
         SubmitQuestionnaireDTO submitDto = new SubmitQuestionnaireDTO(skillAnswers, extraAnswers);
@@ -288,13 +289,52 @@ public class FeedbackIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").exists());
 
+        // 4b. Verify that the request now includes the qualitative comments (extraAnswers)
+        mockMvc.perform(get("/api/feedback/requests")
+                .with(user(securityUser)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].extraAnswers.comments").value("Es un gran profesional y compañero"));
+
         // 5. Verify the request is marked as finished
         mockMvc.perform(get("/api/feedback/requests/experience/" + experienceId + "/count")
                 .with(user(securityUser)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(1));
 
-        // 6. Verify skills metrics are still 0 because the new reference is PRIVATE by default
+        // 6. Verify skills metrics are immediately calculated because the new reference is visible by default
+        mockMvc.perform(get("/api/skills/metrics")
+                .with(user(securityUser)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.teamwork").value(4.0))
+                .andExpect(jsonPath("$.proactivity").value(4.0))
+                .andExpect(jsonPath("$.integrity").value(4.0))
+                .andExpect(jsonPath("$.selfConfidence").value(4.0))
+                .andExpect(jsonPath("$.flexibility").value(4.0))
+                .andExpect(jsonPath("$.averageScore").value(4.0));
+
+        // 6b. Verify the public profile contains the certified testimonial
+        mockMvc.perform(get("/api/public/profile/" + userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.experienceMetrics[0].testimonials.length()").value(1))
+                .andExpect(jsonPath("$.experienceMetrics[0].testimonials[0].comment").value("Es un gran profesional y compañero"))
+                .andExpect(jsonPath("$.experienceMetrics[0].testimonials[0].relationshipCode").value("DIRECT_MANAGER"))
+                .andExpect(jsonPath("$.experienceMetrics[0].testimonials[0].evaluatorName").value("Ana"))
+                .andExpect(jsonPath("$.experienceMetrics[0].testimonials[0].evaluatorSurname").value("López"));
+
+        // 7. Find cacheRequestId in DB and toggle visibility to false
+        UUID requestId = jdbcTemplate.queryForObject(
+            "SELECT id FROM cache_requests WHERE url_token = ?",
+            UUID.class, urlToken
+        );
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch("/api/feedback/requests/" + requestId + "/visibility")
+                .with(user(securityUser))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"visible\":false}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.visible").value(false));
+
+        // 8. Verify skills metrics are now recalculated and show 0.0
         mockMvc.perform(get("/api/skills/metrics")
                 .with(user(securityUser)))
                 .andExpect(status().isOk())
@@ -305,12 +345,7 @@ public class FeedbackIntegrationTests {
                 .andExpect(jsonPath("$.flexibility").value(0.0))
                 .andExpect(jsonPath("$.averageScore").value(0.0));
 
-        // 7. Find cacheRequestId in DB and toggle visibility to true
-        UUID requestId = jdbcTemplate.queryForObject(
-            "SELECT id FROM cache_requests WHERE url_token = ?",
-            UUID.class, urlToken
-        );
-
+        // 9. Toggle visibility back to true and verify metrics return to 4.0
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch("/api/feedback/requests/" + requestId + "/visibility")
                 .with(user(securityUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -318,15 +353,10 @@ public class FeedbackIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.visible").value(true));
 
-        // 8. Verify skills metrics are now recalculated and show 4.0
         mockMvc.perform(get("/api/skills/metrics")
                 .with(user(securityUser)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.teamwork").value(4.0))
-                .andExpect(jsonPath("$.proactivity").value(4.0))
-                .andExpect(jsonPath("$.integrity").value(4.0))
-                .andExpect(jsonPath("$.selfConfidence").value(4.0))
-                .andExpect(jsonPath("$.flexibility").value(4.0))
                 .andExpect(jsonPath("$.averageScore").value(4.0));
     }
 
@@ -579,5 +609,70 @@ public class FeedbackIntegrationTests {
                 .andExpect(jsonPath("$.experienceMetrics[0].categoryAverages.TEAMWORK").value(5.0))
                 .andExpect(jsonPath("$.experienceMetrics[0].averageTrustScore").value(90.0))
                 .andExpect(jsonPath("$.experienceMetrics[0].relationshipCounts.DIRECT_MANAGER").value(1));
+    }
+
+    // ------------------------------------------------------------------ 
+    // Pruebas de Eliminación y Recordatorios
+    // ------------------------------------------------------------------ 
+
+    @Test
+    void shouldDeletePendingFeedbackRequest() throws Exception {
+        String urlToken = createCacheRequestAndGetUrlToken("Ana", "López", "ana@ref.com");
+        UUID requestId = jdbcTemplate.queryForObject(
+            "SELECT id FROM cache_requests WHERE url_token = ?",
+            UUID.class, urlToken
+        );
+
+        // Delete request
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/feedback/requests/" + requestId)
+                .with(user(securityUser)))
+                .andExpect(status().isNoContent());
+
+        // Verify request is deleted in DB
+        Integer count = jdbcTemplate.queryForObject(
+            "SELECT count(*) FROM cache_requests WHERE id = ?",
+            Integer.class, requestId
+        );
+        org.junit.jupiter.api.Assertions.assertEquals(0, count);
+    }
+
+    @Test
+    void shouldRemindFeedbackRequest() throws Exception {
+        String urlToken = createCacheRequestAndGetUrlToken("Ana", "López", "ana@ref.com");
+        UUID requestId = jdbcTemplate.queryForObject(
+            "SELECT id FROM cache_requests WHERE url_token = ?",
+            UUID.class, urlToken
+        );
+
+        // Send reminder
+        mockMvc.perform(post("/api/feedback/requests/" + requestId + "/remind")
+                .with(user(securityUser)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Recordatorio enviado correctamente"));
+    }
+
+    @Test
+    void shouldRejectRemindingFinishedFeedbackRequest() throws Exception {
+        String urlToken = createCacheRequestAndGetUrlToken("Ana", "López", "ana@ref.com");
+        UUID requestId = jdbcTemplate.queryForObject(
+            "SELECT id FROM cache_requests WHERE url_token = ?",
+            UUID.class, urlToken
+        );
+
+        // Submit questionnaire first
+        SubmitQuestionnaireDTO.SkillAnswer ans = new SubmitQuestionnaireDTO.SkillAnswer(
+            jdbcTemplate.queryForObject("SELECT id FROM skill_questions LIMIT 1", UUID.class), 4
+        );
+        SubmitQuestionnaireDTO submitDto = new SubmitQuestionnaireDTO(List.of(ans), Map.of());
+
+        mockMvc.perform(post("/api/questionnaire/" + urlToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(submitDto)))
+                .andExpect(status().isOk());
+
+        // Attempt to remind - should fail because it is finished
+        mockMvc.perform(post("/api/feedback/requests/" + requestId + "/remind")
+                .with(user(securityUser)))
+                .andExpect(status().isBadRequest());
     }
 }

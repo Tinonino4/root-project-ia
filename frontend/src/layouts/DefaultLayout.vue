@@ -181,7 +181,7 @@ const navigation = [
     <!-- Main Content Area -->
     <main id="main-content" class="flex-1 flex flex-col min-h-0 overflow-hidden">
       <!-- Content scroll inside container, clean, no redundant header -->
-      <div class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+      <div class="flex-1 overflow-y-auto px-2 py-4 md:p-6 lg:p-8">
         <div class="mx-auto w-full max-w-7xl relative">
           <router-view v-slot="{ Component, route: viewRoute }">
             <Transition name="route-fade" mode="out-in">

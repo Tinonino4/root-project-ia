@@ -97,6 +97,22 @@ class BrevoEmailService {
         );
     }
 
+    // ── Feedback Completed ──────────────────────────────────
+
+    void sendFeedbackCompleted(String toEmail, String candidateName,
+                               String refereeName, String companyName) {
+        sendTemplate(
+            config.templateIds().feedbackCompleted(),
+            toEmail,
+            "¡Tu perfil ha sido actualizado! " + refereeName + " ha completado tu valoración",
+            Map.of(
+                "CANDIDATE_NAME", candidateName,
+                "REFEREE_NAME", refereeName,
+                "COMPANY_NAME", companyName
+            )
+        );
+    }
+
     // ── Core send logic ─────────────────────────────────────
 
     private void sendTemplate(long templateId, String toEmail,

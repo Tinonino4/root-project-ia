@@ -84,28 +84,28 @@ const goBack = () => {
     <div class="h-40 w-full bg-gradient-to-tr from-primary/90 via-primary/80 to-primary/60 dark:from-primary/60 dark:via-primary/40 dark:to-primary/20 relative overflow-hidden">
       <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdG09IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSJub25lIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvc3ZnPg==')] opacity-30"></div>
       
-      <div class="max-w-4xl mx-auto px-6 h-full flex items-center justify-between relative z-10">
-        <div class="flex items-center space-x-4">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between relative z-10">
+        <div class="flex items-center space-x-3 sm:space-x-4">
           <button 
             @click="goBack" 
-            class="p-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all duration-300 shadow-lg group"
+            class="p-2 sm:p-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all duration-300 shadow-lg group"
             aria-label="Volver"
           >
-            <ArrowLeft class="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft class="w-4.5 h-4.5 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
           </button>
           <div>
-            <h1 class="text-3xl font-bold text-white tracking-tight">Solicitar Feedback</h1>
-            <p class="text-white/80 text-sm mt-0.5">Pide a tus contactos que validen tus habilidades</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Solicitar Feedback</h1>
+            <p class="text-white/80 text-xs sm:text-sm mt-0.5">Pide a tus contactos que validen tus habilidades</p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="max-w-4xl mx-auto px-6 -mt-10 relative z-20">
+    <div class="max-w-4xl mx-auto px-3 sm:px-6 -mt-10 relative z-20">
       
       <!-- Form Card (Glassmorphism) -->
-      <div class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-8 transition-all duration-500">
+      <div class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-4 sm:p-8 transition-all duration-500">
         
         <form @submit.prevent="handleSubmit" class="space-y-6">
           

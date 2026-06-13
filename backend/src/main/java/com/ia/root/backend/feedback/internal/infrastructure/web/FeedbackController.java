@@ -18,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -60,7 +61,7 @@ public class FeedbackController {
             cr.getId(), cr.getExperienceId(), cr.getRelationshipId(),
             cr.isStillWorksThere(), cr.getTargetName(), cr.getTargetSurname(),
             cr.getTargetEmail(), cr.getTargetPhone(), cr.isFinished(), cr.isVisible(),
-            cr.getTrustScore(), cr.getTrustLevel(), cr.getCreatedAt()
+            cr.getTrustScore(), cr.getTrustLevel(), cr.getCreatedAt(), cr.getExtraAnswers()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(view);
     }
@@ -113,6 +114,34 @@ public class FeedbackController {
             @RequestBody @Valid VisibilityToggleRequest request) {
         CacheRequestViewDTO updated = feedbackService.toggleVisibility(userId, requestId, request.visible());
         return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/requests/{requestId}")
+    @Operation(summary = "Eliminar / cancelar una solicitud de feedback",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Solicitud eliminada correctamente"),
+            @ApiResponse(responseCode = "400", description = "Error en la solicitud", content = @Content),
+            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+        })
+    public ResponseEntity<Void> deleteRequest(
+            @AuthenticationPrincipal(expression = "id") UUID userId,
+            @PathVariable UUID requestId) {
+        feedbackService.deleteCacheRequest(userId, requestId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/requests/{requestId}/remind")
+    @Operation(summary = "Reenviar recordatorio de una solicitud de feedback por email",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Recordatorio enviado correctamente"),
+            @ApiResponse(responseCode = "400", description = "Error en la solicitud", content = @Content),
+            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+        })
+    public ResponseEntity<Map<String, String>> remindRequest(
+            @AuthenticationPrincipal(expression = "id") UUID userId,
+            @PathVariable UUID requestId) {
+        feedbackService.remindCacheRequest(userId, requestId);
+        return ResponseEntity.ok(Map.of("message", "Recordatorio enviado correctamente"));
     }
 
     public record VisibilityToggleRequest(boolean visible) {}

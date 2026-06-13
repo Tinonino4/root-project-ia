@@ -2,6 +2,7 @@ package com.ia.root.backend.feedback.internal.infrastructure.web.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Schema(description = "Vista resumida de una solicitud de feedback")
@@ -18,5 +19,6 @@ public record CacheRequestViewDTO(
     @Schema(description = "Si la valoración es visible públicamente en el perfil") boolean visible,
     @Schema(description = "Puntuación de confianza (0-100)") int trustScore,
     @Schema(description = "Nivel de confianza verificado") String trustLevel,
-    @Schema(description = "Fecha de creación") ZonedDateTime createdAt
+    @Schema(description = "Fecha de creación") ZonedDateTime createdAt,
+    @Schema(description = "Respuestas adicionales cualitativas (JSON)") Map<String, Object> extraAnswers
 ) {}

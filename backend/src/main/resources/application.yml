@@ -89,7 +89,7 @@ app:
 logging:
   level:
     org.springframework.security: DEBUG
-    org.springframework.web.client.RestTemplate: DEBUG
+    org.springframework.web: DEBUG
 
 # Brevo Transactional Email
 brevo:
@@ -103,4 +103,5 @@ brevo:
     password-reset: ${BREVO_TPL_PASSWORD:3}
     feedback-request: ${BREVO_TPL_FEEDBACK:2}
     feedback-reminder: ${BREVO_TPL_REMINDER:4}
+    feedback-completed: ${BREVO_TPL_COMPLETED:5}
   frontend-base-url: ${FRONTEND_BASE_URL:http://localhost:5173}

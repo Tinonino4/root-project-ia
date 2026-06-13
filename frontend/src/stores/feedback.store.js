@@ -106,6 +106,33 @@ export const useFeedbackStore = defineStore('feedback', () => {
     }
   }
 
+  async function remindRequest(requestId) {
+    loading.value = true;
+    error.value = null;
+    try {
+      await feedbackApi.remindRequest(requestId);
+    } catch (err) {
+      error.value = err.message || 'Error al enviar recordatorio';
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function deleteRequest(requestId) {
+    loading.value = true;
+    error.value = null;
+    try {
+      await feedbackApi.deleteRequest(requestId);
+      requests.value = requests.value.filter(r => r.id !== requestId);
+    } catch (err) {
+      error.value = err.message || 'Error al eliminar solicitud';
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     requests,
     categories,
@@ -119,5 +146,7 @@ export const useFeedbackStore = defineStore('feedback', () => {
     createRequest,
     getCompletedCount,
     toggleRequestVisibility,
+    remindRequest,
+    deleteRequest,
   };
 });

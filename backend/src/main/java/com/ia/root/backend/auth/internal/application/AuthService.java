@@ -198,6 +198,37 @@ public class AuthService {
         return new TokenRefreshResponse(accessToken, newRefreshToken);
     }
 
+    @Transactional
+    public User processOAuth2Login(String name, String email, String provider, String providerId) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user;
+        boolean isNewUser = false;
+        if (userOptional.isPresent()) {
+            user = userOptional.get();
+            if ("LOCAL".equals(user.getProvider())) {
+                user.linkOAuth2Provider(provider, providerId);
+                user.activate();
+                user = userRepository.save(user);
+            }
+        } else {
+            user = User.createFromOAuth2(
+                name != null ? name : email,
+                email,
+                provider,
+                providerId
+            );
+            user = userRepository.save(user);
+            isNewUser = true;
+        }
+
+        if (isNewUser) {
+            events.publishEvent(new com.ia.root.backend.auth.UserRegisteredEvent(
+                user.getId(), user.getName(), user.getEmail(), user.getRole()
+            ));
+        }
+        return user;
+    }
+
     public User getUserById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));

@@ -17,6 +17,7 @@ record BrevoConfig(
         long otpVerification,
         long passwordReset,
         long feedbackRequest,
-        long feedbackReminder
+        long feedbackReminder,
+        long feedbackCompleted
     ) {}
 }

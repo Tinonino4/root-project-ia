@@ -1,6 +1,8 @@
 package com.ia.root.backend.feedback.internal.application;
 
 import com.ia.root.backend.feedback.FeedbackCompletedEvent;
+import com.ia.root.backend.feedback.FeedbackCompletedNotificationEvent;
+import com.ia.root.backend.feedback.FeedbackReminderRequestedEvent;
 import com.ia.root.backend.feedback.FeedbackRequestCreatedEvent;
 import com.ia.root.backend.feedback.internal.domain.model.CacheRequest;
 import com.ia.root.backend.feedback.internal.domain.model.FeedbackResponse;
@@ -89,6 +91,48 @@ public class FeedbackService {
         ));
 
         return saved;
+    }
+
+    // ── Eliminar y recordar solicitud de feedback ────────────
+
+    @Transactional
+    public void deleteCacheRequest(UUID userId, UUID requestId) {
+        CacheRequest cr = cacheRequestRepository.findById(requestId)
+            .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada"));
+
+        if (!cr.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("No tienes permiso para eliminar esta solicitud");
+        }
+
+        cacheRequestRepository.delete(cr);
+
+        // Si la solicitud estaba completada y era visible, recalculamos las métricas
+        if (cr.isFinished() && cr.isVisible()) {
+            events.publishEvent(new FeedbackCompletedEvent(cr.getId(), cr.getUserId(), cr.getExperienceId()));
+        }
+    }
+
+    @Transactional
+    public void remindCacheRequest(UUID userId, UUID requestId) {
+        CacheRequest cr = cacheRequestRepository.findById(requestId)
+            .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada"));
+
+        if (!cr.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("No tienes permiso para esta solicitud");
+        }
+
+        if (cr.isFinished()) {
+            throw new IllegalArgumentException("Esta solicitud ya ha sido completada");
+        }
+
+        String userName = lookupUserName(userId);
+        String companyName = lookupExperienceCompanyName(cr.getExperienceId());
+
+        events.publishEvent(new FeedbackReminderRequestedEvent(
+            cr.getId(), userId, userName,
+            cr.getTargetName(), cr.getTargetSurname(), cr.getTargetEmail(),
+            companyName, cr.getUrlToken()
+        ));
     }
 
     // ── Listar solicitudes del usuario ──────────────────────
@@ -182,6 +226,17 @@ public class FeedbackService {
         cacheRequestRepository.saveAndFlush(cr);
 
         events.publishEvent(new FeedbackCompletedEvent(cr.getId(), cr.getUserId(), cr.getExperienceId()));
+
+        // Publicar evento para notificar al candidato
+        String candidateName = lookupUserName(cr.getUserId());
+        String candidateEmail = lookupUserEmail(cr.getUserId());
+        String refereeName = cr.getTargetName() + " " + cr.getTargetSurname();
+        events.publishEvent(new FeedbackCompletedNotificationEvent(
+            candidateEmail,
+            candidateName,
+            refereeName,
+            company
+        ));
     }
 
     // ── Cross-module reads via JDBC ─────────────────────────
@@ -233,7 +288,7 @@ public class FeedbackService {
             cr.getId(), cr.getExperienceId(), cr.getRelationshipId(),
             cr.isStillWorksThere(), cr.getTargetName(), cr.getTargetSurname(),
             cr.getTargetEmail(), cr.getTargetPhone(), cr.isFinished(), cr.isVisible(),
-            cr.getTrustScore(), cr.getTrustLevel(), cr.getCreatedAt()
+            cr.getTrustScore(), cr.getTrustLevel(), cr.getCreatedAt(), cr.getExtraAnswers()
         );
     }
 }

@@ -22,23 +22,17 @@ import java.util.Optional;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
-    private final UserRepository userRepository;
     private final AuthService authService;
-    private final org.springframework.context.ApplicationEventPublisher events;
     private final OAuth2AuthorizedClientService authorizedClientService;
     
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
     public OAuth2LoginSuccessHandler(JwtProvider jwtProvider, 
-                                     UserRepository userRepository, 
                                      AuthService authService,
-                                     org.springframework.context.ApplicationEventPublisher events,
                                      OAuth2AuthorizedClientService authorizedClientService) {
         this.jwtProvider = jwtProvider;
-        this.userRepository = userRepository;
         this.authService = authService;
-        this.events = events;
         this.authorizedClientService = authorizedClientService;
     }
 
@@ -72,32 +66,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             throw new ServletException("OAuth2 provider didn't return an email");
         }
 
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        User user;
-        boolean isNewUser = false;
-        if (userOptional.isPresent()) {
-            user = userOptional.get();
-            if ("LOCAL".equals(user.getProvider())) {
-                user.linkOAuth2Provider(provider, providerId);
-                user.activate();
-                userRepository.save(user);
-            }
-        } else {
-            user = User.createFromOAuth2(
-                name != null ? name : email,
-                email,
-                provider,
-                providerId
-            );
-            userRepository.save(user);
-            isNewUser = true;
-        }
-
-        if (isNewUser) {
-            events.publishEvent(new com.ia.root.backend.auth.UserRegisteredEvent(
-                user.getId(), user.getName(), user.getEmail(), user.getRole()
-            ));
-        }
+        User user = authService.processOAuth2Login(name, email, provider, providerId);
 
         // Generate JWT token and Refresh Token
         String token = jwtProvider.generateTokenFromEmail(email); 

@@ -383,16 +383,16 @@ const exportToPDF = () => {
             </div>
           </div>
 
-          <div class="flex items-center gap-3 w-full md:w-auto justify-center">
+          <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-center">
             <button 
               @click="router.push('/profile')"
-              class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-white/5 border border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/10 transition-all duration-200 text-sm font-semibold"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/10 transition-all duration-200 text-sm font-semibold whitespace-nowrap"
             >
               Ver Mi Perfil
             </button>
             <Button 
               @click="router.push('/feedback/new')"
-              class="bg-primary hover:bg-primary/95 text-white flex items-center gap-1.5 px-4 rounded-xl font-semibold shadow-lg shadow-primary/20"
+              class="w-full sm:w-auto bg-primary hover:bg-primary/95 text-white flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-semibold shadow-lg shadow-primary/20 whitespace-nowrap"
             >
               <Plus class="w-4 h-4" />
               Pedir Feedback
@@ -404,7 +404,7 @@ const exportToPDF = () => {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           <!-- Left Column: Metrics and Actions -->
-          <div class="lg:col-span-7 space-y-8">
+          <div class="lg:col-span-7 space-y-8 order-2 lg:order-1">
             
             <!-- Statistics Cards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -532,7 +532,7 @@ const exportToPDF = () => {
           </div>
 
           <!-- Right Column: Skills Radar Chart -->
-          <div class="lg:col-span-5 bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md relative overflow-hidden shadow-sm">
+          <div class="lg:col-span-5 bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md relative overflow-hidden shadow-sm order-1 lg:order-2">
             <div class="absolute -top-12 -left-12 w-40 h-40 bg-primary/10 dark:bg-primary/5 rounded-full blur-2xl pointer-events-none"></div>
             
             <div class="space-y-4 mb-6">

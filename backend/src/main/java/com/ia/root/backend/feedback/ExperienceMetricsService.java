@@ -75,6 +75,32 @@ public class ExperienceMetricsService {
             rolesMap.computeIfAbsent(expId, k -> new java.util.HashMap<>()).put(code, count);
         }, userId);
 
+        java.util.Map<UUID, List<TestimonialDTO>> testimonialsMap = new java.util.HashMap<>();
+        String testimonialSql = """
+            SELECT cr.experience_id, cr.extra_answers->>'comments' as comment, rt.code as relationship_code, 
+                   cr.trust_level, cr.trust_score, cr.created_at, cr.target_name, cr.target_surname
+            FROM cache_requests cr
+            JOIN relationship_types rt ON rt.id = cr.relationship_id
+            WHERE cr.user_id = ? AND cr.finished = true AND cr.is_visible = true 
+              AND cr.extra_answers->>'comments' IS NOT NULL 
+              AND cr.extra_answers->>'comments' <> ''
+            ORDER BY cr.created_at DESC
+        """;
+        jdbcTemplate.query(testimonialSql, rs -> {
+            UUID expId = (UUID) rs.getObject("experience_id");
+            String comment = rs.getString("comment");
+            String relCode = rs.getString("relationship_code");
+            String trustLevel = rs.getString("trust_level");
+            int trustScore = rs.getInt("trust_score");
+            java.sql.Timestamp ts = rs.getTimestamp("created_at");
+            java.time.ZonedDateTime createdAt = ts != null ? java.time.ZonedDateTime.ofInstant(ts.toInstant(), java.time.ZoneId.systemDefault()) : null;
+            String name = rs.getString("target_name");
+            String surname = rs.getString("target_surname");
+
+            TestimonialDTO t = new TestimonialDTO(expId, comment, relCode, trustLevel, trustScore, name, surname, createdAt);
+            testimonialsMap.computeIfAbsent(expId, k -> new java.util.ArrayList<>()).add(t);
+        }, userId);
+
         List<ExperienceMetricsDTO> metrics = new java.util.ArrayList<>();
         jdbcTemplate.query(mainSql, rs -> {
             UUID expId = (UUID) rs.getObject("experience_id");
@@ -84,6 +110,7 @@ public class ExperienceMetricsService {
 
             java.util.Map<String, Double> catAverages = categoriesMap.getOrDefault(expId, java.util.Map.of());
             java.util.Map<String, Long> relCounts = rolesMap.getOrDefault(expId, java.util.Map.of());
+            List<TestimonialDTO> testimonials = testimonialsMap.getOrDefault(expId, java.util.List.of());
 
             metrics.add(new ExperienceMetricsDTO(
                 expId,
@@ -91,7 +118,8 @@ public class ExperienceMetricsService {
                 refCount,
                 catAverages,
                 relCounts,
-                avgTrust
+                avgTrust,
+                testimonials
             ));
         }, userId);
 

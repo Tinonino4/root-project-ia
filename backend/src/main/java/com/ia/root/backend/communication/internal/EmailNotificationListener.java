@@ -1,6 +1,8 @@
 package com.ia.root.backend.communication.internal;
 
 import com.ia.root.backend.auth.UserRequiresOtpEvent;
+import com.ia.root.backend.feedback.FeedbackCompletedNotificationEvent;
+import com.ia.root.backend.feedback.FeedbackReminderRequestedEvent;
 import com.ia.root.backend.feedback.FeedbackRequestCreatedEvent;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,27 @@ class EmailNotificationListener {
             event.userName(),
             event.companyName(),
             event.questionnaireUrl()
+        );
+    }
+
+    @ApplicationModuleListener
+    void onFeedbackReminderRequested(FeedbackReminderRequestedEvent event) {
+        brevoEmailService.sendFeedbackReminder(
+            event.targetEmail(),
+            event.targetName(),
+            event.userName(),
+            event.companyName(),
+            event.questionnaireUrl()
+        );
+    }
+
+    @ApplicationModuleListener
+    void onFeedbackCompletedNotification(FeedbackCompletedNotificationEvent event) {
+        brevoEmailService.sendFeedbackCompleted(
+            event.candidateEmail(),
+            event.candidateName(),
+            event.refereeName(),
+            event.companyName()
         );
     }
 }

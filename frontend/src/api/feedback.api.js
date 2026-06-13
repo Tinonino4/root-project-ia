@@ -8,4 +8,6 @@ export const feedbackApi = {
   getRequestsByExperience: (experienceId) => client.get(`/feedback/requests/experience/${experienceId}`),
   getCompletedCountByExperience: (experienceId) => client.get(`/feedback/requests/experience/${experienceId}/count`),
   toggleVisibility: (requestId, visible) => client.patch(`/feedback/requests/${requestId}/visibility`, { visible }),
+  remindRequest: (requestId) => client.post(`/feedback/requests/${requestId}/remind`),
+  deleteRequest: (requestId) => client.delete(`/feedback/requests/${requestId}`),
 };
