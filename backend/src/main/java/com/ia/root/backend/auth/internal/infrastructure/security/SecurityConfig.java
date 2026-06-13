@@ -13,6 +13,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
+import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -40,7 +45,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler, ClientRegistrationRepository clientRegistrationRepository) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
@@ -54,7 +59,10 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
-                .authorizationEndpoint(auth -> auth.baseUri("/oauth2/authorization"))
+                .authorizationEndpoint(auth -> auth
+                    .baseUri("/oauth2/authorization")
+                    .authorizationRequestResolver(customAuthorizationRequestResolver(clientRegistrationRepository))
+                )
                 .successHandler(oAuth2LoginSuccessHandler)
             )
             .exceptionHandling(exceptions -> exceptions
@@ -79,5 +87,27 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    private OAuth2AuthorizationRequestResolver customAuthorizationRequestResolver(
+            ClientRegistrationRepository clientRegistrationRepository) {
+        DefaultOAuth2AuthorizationRequestResolver resolver = new DefaultOAuth2AuthorizationRequestResolver(
+                clientRegistrationRepository, "/oauth2/authorization");
+        resolver.setAuthorizationRequestCustomizer(customizer -> {
+            var request = customizer.build();
+            String registrationId = request.getAttribute(OAuth2ParameterNames.REGISTRATION_ID);
+            if ("linkedin".equals(registrationId)) {
+                customizer.additionalParameters(params -> {
+                    params.remove(PkceParameterNames.CODE_CHALLENGE);
+                    params.remove(PkceParameterNames.CODE_CHALLENGE_METHOD);
+                    params.remove("nonce");
+                });
+                customizer.attributes(attrs -> {
+                    attrs.remove(PkceParameterNames.CODE_VERIFIER);
+                    attrs.remove("nonce");
+                });
+            }
+        });
+        return resolver;
     }
 }
