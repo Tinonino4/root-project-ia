@@ -1,16 +1,15 @@
 # Estado de la Sesión Actual
 
-## Tareas Iniciales
+## Tareas Completadas
 - [x] Configuración inicial de la memoria persistente del repositorio en `.gemini-context/`.
-- [ ] Iniciar planificación del Hito 3: URL Amigable y Slugs de Usuario (modificación de base de datos con Flyway y endpoints en backend/frontend).
+- [x] Implementación completa del Hito 3: URL Amigable y Slugs de Usuario (base de datos, backend, frontend y suite de tests automáticos).
 
-## Archivos Clave Afectados (Próxima Sesión)
-- `backend/src/main/resources/db/migration` (Nueva migración SQL para columna `username`).
-- `backend/.../professional/internal/domain/model/UserProfile.java` (Añadir campo username).
-- `frontend/src/views/profile/ProfileEditView.vue` (Permitir edición del username).
-- `frontend/src/router/index.js` (Rutas amigables en el frontal).
+## Próximas Tareas (Hito 4: Gating B2B y Registro de Empresas)
+- [ ] Implementar soporte completo para `ROLE_COMPANY` en Spring Security.
+- [ ] Modificar formulario de registro en Vue para seleccionar "Candidato" o "Empresa (Reclutador)", exigiendo nombre de empresa y CIF para esta última.
+- [ ] Restringir endpoints de búsqueda en `RecruiterController.java` para que solo sean accesibles por usuarios con `ROLE_COMPANY`.
+- [ ] Modificar el listado de búsqueda para mostrar insignias y habilitar descargas en PDF.
 
 ## Estado del Entorno Local
-- **Backend**: Compila con `mvn clean install`.
-- **Frontend**: Compila con `npm run build`.
-- **BD Local**: PostgreSQL corriendo localmente en el puerto 5432 (`root_ia_db`).
+- **Backend**: Compila y pasa tests con `mvn clean test`.
+- **Frontend**: Compila y genera bundle de producción con `npm run build`.

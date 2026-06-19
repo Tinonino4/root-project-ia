@@ -14,10 +14,10 @@
 - [x] Pestaña de solicitudes pendientes, envío de recordatorios y cancelación en frontend.
 - [x] Envío de notificaciones automáticas por correo electrónico (Brevo) al crearse, recordarse y completarse una referencia.
 
-## Hito 3: URL Amigable y Slugs de Usuario [Pendiente]
-- [ ] Añadir columna `username` único en `user_profiles` en base de datos.
-- [ ] Permitir modificar el username del perfil desde el frontend.
-- [ ] Adaptar router de Vue y backend para servir el perfil público en `/u/{username}`.
+## Hito 3: URL Amigable y Slugs de Usuario [Completado]
+- [x] Añadir columna `username` único en `user_profiles` en base de datos.
+- [x] Permitir modificar el username del perfil desde el frontend.
+- [x] Adaptar router de Vue y backend para servir el perfil público en `/u/{username}`.
 
 ## Hito 4: Gating B2B y Registro de Empresas (Reclutadores) [Pendiente]
 - [ ] Implementar soporte completo para `ROLE_COMPANY` en Spring Security.

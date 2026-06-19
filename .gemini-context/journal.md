@@ -7,6 +7,8 @@
 - **2026-06-19 - Lecturas ligeras entre módulos vía JDBC**: En `FeedbackService`, para consultar datos básicos de otros módulos (nombre de usuario, email, empresa de la experiencia laboral) se utiliza `JdbcTemplate` con consultas SQL crudas en lugar de acoplar y consultar repositorios externos de otros módulos, lo cual violaría las fronteras lógicas de Spring Modulith.
 - **2026-06-19 - Script local de gestión de datos**: Se mantiene `manage_user_data.py` en la raíz como utilidad para realizar backups, borrados y restauraciones de usuarios conectándose por SSH al VPS de producción.
 - **2026-06-19 - Configuración manual de OAuth2 (LinkedIn)**: En `SecurityConfig`, se personaliza el resolvedor de solicitudes OAuth2 para LinkedIn eliminando parámetros de PKCE y `nonce` que no son compatibles con su API.
+- **2026-06-19 - Resolución transparente de perfil público (UUID vs Slug)**: Se implementó la resolución automática en un único endpoint del backend (`PublicProfileController`), intentando parsear el parámetro como UUID primero y cayendo a username en caso de excepción. Esto evita duplicar rutas de controlador y simplifica el router del frontend.
+- **2026-06-19 - Inicialización y autogeneración de slugs secuenciales**: Para mitigar colisiones, se implementó una estrategia en base de datos basada en una porción de UUID para usuarios existentes, y una resolución incremental y secuencial (sufijos `-1`, `-2`, etc.) en el backend para nuevos registros.
 
 ## Deuda Técnica Identificada
 - [ ] Restringir seguridad en el backend para `/api/recruiter/**` para que solo acepte usuarios con rol `ROLE_COMPANY`.
