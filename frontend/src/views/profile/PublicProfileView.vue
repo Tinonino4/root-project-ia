@@ -353,7 +353,7 @@ const topSkill = computed(() => {
                   <Calendar class="w-3.5 h-3.5" />
                   <span>{{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Presente' }}</span>
                 </div>
-                <p class="text-sm text-[hsl(220,10%,60%)] mt-2 leading-relaxed">{{ exp.functions }}</p>
+                <p class="text-sm text-[hsl(220,10%,60%)] mt-2 leading-relaxed whitespace-pre-wrap">{{ exp.functions }}</p>
 
                 <!-- Experience Rating Breakdown (Showable/Hideable) -->
                 <div v-if="getMetricsForExperience(exp.id)" class="mt-4 p-4 rounded-xl bg-white/[0.01] border border-white/5 space-y-4">
@@ -648,7 +648,7 @@ const topSkill = computed(() => {
                   <p class="text-[10px] text-zinc-400 font-medium" style="margin: 0 0 6px 0;">
                     {{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Presente' }}
                   </p>
-                  <p class="text-xs text-zinc-500 leading-relaxed" style="margin: 0 0 8px 0; word-wrap: break-word;">{{ exp.functions }}</p>
+                  <p class="text-xs text-zinc-500 leading-relaxed" style="margin: 0 0 8px 0; word-wrap: break-word; white-space: pre-wrap;">{{ exp.functions }}</p>
 
                   <!-- Métricas Certificadas en el PDF (Nuevo feature) -->
                   <div v-if="getMetricsForExperience(exp.id)" class="p-3 bg-zinc-50 rounded-xl border border-zinc-200/60" style="margin-top: 8px;">

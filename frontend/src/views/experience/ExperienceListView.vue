@@ -144,7 +144,7 @@ const formatDate = (dateString) => {
                   {{ formatDate(exp.startDate) }} - {{ formatDate(exp.finishDate) }}
                 </span>
               </div>
-              <p v-if="exp.functions" class="text-zinc-600 dark:text-zinc-400 mt-3 text-sm leading-relaxed">
+              <p v-if="exp.functions" class="text-zinc-600 dark:text-zinc-400 mt-3 text-sm leading-relaxed whitespace-pre-wrap">
                 {{ exp.functions }}
               </p>
             </div>

@@ -148,8 +148,8 @@ const handleSave = async () => {
           <textarea 
             id="functions" 
             v-model="formData.functions" 
-            rows="5" 
-            class="flex w-full rounded-md border border-zinc-200 dark:border-zinc-800 bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 dark:placeholder:text-zinc-400"
+            rows="12" 
+            class="flex w-full min-h-[320px] rounded-md border border-zinc-200 dark:border-zinc-800 bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 dark:placeholder:text-zinc-400"
             placeholder="Describe tus responsabilidades y logros clave..."
           ></textarea>
         </div>
