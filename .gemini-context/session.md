@@ -3,6 +3,7 @@
 ## Tareas Completadas
 - [x] Configuración inicial de la memoria persistente del repositorio en `.gemini-context/`.
 - [x] Implementación completa del Hito 3: URL Amigable y Slugs de Usuario (base de datos, backend, frontend y suite de tests automáticos).
+- [x] Rediseño de la UI en la vista de perfil privado y público (layout asimétrico 4/12 vs 8/12, barra lateral sticky flotante y tarjeta de resumen de certificación).
 
 ## Próximas Tareas (Hito 4: Gating B2B y Registro de Empresas)
 - [ ] Implementar soporte completo para `ROLE_COMPANY` en Spring Security.
