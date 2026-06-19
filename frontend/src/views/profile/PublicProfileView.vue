@@ -118,6 +118,31 @@ const exportPDF = () => {
       });
   }, 200);
 };
+
+const topSkill = computed(() => {
+  if (!profile.value || !profile.value.skills) return null;
+  const skills = profile.value.skills;
+  const candidates = [
+    { key: 'teamwork', label: 'Trabajo en equipo' },
+    { key: 'proactivity', label: 'Proactividad' },
+    { key: 'integrity', label: 'Integridad' },
+    { key: 'selfConfidence', label: 'Autoconfianza' },
+    { key: 'flexibility', label: 'Flexibilidad' }
+  ];
+  
+  let best = candidates[0];
+  let maxVal = skills[best.key] || 0;
+  
+  for (let i = 1; i < candidates.length; i++) {
+    const val = skills[candidates[i].key] || 0;
+    if (val > maxVal) {
+      maxVal = val;
+      best = candidates[i];
+    }
+  }
+  
+  return maxVal > 0 ? best : null;
+});
 </script>
 
 <template>
@@ -250,23 +275,68 @@ const exportPDF = () => {
       </div>
 
       <!-- Grid: Skills and Experience -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Skills (Radar Chart) -->
-        <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
-          <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-            <Award class="w-5 h-5 text-primary" />
-            Habilidades Blandas
-          </h2>
-          <div v-if="profile.skills" class="h-80 flex items-center justify-center">
-            <SkillsRadarChart :metrics="profile.skills" />
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Sticky Radar Chart & Verification Summary -->
+        <div class="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-6 self-start">
+          
+          <!-- Skills (Radar Chart) -->
+          <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <Award class="w-5 h-5 text-primary" />
+              Habilidades Blandas
+            </h2>
+            <div v-if="profile.skills" class="h-80 flex items-center justify-center">
+              <SkillsRadarChart :metrics="profile.skills" />
+            </div>
+            <div v-else class="text-center py-20 text-[hsl(220,10%,40%)]">
+              No hay métricas de habilidades disponibles.
+            </div>
           </div>
-          <div v-else class="text-center py-20 text-[hsl(220,10%,40%)]">
-            No hay métricas de habilidades disponibles.
+
+          <!-- Certification Summary Card -->
+          <div v-if="profile.skills" class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl space-y-5">
+            <h3 class="text-lg font-bold text-white border-b border-white/5 pb-3 flex items-center gap-2">
+              <ShieldCheck class="w-5 h-5 text-emerald-400" />
+              Resumen de Certificación
+            </h3>
+            <div class="space-y-4">
+              <!-- Global Average -->
+              <div class="flex items-center justify-between">
+                <span class="text-zinc-400 text-sm">Media Global</span>
+                <div class="flex items-center text-amber-400 gap-1.5">
+                  <span class="text-sm font-bold text-white">{{ profile.skills.averageScore.toFixed(1) }}</span>
+                  <div class="flex items-center">
+                    <svg v-for="star in 5" :key="star" class="w-3.5 h-3.5" :class="star <= Math.round(profile.skills.averageScore) ? 'fill-current' : 'text-zinc-700'" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- References Count -->
+              <div class="flex items-center justify-between">
+                <span class="text-zinc-400 text-sm">Referencias</span>
+                <span class="text-sm font-bold text-white flex items-center gap-1">
+                  <ShieldCheck class="w-4 h-4 text-emerald-400" />
+                  {{ profile.totalReferencesCount }} validadas
+                </span>
+              </div>
+
+              <!-- Top Skill -->
+              <div class="flex items-center justify-between" v-if="topSkill">
+                <span class="text-zinc-400 text-sm">Habilidad Destacada</span>
+                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20">
+                  {{ topSkill.label }}
+                </span>
+              </div>
+            </div>
           </div>
+
         </div>
 
         <!-- Experience Timeline -->
-        <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
+        <div class="lg:col-span-7 xl:col-span-8 bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
           <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
             <Briefcase class="w-5 h-5 text-primary" />
             Experiencia Profesional
