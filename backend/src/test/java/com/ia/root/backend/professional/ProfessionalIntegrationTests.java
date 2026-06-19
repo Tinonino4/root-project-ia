@@ -93,10 +93,21 @@ public class ProfessionalIntegrationTests {
     }
 
     @Test
+    void shouldGetPublicProfileByUsername() throws Exception {
+        String username = userProfileRepository.findByUserId(userId).get().getUsername();
+
+        mockMvc.perform(get("/api/public/profile/" + username))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Pro"))
+                .andExpect(jsonPath("$.surname").value("User"))
+                .andExpect(jsonPath("$.username").value(username));
+    }
+
+    @Test
     void shouldUpdateProfile() throws Exception {
         UserProfileRequest updateRequest = new UserProfileRequest(
                 "Updated", "Name", null, "New bio", "Madrid",
-                null, "28001", null, null, "Developer", null
+                null, "28001", null, null, "Developer", null, "updated-user"
         );
 
         mockMvc.perform(put("/api/professional/profile")
@@ -294,7 +305,7 @@ public class ProfessionalIntegrationTests {
         // Update profile first to have a job title "Software Specialist"
         UserProfileRequest updateRequest = new UserProfileRequest(
                 "Pro", "User", null, "Bio", "Madrid",
-                null, "28001", null, null, "Software Specialist", null
+                null, "28001", null, null, "Software Specialist", null, "pro-user"
         );
 
         mockMvc.perform(put("/api/professional/profile")

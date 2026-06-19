@@ -10,7 +10,8 @@ import { useAuthStore } from '@/stores/auth.store';
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const userId = route.params.userId;
+const slug = route.params.slug;
+const userId = ref(null);
 
 const profile = ref(null);
 const loading = ref(true);
@@ -54,8 +55,9 @@ const categoryLabels = {
 
 onMounted(async () => {
   try {
-    const response = await client.get(`/public/profile/${userId}`);
+    const response = await client.get(`/public/profile/${slug}`);
     profile.value = response.data;
+    userId.value = response.data.userId;
   } catch (err) {
     console.error('Error fetching public profile:', err);
     error.value = 'No se pudo cargar el perfil o no existe.';
@@ -203,9 +205,8 @@ const exportPDF = () => {
         </button>
       </div>
 
-      <!-- Read-Only / Modo Lectura Banner -->
       <div 
-        v-if="authStore.isAuthenticated && route.params.userId !== authStore.user?.id" 
+        v-if="authStore.isAuthenticated && userId !== authStore.user?.id" 
         class="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-5 rounded-2xl flex items-center justify-between shadow-lg"
       >
         <div class="flex items-center space-x-3.5">
@@ -654,7 +655,7 @@ const exportPDF = () => {
                 Este reporte ha sido certificado mediante el protocolo de feedback seguro de MiCaché. La valoración de habilidades blandas es el resultado de opiniones anonimizadas de compañeros y superiores validados.
               </p>
             </div>
-            <div class="text-right">
+            <div class="text-right" v-if="userId">
               <p class="font-semibold text-zinc-500" style="margin: 0 0 2px 0;">ID Candidato:</p>
               <p class="font-mono" style="margin: 0;">{{ userId.substring(0, 8) }}...{{ userId.substring(userId.length - 8) }}</p>
             </div>

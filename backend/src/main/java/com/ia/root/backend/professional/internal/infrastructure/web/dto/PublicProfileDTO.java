@@ -6,11 +6,13 @@ import com.ia.root.backend.feedback.ExperienceMetricsDTO;
 import java.util.List;
 
 public record PublicProfileDTO(
+    java.util.UUID userId,
     String name,
     String surname,
     String jobTitle,
     String aboutMe,
     String photoUrl,
+    String username,
     List<Experience> experiences,
     SkillsData skills,
     long totalReferencesCount,

@@ -41,6 +41,9 @@ public class UserProfile {
 
     private String education;
 
+    @Column(nullable = false, unique = true)
+    private String username;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private ZonedDateTime createdAt;
 
@@ -53,7 +56,30 @@ public class UserProfile {
         this.userId = Objects.requireNonNull(userId, "userId must not be null");
         this.name = Objects.requireNonNull(name, "name must not be null");
         this.contactEmail = contactEmail;
+        this.username = generateDefaultUsername(name);
     }
+
+    public UserProfile(UUID userId, String name, String contactEmail, String username) {
+        this.userId = Objects.requireNonNull(userId, "userId must not be null");
+        this.name = Objects.requireNonNull(name, "name must not be null");
+        this.contactEmail = contactEmail;
+        this.username = Objects.requireNonNull(username, "username must not be null");
+    }
+
+    private static String generateDefaultUsername(String name) {
+        if (name == null || name.isBlank()) {
+            return "user-" + UUID.randomUUID().toString().substring(0, 8);
+        }
+        String slug = name.toLowerCase()
+            .replaceAll("[^a-z0-9-_]", "-")
+            .replaceAll("-+", "-")
+            .replaceAll("^-|-$", "");
+        if (slug.isEmpty()) {
+            slug = "user";
+        }
+        return slug + "-" + UUID.randomUUID().toString().substring(0, 8);
+    }
+
 
     public void updatePersonalInfo(String name, String surname, String city,
                                    LocalDate birthday, String zipcode, String phoneNumber) {
@@ -104,4 +130,9 @@ public class UserProfile {
     public String getEducation() { return education; }
     public ZonedDateTime getCreatedAt() { return createdAt; }
     public ZonedDateTime getUpdatedAt() { return updatedAt; }
+
+    public String getUsername() { return username; }
+    public void updateUsername(String username) {
+        this.username = Objects.requireNonNull(username, "username must not be null");
+    }
 }

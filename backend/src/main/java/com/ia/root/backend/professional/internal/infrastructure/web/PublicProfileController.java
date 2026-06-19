@@ -36,22 +36,34 @@ public class PublicProfileController {
         this.experienceMetricsService = experienceMetricsService;
     }
 
-    @GetMapping("/{userId}")
-    @Operation(summary = "Obtener perfil público por ID de usuario")
-    public ResponseEntity<PublicProfileDTO> getPublicProfile(@PathVariable UUID userId) {
+    @GetMapping("/{userIdOrUsername}")
+    @Operation(summary = "Obtener perfil público por ID de usuario o nombre de usuario amigable")
+    public ResponseEntity<PublicProfileDTO> getPublicProfile(@PathVariable String userIdOrUsername) {
         try {
-            UserProfile profile = professionalService.getProfile(userId);
+            UUID userId;
+            UserProfile profile;
+            try {
+                userId = UUID.fromString(userIdOrUsername);
+                profile = professionalService.getProfile(userId);
+            } catch (IllegalArgumentException e) {
+                // No es un UUID válido, intentamos buscar por username
+                profile = professionalService.getProfileByUsername(userIdOrUsername);
+                userId = profile.getUserId();
+            }
+
             List<Experience> experiences = professionalService.getExperiences(userId);
             SkillsData skillsData = skillsMetricsService.getSkillsData(userId);
             long totalRefs = experienceMetricsService.getTotalReferencesCount(userId);
             List<ExperienceMetricsDTO> experienceMetrics = experienceMetricsService.getExperienceMetrics(userId);
 
             PublicProfileDTO dto = new PublicProfileDTO(
+                userId,
                 profile.getName(),
                 profile.getSurname(),
                 profile.getJobTitle(),
                 profile.getAboutMe(),
                 profile.getPhotoUrl(),
+                profile.getUsername(),
                 experiences,
                 skillsData,
                 totalRefs,

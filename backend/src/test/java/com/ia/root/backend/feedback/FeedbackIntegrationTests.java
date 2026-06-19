@@ -74,8 +74,8 @@ public class FeedbackIntegrationTests {
 
         // Create user profile
         jdbcTemplate.update(
-            "INSERT INTO user_profiles (id, user_id, name, contact_email) VALUES (?, ?, ?, ?)",
-            UUID.randomUUID(), userId, "Test User", "test@example.com"
+            "INSERT INTO user_profiles (id, user_id, name, contact_email, username) VALUES (?, ?, ?, ?, ?)",
+            UUID.randomUUID(), userId, "Test User", "test@example.com", "test-user-" + UUID.randomUUID().toString().substring(0, 8)
         );
 
         // Initialize skills metrics

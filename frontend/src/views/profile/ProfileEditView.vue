@@ -22,19 +22,24 @@ const formData = ref({
   phoneNumber: '',
   photoUrl: '',
   jobTitle: '',
-  education: ''
+  education: '',
+  username: ''
 });
 
+const frontendUrl = ref('');
+
 const successMessage = ref('');
+const localError = ref('');
 
 onMounted(async () => {
+  frontendUrl.value = window.location.origin;
   if (!profileStore.profile) {
     await profileStore.fetchProfile();
   }
   if (profileStore.profile) {
     // Populate form data
     Object.keys(formData.value).forEach(key => {
-      if (profileStore.profile[key] !== undefined) {
+      if (profileStore.profile[key] !== undefined && profileStore.profile[key] !== null) {
         formData.value[key] = profileStore.profile[key];
       }
     });
@@ -43,6 +48,22 @@ onMounted(async () => {
 
 const handleSave = async () => {
   successMessage.value = '';
+  localError.value = '';
+  
+  // Validar username en cliente
+  const usernameRegex = /^[a-z0-9-_]+$/;
+  if (formData.value.username) {
+    const cleanUsername = formData.value.username.trim().toLowerCase();
+    formData.value.username = cleanUsername;
+    if (!usernameRegex.test(cleanUsername)) {
+      localError.value = 'El nombre de usuario solo puede contener letras minúsculas, números, guiones y guiones bajos (sin espacios ni acentos)';
+      return;
+    }
+  } else {
+    localError.value = 'El nombre de usuario es obligatorio para tu enlace amigable';
+    return;
+  }
+  
   try {
     // Clean up empty fields if necessary, or just send all
     await profileStore.updateProfile(formData.value);
@@ -52,6 +73,7 @@ const handleSave = async () => {
     }, 1500);
   } catch (error) {
     console.error('Error updating profile:', error);
+    // Si la API falló y no se setea automáticamente, podemos poner un error genérico o el que devuelva el store
   }
 };
 </script>
@@ -119,6 +141,13 @@ const handleSave = async () => {
               <Input id="surname" v-model="formData.surname" class="focus:ring-primary" />
             </div>
             <div class="space-y-2">
+              <Label for="username">Nombre de usuario (enlace amigable)</Label>
+              <Input id="username" v-model="formData.username" required class="focus:ring-primary" placeholder="ej: agustin-hernandez" />
+              <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">
+                Tu perfil público será: {{ frontendUrl }}/u/{{ formData.username || 'tu-usuario' }}
+              </p>
+            </div>
+            <div class="space-y-2">
               <Label for="contactEmail">Email de Contacto</Label>
               <Input id="contactEmail" type="email" v-model="formData.contactEmail" required class="focus:ring-primary" />
             </div>
@@ -178,8 +207,8 @@ const handleSave = async () => {
         </div>
 
         <!-- Feedback Messages -->
-        <div v-if="profileStore.error" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
-          {{ profileStore.error }}
+        <div v-if="profileStore.error || localError" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
+          {{ profileStore.error || localError }}
         </div>
         <div v-if="successMessage" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 p-3 rounded-lg text-sm font-medium">
           {{ successMessage }}

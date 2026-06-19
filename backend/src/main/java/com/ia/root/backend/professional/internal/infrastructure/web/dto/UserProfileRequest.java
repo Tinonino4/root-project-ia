@@ -36,5 +36,8 @@ public record UserProfileRequest(
     String jobTitle,
 
     @Schema(description = "Formación académica", example = "Ingeniería Informática")
-    String education
+    String education,
+
+    @Schema(description = "Nombre de usuario único para la URL amigable", example = "juan-perez")
+    String username
 ) {}

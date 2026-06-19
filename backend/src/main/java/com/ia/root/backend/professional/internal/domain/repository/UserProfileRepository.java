@@ -10,6 +10,8 @@ import java.util.UUID;
 @Repository
 public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> {
     Optional<UserProfile> findByUserId(UUID userId);
+    Optional<UserProfile> findByUsername(String username);
+    boolean existsByUsername(String username);
 
     @org.springframework.data.jpa.repository.Query("""
         SELECT u FROM UserProfile u WHERE 

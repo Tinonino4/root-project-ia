@@ -109,7 +109,8 @@ const formatDate = (dateString) => {
 };
 
 const copyProfileLink = () => {
-  const url = `${window.location.origin}/u/${authStore.user?.id}`;
+  const slugOrId = privateProfile.value?.username || authStore.user?.id;
+  const url = `${window.location.origin}/u/${slugOrId}`;
   navigator.clipboard.writeText(url).then(() => {
     toast.success('¡Enlace copiado!', {
       description: 'El enlace a tu perfil público se ha copiado al portapapeles.',
@@ -299,7 +300,7 @@ const exportPDF = () => {
               </button>
               
               <button 
-                @click="router.push(`/u/${authStore.user?.id}`)"
+                @click="router.push(`/u/${privateProfile?.username || authStore.user?.id}`)"
                 class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white transition-all text-xs font-semibold whitespace-nowrap"
               >
                 <ExternalLink class="w-3.5 h-3.5" />

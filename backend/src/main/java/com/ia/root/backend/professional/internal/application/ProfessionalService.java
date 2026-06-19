@@ -29,9 +29,28 @@ public class ProfessionalService {
                 .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
     }
 
+    public UserProfile getProfileByUsername(String username) {
+        return userProfileRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
+    }
+
     @Transactional
     public UserProfile updateProfile(UUID userId, UserProfileRequest request) {
         UserProfile profile = getProfile(userId);
+
+        // Validar y actualizar username si se ha proporcionado
+        if (request.username() != null && !request.username().trim().isEmpty()) {
+            String newUsername = request.username().trim().toLowerCase();
+            if (!newUsername.equals(profile.getUsername())) {
+                if (!newUsername.matches("^[a-z0-9-_]+$")) {
+                    throw new IllegalArgumentException("Formato de nombre de usuario inválido");
+                }
+                if (userProfileRepository.existsByUsername(newUsername)) {
+                    throw new IllegalArgumentException("El nombre de usuario ya está en uso");
+                }
+                profile.updateUsername(newUsername);
+            }
+        }
 
         profile.updatePersonalInfo(
             request.name(), request.surname(), request.city(),

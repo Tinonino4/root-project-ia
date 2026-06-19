@@ -6,7 +6,7 @@ export default [
     meta: { layout: 'PublicLayout' }
   },
   {
-    path: '/u/:userId',
+    path: '/u/:slug',
     name: 'PublicProfile',
     component: () => import('@/views/profile/PublicProfileView.vue'),
     meta: { layout: 'PublicLayout' }
