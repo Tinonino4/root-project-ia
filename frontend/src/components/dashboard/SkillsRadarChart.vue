@@ -20,6 +20,10 @@ ChartJS.register(
   Legend
 );
 
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
 const props = defineProps({
   metrics: {
     type: Object,
@@ -30,15 +34,15 @@ const props = defineProps({
 const chartData = computed(() => {
   return {
     labels: [
-      'Trabajo en equipo',
-      'Proactividad',
-      'Integridad',
-      'Confianza',
-      'Flexibilidad'
+      t('questionnaire.categories.TEAMWORK.name'),
+      t('questionnaire.categories.PROACTIVITY.name'),
+      t('questionnaire.categories.INTEGRITY.name'),
+      t('questionnaire.categories.SELF_CONFIDENCE.name'),
+      t('questionnaire.categories.FLEXIBILITY.name')
     ],
     datasets: [
       {
-        label: 'Tus Puntuaciones',
+        label: t('dashboard.metrics.verifiedSkills'),
         backgroundColor: 'rgba(242, 151, 39, 0.2)',
         borderColor: 'rgba(242, 151, 39, 1)',
         pointBackgroundColor: 'rgba(242, 151, 39, 1)',

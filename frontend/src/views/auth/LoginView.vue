@@ -29,17 +29,17 @@ const handleLogin = async () => {
 <template>
   <div class="space-y-6">
     <div class="space-y-2 text-center md:text-left">
-      <h1 class="text-3xl font-bold font-heading tracking-tight text-zinc-900 dark:text-white">Bienvenido de nuevo</h1>
-      <p class="text-zinc-500 dark:text-zinc-400">Ingresa tus credenciales para acceder a tu cuenta</p>
+      <h1 class="text-3xl font-bold font-heading tracking-tight text-zinc-900 dark:text-white">{{ $t('auth.loginTitle') }}</h1>
+      <p class="text-zinc-500 dark:text-zinc-400">{{ $t('auth.loginSubtitle') }}</p>
     </div>
 
     <form @submit.prevent="handleLogin" class="space-y-4">
       <div class="space-y-2">
-        <Label for="email">Correo electrónico</Label>
+        <Label for="email">{{ $t('auth.email') }}</Label>
         <Input 
           id="email" 
           type="email" 
-          placeholder="nombre@ejemplo.com" 
+          :placeholder="$t('auth.emailPlaceholder')" 
           v-model="email" 
           required 
           class="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm transition-all focus:ring-primary"
@@ -48,9 +48,9 @@ const handleLogin = async () => {
       
       <div class="space-y-2">
         <div class="flex items-center justify-between">
-          <Label for="password">Contraseña</Label>
+          <Label for="password">{{ $t('auth.password') }}</Label>
           <RouterLink to="/forgot-password" class="text-sm font-medium text-primary hover:text-primary/80 transition-colors">
-            ¿Olvidaste tu contraseña?
+            {{ $t('auth.forgotPassword') }}
           </RouterLink>
         </div>
         <Input 
@@ -70,8 +70,7 @@ const handleLogin = async () => {
       
       <Button type="submit" class="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_hsl(var(--primary)/0.39)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.23)] hover:-translate-y-0.5 transition-all duration-200" :disabled="authStore.loading">
         <svg v-if="authStore.loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-primary-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-        <span v-if="authStore.loading">Iniciando sesión...</span>
-        <span v-else>Iniciar sesión</span>
+        <span>{{ authStore.loading ? $t('common.loading') : $t('auth.loginButton') }}</span>
       </Button>
     </form>
 
@@ -81,7 +80,7 @@ const handleLogin = async () => {
         <div class="w-full border-t border-zinc-200 dark:border-zinc-800"></div>
       </div>
       <span class="relative px-3 bg-white dark:bg-zinc-950 text-xs text-zinc-500 dark:text-zinc-400 uppercase tracking-wider font-semibold">
-        O continuar con
+        {{ $t('auth.socialGoogle') }}
       </span>
     </div>
 
@@ -90,7 +89,7 @@ const handleLogin = async () => {
       <a
         :href="googleLoginUrl"
         class="inline-flex items-center justify-center py-3 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 rounded-xl shadow-sm hover:shadow transition-all duration-200 hover:-translate-y-0.5"
-        aria-label="Iniciar sesión con Google"
+        :aria-label="$t('auth.socialGoogle')"
       >
         <svg class="w-5 h-5" viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -102,7 +101,7 @@ const handleLogin = async () => {
       <a
         :href="githubLoginUrl"
         class="inline-flex items-center justify-center py-3 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 text-zinc-700 dark:text-zinc-200 rounded-xl shadow-sm hover:shadow transition-all duration-200 hover:-translate-y-0.5"
-        aria-label="Iniciar sesión con GitHub"
+        :aria-label="$t('auth.socialGithub')"
       >
         <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
@@ -111,7 +110,7 @@ const handleLogin = async () => {
       <a
         :href="linkedinLoginUrl"
         class="inline-flex items-center justify-center py-3 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white/50 dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 rounded-xl shadow-sm hover:shadow transition-all duration-200 hover:-translate-y-0.5"
-        aria-label="Iniciar sesión con LinkedIn"
+        :aria-label="$t('auth.socialLinkedin')"
       >
         <svg class="w-5 h-5 fill-current text-[#0A66C2]" viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
           <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
@@ -120,9 +119,9 @@ const handleLogin = async () => {
     </div>
 
     <div class="text-center text-sm text-zinc-500 dark:text-zinc-400 mt-6">
-      ¿No tienes una cuenta?
+      {{ $t('auth.noAccount') }}
       <RouterLink to="/register" class="font-medium text-primary hover:text-primary/80 hover:underline transition-all">
-        Regístrate aquí
+        {{ $t('auth.signUp') }}
       </RouterLink>
     </div>
   </div>

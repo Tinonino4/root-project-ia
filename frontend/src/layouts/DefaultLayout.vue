@@ -20,7 +20,7 @@ import { switchLanguage } from '@/i18n';
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
-const { locale } = useI18n();
+const { t, locale } = useI18n();
 const isMobileMenuOpen = ref(false);
 
 const currentLocale = computed(() => locale.value);
@@ -41,19 +41,18 @@ const handleLogout = () => {
 // Map raw backend roles to friendly, secure titles
 const displayRole = computed(() => {
   const role = authStore.user?.role;
-  if (!role) return 'Profesional';
-  if (role === 'ROLE_USER') return 'Profesional';
-  if (role === 'ROLE_ADMIN') return 'Administrador';
-  return 'Profesional';
+  if (role === 'ROLE_ADMIN') return t('sidebar.adminRole');
+  if (role === 'ROLE_COMPANY') return t('sidebar.companyRole');
+  return t('sidebar.professionalRole');
 });
 
-const navigation = [
-  { name: 'Dashboard', routeName: 'Dashboard', icon: LayoutDashboard },
-  { name: 'Buscador de Talento', routeName: 'RecruiterSearch', icon: Search },
-  { name: 'Mi Perfil', routeName: 'Profile', icon: User },
-  { name: 'Mis Experiencias', routeName: 'ExperienceList', icon: BriefcaseBusiness },
-  { name: 'Solicitudes de Feedback', routeName: 'FeedbackList', icon: MessageSquareQuote },
-];
+const navigation = computed(() => [
+  { key: 'sidebar.dashboard', routeName: 'Dashboard', icon: LayoutDashboard },
+  { key: 'sidebar.recruiterSearch', routeName: 'RecruiterSearch', icon: Search },
+  { key: 'sidebar.profile', routeName: 'Profile', icon: User },
+  { key: 'sidebar.experiences', routeName: 'ExperienceList', icon: BriefcaseBusiness },
+  { key: 'sidebar.feedbackRequests', routeName: 'FeedbackList', icon: MessageSquareQuote },
+]);
 </script>
 
 <template>
@@ -111,7 +110,7 @@ const navigation = [
         <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
           <RouterLink 
             v-for="item in navigation" 
-            :key="item.name" 
+            :key="item.key" 
             :to="{ name: item.routeName }"
             @click="isMobileMenuOpen = false"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 font-medium text-sm group relative"
@@ -128,7 +127,7 @@ const navigation = [
                   : 'text-zinc-400 group-hover:text-zinc-500 dark:group-hover:text-zinc-300'
               ]" 
             />
-            {{ item.name }}
+            {{ $t(item.key) }}
           </RouterLink>
         </nav>
 
@@ -136,7 +135,7 @@ const navigation = [
         <div class="p-4 border-t border-zinc-100 dark:border-zinc-800 flex-shrink-0 bg-white dark:bg-zinc-900 flex flex-col gap-3">
           <!-- Selector de Idioma Estilizado para Dashboard -->
           <div class="flex items-center justify-between px-3 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
-            <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">Idioma / Language</span>
+            <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">{{ $t('sidebar.language') }}</span>
             <div class="flex items-center gap-0.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-md p-0.5">
               <button
                 @click="changeLang('es')"
@@ -160,10 +159,10 @@ const navigation = [
               {{ authStore.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
             </div>
             <div class="flex-1 min-w-0 overflow-hidden">
-              <p class="text-sm font-semibold text-zinc-900 dark:text-white truncate">{{ authStore.user?.name || 'Usuario' }}</p>
+              <p class="text-sm font-semibold text-zinc-900 dark:text-white truncate">{{ authStore.user?.name || $t('sidebar.userFallback') }}</p>
               <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate">{{ displayRole }}</p>
             </div>
-            <button @click="handleLogout" class="text-zinc-400 hover:text-red-500 transition-colors p-1" title="Cerrar sesión">
+            <button @click="handleLogout" class="text-zinc-400 hover:text-red-500 transition-colors p-1" :title="$t('sidebar.logout')">
               <LogOut class="w-5 h-5" />
             </button>
           </div>

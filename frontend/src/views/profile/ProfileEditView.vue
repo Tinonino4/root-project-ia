@@ -87,8 +87,8 @@ const handleSave = async () => {
         <ArrowLeft class="w-5 h-5" />
       </Button>
       <div>
-        <h2 class="text-3xl font-bold font-heading text-zinc-900 dark:text-white">Editar Perfil</h2>
-        <p class="text-zinc-500 dark:text-zinc-400 mt-1">Actualiza tu información personal y profesional.</p>
+        <h2 class="text-3xl font-bold font-heading text-zinc-900 dark:text-white">{{ $t('profileEdit.title') }}</h2>
+        <p class="text-zinc-500 dark:text-zinc-400 mt-1">{{ $t('profileEdit.subtitle') }}</p>
       </div>
     </div>
 
@@ -129,11 +129,11 @@ const handleSave = async () => {
         <!-- Personal Information Section -->
         <div class="space-y-4">
           <h3 class="text-lg font-bold font-heading text-zinc-900 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-2">
-            Información Personal
+            {{ $t('profileEdit.fullName') }}
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-2">
-              <Label for="name">Nombre</Label>
+              <Label for="name">{{ $t('profileEdit.fullName') }}</Label>
               <Input id="name" v-model="formData.name" required class="focus:ring-primary" />
             </div>
             <div class="space-y-2">
@@ -141,14 +141,14 @@ const handleSave = async () => {
               <Input id="surname" v-model="formData.surname" class="focus:ring-primary" />
             </div>
             <div class="space-y-2">
-              <Label for="username">Nombre de usuario (enlace amigable)</Label>
-              <Input id="username" v-model="formData.username" required class="focus:ring-primary" placeholder="ej: agustin-hernandez" />
+              <Label for="username">{{ $t('profileEdit.username') }}</Label>
+              <Input id="username" v-model="formData.username" required class="focus:ring-primary" placeholder="agustin-hernandez" />
               <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">
-                Tu perfil público será: {{ frontendUrl }}/u/{{ formData.username || 'tu-usuario' }}
+                {{ $t('profileEdit.usernameHelp', { username: formData.username || 'user' }) }}
               </p>
             </div>
             <div class="space-y-2">
-              <Label for="contactEmail">Email de Contacto</Label>
+              <Label for="contactEmail">Email</Label>
               <Input id="contactEmail" type="email" v-model="formData.contactEmail" required class="focus:ring-primary" />
             </div>
             <div class="space-y-2">
@@ -165,12 +165,12 @@ const handleSave = async () => {
         <!-- Location Section -->
         <div class="space-y-4">
           <h3 class="text-lg font-bold font-heading text-zinc-900 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-2">
-            Ubicación
+            {{ $t('profileEdit.location') }}
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-2">
-              <Label for="city">Ciudad</Label>
-              <Input id="city" v-model="formData.city" class="focus:ring-primary" />
+              <Label for="city">{{ $t('profileEdit.location') }}</Label>
+              <Input id="city" v-model="formData.city" class="focus:ring-primary" :placeholder="$t('profileEdit.locationPlaceholder')" />
             </div>
             <div class="space-y-2">
               <Label for="zipcode">Código Postal</Label>
@@ -182,25 +182,25 @@ const handleSave = async () => {
         <!-- Professional Information Section -->
         <div class="space-y-4">
           <h3 class="text-lg font-bold font-heading text-zinc-900 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-2">
-            Información Profesional
+            {{ $t('profile.experiencesTitle') }}
           </h3>
           <div class="grid grid-cols-1 gap-6">
             <div class="space-y-2">
-              <Label for="jobTitle">Puesto Actual</Label>
-              <Input id="jobTitle" v-model="formData.jobTitle" placeholder="Ej: Senior Developer" class="focus:ring-primary" />
+              <Label for="jobTitle">{{ $t('profileEdit.headline') }}</Label>
+              <Input id="jobTitle" v-model="formData.jobTitle" :placeholder="$t('profileEdit.headlinePlaceholder')" class="focus:ring-primary" />
             </div>
             <div class="space-y-2">
-              <Label for="education">Formación / Educación</Label>
-              <Input id="education" v-model="formData.education" placeholder="Ej: Ingeniería Informática" class="focus:ring-primary" />
+              <Label for="education">{{ $t('profileEdit.department') }}</Label>
+              <Input id="education" v-model="formData.education" :placeholder="$t('profileEdit.departmentPlaceholder')" class="focus:ring-primary" />
             </div>
             <div class="space-y-2">
-              <Label for="aboutMe">Sobre Mí (Biografía)</Label>
+              <Label for="aboutMe">{{ $t('profileEdit.bio') }}</Label>
               <textarea 
                 id="aboutMe" 
                 v-model="formData.aboutMe" 
                 rows="4" 
                 class="flex w-full rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/60 px-3 py-2.5 text-sm text-foreground shadow-sm transition-all duration-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-                placeholder="Escribe algo sobre tu experiencia y habilidades..."
+                :placeholder="$t('profileEdit.bioPlaceholder')"
               ></textarea>
             </div>
           </div>
@@ -217,12 +217,12 @@ const handleSave = async () => {
         <!-- Submit Actions -->
         <div class="flex justify-end gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
           <Button type="button" variant="outline" @click="router.push('/profile')" :disabled="profileStore.loading">
-            Cancelar
+            {{ $t('profileEdit.cancel') }}
           </Button>
           <Button type="submit" class="bg-primary hover:bg-primary/90 text-primary-foreground gap-2" :disabled="profileStore.loading">
             <svg v-if="profileStore.loading" class="animate-spin -ml-1 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             <Save v-else class="w-4 h-4" />
-            Guardar Cambios
+            {{ profileStore.loading ? $t('profileEdit.saving') : $t('profileEdit.save') }}
           </Button>
         </div>
       </form>

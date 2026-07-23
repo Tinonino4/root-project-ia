@@ -66,10 +66,10 @@ const clearSearch = () => {
     <!-- Header -->
     <div class="space-y-2">
       <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
-        Buscador de Talento <span class="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">B2B</span>
+        {{ $t('recruiterSearch.title') }} <span class="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">B2B</span>
       </h1>
       <p class="text-zinc-500 dark:text-zinc-400 text-lg max-w-2xl leading-relaxed">
-        Encuentra candidatos de primer nivel, analiza sus soft-skills validadas por compañeros y exporta sus informes certificados.
+        {{ $t('recruiterSearch.subtitle') }}
       </p>
     </div>
 
@@ -80,7 +80,7 @@ const clearSearch = () => {
 
       <div class="space-y-4 relative z-10">
         <label for="search-input" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-          ¿A quién estás buscando hoy?
+          {{ $t('recruiterSearch.title') }}
         </label>
         
         <div class="relative">
@@ -91,7 +91,7 @@ const clearSearch = () => {
             id="search-input"
             v-model="query"
             type="text"
-            placeholder="Escribe un nombre, puesto laboral (ej. Frontend), palabra clave o ciudad..."
+            :placeholder="$t('recruiterSearch.searchPlaceholder')"
             class="block w-full pl-12 pr-10 py-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 text-base"
             @input="onSearchInput"
             @keydown.enter="fetchCandidates"
@@ -108,7 +108,7 @@ const clearSearch = () => {
         <!-- Quick Filters -->
         <div class="flex flex-wrap items-center gap-2.5 pt-2">
           <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mr-1.5">
-            Búsquedas rápidas:
+            Quick search:
           </span>
           <button
             v-for="filter in quickFilters"
@@ -131,9 +131,9 @@ const clearSearch = () => {
     <div class="space-y-4">
       <div v-if="searchPerformed" class="flex items-center justify-between px-1">
         <h2 class="text-lg font-bold text-zinc-800 dark:text-zinc-200">
-          Resultados de búsqueda
+          Results
           <span v-if="!loading" class="text-sm font-normal text-zinc-500 dark:text-zinc-500 ml-2">
-            ({{ candidates.length }} {{ candidates.length === 1 ? 'candidato encontrado' : 'candidatos encontrados' }})
+            ({{ candidates.length }})
           </span>
         </h2>
       </div>
@@ -171,9 +171,9 @@ const clearSearch = () => {
           <Users class="w-7 h-7" />
         </div>
         <div class="max-w-sm space-y-2">
-          <h3 class="text-base font-bold text-zinc-900 dark:text-white">Empieza a explorar</h3>
+          <h3 class="text-base font-bold text-zinc-900 dark:text-white">{{ $t('recruiterSearch.title') }}</h3>
           <p class="text-sm text-zinc-500 dark:text-zinc-400">
-            Introduce términos de búsqueda arriba o selecciona una de las etiquetas de acceso rápido para explorar el talento disponible en la plataforma.
+            {{ $t('recruiterSearch.subtitle') }}
           </p>
         </div>
       </div>
@@ -187,10 +187,7 @@ const clearSearch = () => {
           <Search class="w-7 h-7" />
         </div>
         <div class="max-w-sm space-y-2">
-          <h3 class="text-base font-bold text-zinc-900 dark:text-white">Sin resultados</h3>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">
-            No pudimos encontrar ningún candidato que coincida con "{{ query }}". Prueba a simplificar el término de búsqueda.
-          </p>
+          <h3 class="text-base font-bold text-zinc-900 dark:text-white">{{ $t('recruiterSearch.noResults') }}</h3>
         </div>
       </div>
 
@@ -218,7 +215,7 @@ const clearSearch = () => {
                 
                 <div class="flex items-center gap-1.5 text-xs font-semibold text-primary">
                   <Briefcase class="w-3.5 h-3.5 flex-shrink-0" />
-                  <span class="truncate">{{ candidate.jobTitle || 'Profesional' }}</span>
+                  <span class="truncate">{{ candidate.jobTitle || $t('sidebar.professionalRole') }}</span>
                 </div>
 
                 <div v-if="candidate.city" class="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
@@ -231,7 +228,7 @@ const clearSearch = () => {
             <!-- Subtle verification check -->
             <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200/40 dark:border-green-900/30 text-xs font-medium text-green-700 dark:text-green-400">
               <UserCheck class="w-4 h-4 text-green-500 flex-shrink-0" />
-              <span>Referencias Verificadas por MiCaché</span>
+              <span>{{ $t('profile.verificationBadge') }}</span>
             </div>
           </div>
 
@@ -241,7 +238,7 @@ const clearSearch = () => {
               :to="`/u/${candidate.userId}`"
               class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white border border-zinc-200 dark:border-zinc-700 hover:border-primary dark:hover:border-primary transition-all duration-200 group-hover:shadow-md"
             >
-              Ver Perfil Completo
+              {{ $t('recruiterSearch.viewProfile') }}
               <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </RouterLink>
           </div>

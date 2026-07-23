@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, onBeforeUnmount } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { useFeedbackStore } from '@/stores/feedback.store';
 import { useExperienceStore } from '@/stores/experience.store';
-import { ArrowLeft, Send, User, Mail, Phone, Briefcase, Heart } from 'lucide-vue-next';
+import { ArrowLeft, Send, User, Mail, Phone, Briefcase, ChevronDown } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +13,7 @@ const router = useRouter();
 const route = useRoute();
 const feedbackStore = useFeedbackStore();
 const experienceStore = useExperienceStore();
+const { t } = useI18n();
 
 const form = ref({
   targetName: '',
@@ -28,13 +30,17 @@ const isSubmitting = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
 
+const showRelationshipDropdown = ref(false);
+const showExperienceDropdown = ref(false);
+const relationshipContainer = ref(null);
+const experienceContainer = ref(null);
+
 onMounted(async () => {
   await Promise.all([
     feedbackStore.fetchRelationships(),
     experienceStore.fetchExperiences()
   ]);
   
-  // If experienceId is in query, use it. Otherwise use the first one.
   const queryExperienceId = route.query.experienceId;
   if (queryExperienceId) {
     form.value.experienceId = queryExperienceId;
@@ -46,27 +52,75 @@ onMounted(async () => {
 const relationships = computed(() => feedbackStore.relationships);
 const experiences = computed(() => experienceStore.experiences);
 
+const selectedRelationship = computed(() => {
+  return relationships.value.find(r => r.id.toString() === form.value.relationshipId) || null;
+});
+
+const selectedExperience = computed(() => {
+  return experiences.value.find(e => e.id === form.value.experienceId) || null;
+});
+
+const selectRelationship = (id) => {
+  form.value.relationshipId = id.toString();
+  showRelationshipDropdown.value = false;
+};
+
+const selectExperience = (id) => {
+  form.value.experienceId = id;
+  showExperienceDropdown.value = false;
+};
+
+const closeDropdowns = (e) => {
+  if (relationshipContainer.value && !relationshipContainer.value.contains(e.target)) {
+    showRelationshipDropdown.value = false;
+  }
+  if (experienceContainer.value && !experienceContainer.value.contains(e.target)) {
+    showExperienceDropdown.value = false;
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('click', closeDropdowns);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('click', closeDropdowns);
+});
+
 const handleSubmit = async () => {
+  if (!form.value.relationshipId) {
+    errorMessage.value = t('feedback.relationship');
+    return;
+  }
+  if (!form.value.experienceId) {
+    errorMessage.value = t('feedback.selectExperience');
+    return;
+  }
+
   isSubmitting.value = true;
   successMessage.value = '';
   errorMessage.value = '';
   
   try {
-    const data = {
-      ...form.value,
-      relationshipId: parseInt(form.value.relationshipId),
-      experienceId: form.value.experienceId
-    };
+    await feedbackStore.createRequest({
+      targetName: form.value.targetName,
+      targetSurname: form.value.targetSurname,
+      targetEmail: form.value.targetEmail,
+      targetPhone: form.value.targetPhone,
+      relationshipId: parseInt(form.value.relationshipId, 10),
+      experienceId: form.value.experienceId,
+      stillWorksThere: form.value.stillWorksThere,
+      extraAnswers: form.value.extraAnswers
+    });
     
-    await feedbackStore.createRequest(data);
-    successMessage.value = '¡Solicitud de feedback enviada con éxito!';
+    successMessage.value = t('feedback.status.COMPLETED');
     
-    // Reset form or redirect after a delay
     setTimeout(() => {
-      router.push('/dashboard');
-    }, 2000);
-  } catch (err) {
-    errorMessage.value = err.message || 'Error al enviar la solicitud';
+      router.push('/feedback');
+    }, 1500);
+  } catch (error) {
+    console.error('Error creating feedback request:', error);
+    errorMessage.value = error.response?.data?.message || 'Error sending request';
   } finally {
     isSubmitting.value = false;
   }
@@ -94,8 +148,8 @@ const goBack = () => {
             <ArrowLeft class="w-4.5 h-4.5 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
           </button>
           <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Solicitar Feedback</h1>
-            <p class="text-white/80 text-xs sm:text-sm mt-0.5">Pide a tus contactos que validen tus habilidades</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">{{ $t('feedback.createTitle') }}</h1>
+            <p class="text-white/80 text-xs sm:text-sm mt-0.5">{{ $t('feedback.createSubtitle') }}</p>
           </div>
         </div>
       </div>
@@ -125,13 +179,13 @@ const goBack = () => {
             
             <!-- Target Name -->
             <div class="space-y-2">
-              <Label for="targetName" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Nombre del Validador</Label>
+              <Label for="targetName" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ $t('feedback.refereeName') }}</Label>
               <div class="relative">
                 <User class="w-4 h-4 absolute left-3.5 top-3 text-zinc-400" />
                 <Input 
                   id="targetName" 
                   v-model="form.targetName" 
-                  placeholder="Ej. Juan" 
+                  placeholder="Juan" 
                   class="pl-10 h-11 bg-white dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700 focus:ring-primary focus:border-primary rounded-xl"
                   required 
                 />
@@ -146,7 +200,7 @@ const goBack = () => {
                 <Input 
                   id="targetSurname" 
                   v-model="form.targetSurname" 
-                  placeholder="Ej. Pérez" 
+                  placeholder="Pérez" 
                   class="pl-10 h-11 bg-white dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700 focus:ring-primary focus:border-primary rounded-xl"
                   required 
                 />
@@ -155,14 +209,14 @@ const goBack = () => {
 
             <!-- Target Email -->
             <div class="space-y-2">
-              <Label for="targetEmail" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Email</Label>
+              <Label for="targetEmail" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ $t('feedback.refereeEmail') }}</Label>
               <div class="relative">
                 <Mail class="w-4 h-4 absolute left-3.5 top-3 text-zinc-400" />
                 <Input 
                   id="targetEmail" 
                   type="email" 
                   v-model="form.targetEmail" 
-                  placeholder="ejemplo@email.com" 
+                  placeholder="example@email.com" 
                   class="pl-10 h-11 bg-white dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700 focus:ring-primary focus:border-primary rounded-xl"
                   required 
                 />
@@ -171,7 +225,7 @@ const goBack = () => {
 
             <!-- Target Phone -->
             <div class="space-y-2">
-              <Label for="targetPhone" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Teléfono (Opcional)</Label>
+              <Label for="targetPhone" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ $t('feedback.refereePhone') }}</Label>
               <div class="relative">
                 <Phone class="w-4 h-4 absolute left-3.5 top-3 text-zinc-400" />
                 <Input 
@@ -184,42 +238,98 @@ const goBack = () => {
             </div>
 
             <!-- Relationship -->
-            <div class="space-y-2">
-              <Label for="relationship" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Relación</Label>
+            <div class="space-y-2" ref="relationshipContainer">
+              <Label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ $t('feedback.relationship') }}</Label>
               <div class="relative">
-                <Heart class="w-4 h-4 absolute left-3.5 top-3 text-zinc-400" />
-                <select 
-                  id="relationship" 
-                  v-model="form.relationshipId" 
-                  class="w-full pl-10 h-11 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 focus:ring-primary focus:border-primary text-sm"
-                  required
+                <button 
+                  type="button"
+                  @click.stop="showRelationshipDropdown = !showRelationshipDropdown; showExperienceDropdown = false;"
+                  class="w-full px-4 h-11 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-left text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm flex items-center justify-between transition-all duration-200"
                 >
-                  <option value="" disabled>Selecciona una relación</option>
-                  <option v-for="rel in relationships" :key="rel.id" :value="rel.id">
-                    {{ rel.name }}
-                  </option>
-                </select>
+                  <span :class="{ 'text-zinc-400 dark:text-zinc-500': !selectedRelationship }">
+                    {{ selectedRelationship ? selectedRelationship.name : $t('feedback.relationship') }}
+                  </span>
+                  <ChevronDown class="w-4 h-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200" :class="{ 'rotate-180': showRelationshipDropdown }" />
+                </button>
+                <div 
+                  v-if="showRelationshipDropdown" 
+                  class="absolute z-50 w-full mt-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
+                >
+                  <button
+                    v-for="rel in relationships"
+                    :key="rel.id"
+                    type="button"
+                    @click="selectRelationship(rel.id)"
+                    class="w-full px-4 py-2.5 text-left text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 transition-colors flex items-center justify-between"
+                    :class="{ 'bg-primary/5 text-primary dark:bg-primary/10 dark:text-primary font-semibold': form.relationshipId === rel.id.toString() }"
+                  >
+                    <span>{{ rel.name }}</span>
+                    <span v-if="form.relationshipId === rel.id.toString()" class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                  </button>
+                </div>
               </div>
             </div>
 
             <!-- Experience -->
-            <div class="space-y-2">
-              <Label for="experience" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Experiencia Asociada</Label>
+            <div class="space-y-2" ref="experienceContainer">
+              <Label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ $t('feedback.selectExperience') }}</Label>
               <div class="relative">
-                <Briefcase class="w-4 h-4 absolute left-3.5 top-3 text-zinc-400" />
-                <select 
-                  id="experience" 
-                  v-model="form.experienceId" 
-                  class="w-full pl-10 h-11 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 focus:ring-primary focus:border-primary text-sm"
-                  required
+                <button 
+                  type="button"
+                  @click.stop="showExperienceDropdown = !showExperienceDropdown; showRelationshipDropdown = false;"
+                  class="w-full px-4 h-11 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-left text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm flex items-center justify-between transition-all duration-200"
                 >
-                  <option value="" disabled>Selecciona una experiencia</option>
-                  <option v-for="exp in experiences" :key="exp.id" :value="exp.id">
-                    {{ exp.company }} - {{ exp.position }}
-                  </option>
-                </select>
+                  <span :class="{ 'text-zinc-400 dark:text-zinc-500': !selectedExperience }">
+                    {{ selectedExperience ? `${selectedExperience.position} - ${selectedExperience.companyName}` : $t('feedback.selectExperience') }}
+                  </span>
+                  <ChevronDown class="w-4 h-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200" :class="{ 'rotate-180': showExperienceDropdown }" />
+                </button>
+                <div 
+                  v-if="showExperienceDropdown" 
+                  class="absolute z-50 w-full mt-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
+                >
+                  <button
+                    v-for="exp in experiences"
+                    :key="exp.id"
+                    type="button"
+                    @click="selectExperience(exp.id)"
+                    class="w-full px-4 py-2.5 text-left text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 transition-colors flex items-center justify-between"
+                    :class="{ 'bg-primary/5 text-primary dark:bg-primary/10 dark:text-primary font-semibold': form.experienceId === exp.id }"
+                  >
+                    <span class="truncate">{{ exp.position }} - {{ exp.companyName }}</span>
+                    <span v-if="form.experienceId === exp.id" class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 ml-2"></span>
+                  </button>
+                </div>
               </div>
             </div>
+
+            <!-- Email Language Selector -->
+            <div class="space-y-2">
+              <Label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ $t('extraFeedback.emailLanguage') }}</Label>
+              <div class="flex items-center gap-2 h-11">
+                <button
+                  type="button"
+                  @click="form.emailLanguage = 'en'"
+                  class="flex-1 h-full rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                  :class="form.emailLanguage === 'en' 
+                    ? 'bg-primary text-white border-primary shadow-sm' 
+                    : 'bg-white dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'"
+                >
+                  <span>🇬🇧 EN</span>
+                </button>
+                <button
+                  type="button"
+                  @click="form.emailLanguage = 'es'"
+                  class="flex-1 h-full rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                  :class="form.emailLanguage === 'es' 
+                    ? 'bg-primary text-white border-primary shadow-sm' 
+                    : 'bg-white dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'"
+                >
+                  <span>🇪🇸 ES</span>
+                </button>
+              </div>
+            </div>
+
           </div>
 
           <!-- Checkboxes -->
@@ -232,7 +342,7 @@ const goBack = () => {
                 class="w-5 h-5 rounded-md border-zinc-300 dark:border-zinc-700 text-primary focus:ring-primary dark:bg-zinc-800"
               />
               <Label for="stillWorksThere" class="text-sm font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer">
-                ¿Sigue trabajando ahí?
+                {{ $t('extraFeedback.stillWorksThere') }}
               </Label>
             </div>
           </div>
@@ -241,13 +351,13 @@ const goBack = () => {
           <div class="pt-4">
             <Button 
               type="submit" 
-              class="w-full h-12 bg-primary hover:bg-primary-hover text-white font-medium rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg shadow-primary/20"
+              class="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg shadow-primary/20"
               :disabled="isSubmitting"
             >
               <span v-if="isSubmitting" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
               <template v-else>
                 <Send class="w-5 h-5" />
-                <span>Enviar Solicitud</span>
+                <span>{{ isSubmitting ? $t('feedback.sending') : $t('feedback.submitRequest') }}</span>
               </template>
             </Button>
           </div>

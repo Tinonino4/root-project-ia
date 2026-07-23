@@ -49,10 +49,10 @@ onMounted(async () => {
     
     <div class="space-y-2">
       <h2 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-white font-heading">
-        Procesando autenticación
+        {{ $t('auth.processing') }}
       </h2>
       <p class="text-sm text-zinc-500 dark:text-zinc-400 max-w-xs">
-        Estamos configurando tu sesión de forma segura. Un momento, por favor...
+        {{ $t('auth.processingDesc') }}
       </p>
     </div>
   </div>

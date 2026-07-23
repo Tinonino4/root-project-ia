@@ -1,12 +1,14 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { useFeedbackStore } from '@/stores/feedback.store';
 import { ArrowLeft, Plus, Mail, Clock, CheckCircle2, XCircle, ShieldCheck, Send, Trash2, AlertTriangle } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 
 const router = useRouter();
 const feedbackStore = useFeedbackStore();
+const { t } = useI18n();
 
 onMounted(async () => {
   await feedbackStore.fetchRequests();
@@ -43,20 +45,20 @@ const handleToggleVisibility = async (requestId, visible) => {
   try {
     await feedbackStore.toggleRequestVisibility(requestId, visible);
     triggerToast(visible 
-      ? 'Referencia visible. Tus soft-skills se han recalculado.' 
-      : 'Referencia oculta. Tus soft-skills se han recalculado.'
+      ? t('feedback.toast.visible') 
+      : t('feedback.toast.hidden')
     );
   } catch (err) {
-    triggerToast('Error al cambiar la visibilidad');
+    triggerToast(t('errors.generic'));
   }
 };
 
 const handleRemind = async (requestId) => {
   try {
     await feedbackStore.remindRequest(requestId);
-    triggerToast('Recordatorio enviado con éxito.');
+    triggerToast(t('feedback.toast.remind'));
   } catch (err) {
-    triggerToast('Error al enviar el recordatorio');
+    triggerToast(t('errors.generic'));
   }
 };
 
@@ -72,9 +74,9 @@ const executeDelete = async () => {
   if (requestToDelete.value) {
     try {
       await feedbackStore.deleteRequest(requestToDelete.value);
-      triggerToast('Solicitud cancelada correctamente.');
+      triggerToast(t('feedback.toast.deleted'));
     } catch (err) {
-      triggerToast('Error al cancelar la solicitud');
+      triggerToast(t('errors.generic'));
     } finally {
       showDeleteModal.value = false;
       requestToDelete.value = null;
@@ -98,9 +100,9 @@ const goToCreate = () => {
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
-  return date.toLocaleDateString('es-ES', {
+  return date.toLocaleDateString(t('locale') === 'es' ? 'es-ES' : 'en-US', {
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric'
   });
 };
@@ -133,10 +135,10 @@ const hasCompanyMatch = (req) => {
 };
 
 const getTrustLabel = (score) => {
-  if (score >= 80) return 'Excelente';
-  if (score >= 50) return 'Alta';
-  if (score >= 30) return 'Media';
-  return 'Básica';
+  if (score >= 80) return t('home.trustProtocol.level1');
+  if (score >= 50) return t('home.trustProtocol.level2');
+  if (score >= 30) return t('home.trustProtocol.level3');
+  return t('home.trustProtocol.level4');
 };
 
 const selectedRequest = ref(null);
@@ -152,13 +154,13 @@ const closeAnswersModal = () => {
   selectedRequest.value = null;
 };
 
-const relationshipIdLabels = {
-  0: 'Jefe directo',
-  1: 'Compañero/a',
-  2: 'Subordinado/a',
-  3: 'Cliente',
-  4: 'Otro'
-};
+const relationshipIdLabels = computed(() => ({
+  0: t('feedback.relationships.SUPERVISOR'),
+  1: t('feedback.relationships.PEER'),
+  2: t('feedback.relationships.SUBORDINATE'),
+  3: t('feedback.relationships.CLIENT'),
+  4: t('feedback.relationships.OTHER')
+}));
 </script>
 
 <template>
@@ -178,8 +180,8 @@ const relationshipIdLabels = {
             <ArrowLeft class="w-4.5 h-4.5 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
           </button>
           <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Solicitudes</h1>
-            <p class="text-white/80 text-xs sm:text-sm mt-0.5">Gestiona tus validaciones</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">{{ $t('feedback.listTitle') }}</h1>
+            <p class="text-white/80 text-xs sm:text-sm mt-0.5">{{ $t('feedback.listSubtitle') }}</p>
           </div>
         </div>
 
@@ -188,7 +190,7 @@ const relationshipIdLabels = {
           class="bg-gradient-to-r from-primary to-orange-500 hover:scale-[1.02] active:scale-[0.98] transition-all text-white border-0 rounded-xl px-3 sm:px-5 h-10 flex items-center gap-1.5 shadow-lg shadow-primary/20 flex-shrink-0"
         >
           <Plus class="w-4.5 h-4.5" />
-          <span class="text-xs sm:text-sm hidden xs:inline">Nueva</span>
+          <span class="text-xs sm:text-sm hidden xs:inline">{{ $t('experience.add') }}</span>
         </Button>
       </div>
     </div>
@@ -205,7 +207,7 @@ const relationshipIdLabels = {
             ? 'bg-white dark:bg-zinc-900 text-primary dark:text-white shadow-sm border border-zinc-100 dark:border-zinc-800/50' 
             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'"
         >
-          <span>Todas</span>
+          <span>{{ $t('feedback.tabs.all') }}</span>
           <span class="px-1.5 py-0.5 text-[10px] rounded-md bg-zinc-150 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-bold">
             {{ requests.length }}
           </span>
@@ -217,7 +219,7 @@ const relationshipIdLabels = {
             ? 'bg-white dark:bg-zinc-900 text-primary dark:text-white shadow-sm border border-zinc-100 dark:border-zinc-800/50' 
             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'"
         >
-          <span>Completadas</span>
+          <span>{{ $t('feedback.status.COMPLETED') }}</span>
           <span class="px-1.5 py-0.5 text-[10px] rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">
             {{ completedCount }}
           </span>
@@ -229,7 +231,7 @@ const relationshipIdLabels = {
             ? 'bg-white dark:bg-zinc-900 text-primary dark:text-white shadow-sm border border-zinc-100 dark:border-zinc-800/50' 
             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'"
         >
-          <span>Pendientes</span>
+          <span>{{ $t('feedback.status.PENDING') }}</span>
           <span class="px-1.5 py-0.5 text-[10px] rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold">
             {{ pendingCount }}
           </span>
@@ -302,32 +304,32 @@ const relationshipIdLabels = {
               <span 
                 v-if="req.finished" 
                 class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                title="Completado"
+                :title="$t('feedback.status.COMPLETED')"
               >
                 <CheckCircle2 class="w-4 h-4 flex-shrink-0" />
-                <span class="ml-1 hidden sm:inline">Completado</span>
+                <span class="ml-1 hidden sm:inline">{{ $t('feedback.status.COMPLETED') }}</span>
               </span>
               <span 
                 v-else 
                 class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                title="Pendiente"
+                :title="$t('feedback.status.PENDING')"
               >
                 <Clock class="w-4 h-4 flex-shrink-0" />
-                <span class="ml-1 hidden sm:inline">Pendiente</span>
+                <span class="ml-1 hidden sm:inline">{{ $t('feedback.status.PENDING') }}</span>
               </span>
             </div>
 
             <div class="space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
               <div class="flex justify-between">
-                <span>Fecha:</span>
+                <span>{{ $t('feedback.date') }}:</span>
                 <span class="font-medium">{{ formatDate(req.createdAt) }}</span>
               </div>
               <div class="flex justify-between">
-                <span>Token:</span>
+                <span>{{ $t('feedback.token') }}:</span>
                 <span class="font-mono text-xs bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">{{ req.id.substring(0, 8) }}...</span>
               </div>
               <div v-if="req.finished" class="flex justify-between items-center pt-1.5 border-t border-zinc-100 dark:border-zinc-800/40 mt-1.5">
-                <span class="text-xs text-zinc-500 dark:text-zinc-400">Confianza del Referente:</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $t('feedback.referralTrust') }}:</span>
                 <div class="relative group cursor-help select-none">
                   <span 
                     class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border"
@@ -346,23 +348,23 @@ const relationshipIdLabels = {
                   <div class="absolute bottom-full right-0 mb-2 w-64 p-3 rounded-xl bg-zinc-900 border border-white/10 text-white text-xs space-y-1.5 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-2xl z-50">
                     <p class="font-bold text-zinc-300 mb-1 border-b border-white/10 pb-1 flex items-center gap-1.5">
                       <ShieldCheck class="w-3.5 h-3.5 text-primary" />
-                      Desglose de Verificación
+                      {{ $t('extraFeedback.breakdownTitle') }}
                     </p>
                     <div class="flex justify-between">
-                      <span class="text-zinc-400">Email Corporativo (+30%):</span>
-                      <span class="font-bold" :class="hasCorporate(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasCorporate(req) ? '✓ Sí' : '✗ No' }}</span>
+                      <span class="text-zinc-400">{{ $t('extraFeedback.corporateEmail') }}:</span>
+                      <span class="font-bold" :class="hasCorporate(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasCorporate(req) ? $t('extraFeedback.yes') : $t('extraFeedback.no') }}</span>
                     </div>
                     <div class="flex justify-between">
-                      <span class="text-zinc-400">Coincide con Empresa (+40%):</span>
-                      <span class="font-bold" :class="hasCompanyMatch(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasCompanyMatch(req) ? '✓ Sí' : '✗ No' }}</span>
+                      <span class="text-zinc-400">{{ $t('extraFeedback.companyMatch') }}:</span>
+                      <span class="font-bold" :class="hasCompanyMatch(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasCompanyMatch(req) ? $t('extraFeedback.yes') : $t('extraFeedback.no') }}</span>
                     </div>
                     <div class="flex justify-between">
-                      <span class="text-zinc-400">Referente Registrado (+20%):</span>
-                      <span class="font-bold" :class="hasRegistered(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasRegistered(req) ? '✓ Sí' : '✗ No' }}</span>
+                      <span class="text-zinc-400">{{ $t('extraFeedback.registeredReferent') }}:</span>
+                      <span class="font-bold" :class="hasRegistered(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasRegistered(req) ? $t('extraFeedback.yes') : $t('extraFeedback.no') }}</span>
                     </div>
                     <div class="flex justify-between">
-                      <span class="text-zinc-400">Teléfono Provisto (+10%):</span>
-                      <span class="font-bold" :class="hasPhone(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasPhone(req) ? '✓ Sí' : '✗ No' }}</span>
+                      <span class="text-zinc-400">{{ $t('extraFeedback.phoneProvided') }}:</span>
+                      <span class="font-bold" :class="hasPhone(req) ? 'text-emerald-400' : 'text-zinc-600'">{{ hasPhone(req) ? $t('extraFeedback.yes') : $t('extraFeedback.no') }}</span>
                     </div>
                   </div>
                 </div>
@@ -373,7 +375,7 @@ const relationshipIdLabels = {
           <div class="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
             <!-- Toggle switch for visibility (only shown if finished) -->
             <div v-if="req.finished" class="flex items-center space-x-2">
-              <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Perfil Público:</span>
+              <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{{ $t('feedback.publicProfile') }}:</span>
               <label :for="'toggle-' + req.id" class="inline-flex items-center cursor-pointer select-none">
                 <input 
                   type="checkbox" 
@@ -386,7 +388,7 @@ const relationshipIdLabels = {
               </label>
             </div>
             <div v-else class="text-xs text-zinc-400 dark:text-zinc-500 italic">
-              Esperando respuesta...
+              {{ $t('feedback.waitingResponse') }}
             </div>
 
             <div class="flex items-center gap-2">
@@ -398,7 +400,7 @@ const relationshipIdLabels = {
                 :disabled="loading"
               >
                 <Send class="w-3.5 h-3.5" />
-                <span>Recordar</span>
+                <span>{{ $t('feedback.actions.resend') }}</span>
               </Button>
               <Button 
                 v-if="!req.finished"
@@ -408,7 +410,7 @@ const relationshipIdLabels = {
                 :disabled="loading"
               >
                 <Trash2 class="w-3.5 h-3.5" />
-                <span>Cancelar</span>
+                <span>{{ $t('feedback.actions.cancel') }}</span>
               </Button>
               <Button 
                 v-else
@@ -416,7 +418,7 @@ const relationshipIdLabels = {
                 class="text-xs text-primary hover:text-primary-hover rounded-lg h-9"
                 @click="openAnswersModal(req)"
               >
-                Ver Respuestas
+                {{ $t('feedback.viewAnswers') }}
               </Button>
             </div>
           </div>

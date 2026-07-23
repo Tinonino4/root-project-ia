@@ -457,7 +457,7 @@ const softSkills = [
           class="inline-block px-10 py-5 rounded-xl font-bold text-white bg-primary hover:bg-primary/90 transition-all duration-300 text-lg
                  hover:shadow-[0_0_40px_rgba(242,151,39,0.4)] hover:-translate-y-1"
         >
-          Crear mi perfil gratis
+          {{ $t('home.bottomCta.cta') }}
         </RouterLink>
       </div>
     </section>

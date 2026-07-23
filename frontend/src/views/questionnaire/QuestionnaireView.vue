@@ -1,12 +1,14 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { questionnaireApi } from '@/api/questionnaire.api';
 import { Check, Star, AlertTriangle, ArrowLeft, ArrowRight, Award, MessageSquare } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 
 const route = useRoute();
 const urlToken = route.params.token;
+const { t } = useI18n();
 
 const questionnaire = ref(null);
 const loading = ref(true);
@@ -30,7 +32,7 @@ onMounted(async () => {
       });
     });
   } catch (err) {
-    error.value = err.message || 'Error al cargar el cuestionario. Es posible que el enlace haya expirado o ya haya sido completado.';
+    error.value = err.message || t('questionnaire.errorMsg');
   } finally {
     loading.value = false;
   }
@@ -38,6 +40,9 @@ onMounted(async () => {
 
 const isCurrentStepValid = computed(() => {
   if (!questionnaire.value) return false;
+  if (currentStep.value === questionnaire.value.categories.length) {
+    return true; // El paso de comentarios adicionales es opcional
+  }
   const currentCategory = questionnaire.value.categories[currentStep.value];
   for (const question of currentCategory.questions) {
     if (answers.value[question.id] === null) {
@@ -66,21 +71,24 @@ const setRating = (questionId, rating) => {
   
   // Check if current step is fully answered to auto-advance
   setTimeout(() => {
-    if (isCurrentStepValid.value && currentStep.value < questionnaire.value.categories.length - 1) {
+    if (isCurrentStepValid.value && currentStep.value < questionnaire.value.categories.length) {
       currentStep.value++;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, 400);
+  }, 450);
 };
 
 const nextStep = () => {
-  if (currentStep.value < questionnaire.value.categories.length - 1) {
+  if (currentStep.value < questionnaire.value.categories.length) {
     currentStep.value++;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 };
 
 const prevStep = () => {
   if (currentStep.value > 0) {
     currentStep.value--;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 };
 
@@ -127,8 +135,9 @@ const handleSubmit = async () => {
     
     await questionnaireApi.submitQuestionnaire(urlToken, data);
     submitted.value = true;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (err) {
-    error.value = err.message || 'Error al enviar el cuestionario';
+    error.value = err.message || t('questionnaire.submitError');
   } finally {
     isSubmitting.value = false;
   }
@@ -143,8 +152,8 @@ const handleSubmit = async () => {
       <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdG09IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSJub25lIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvc3ZnPg==')] opacity-30"></div>
       
       <div class="max-w-3xl mx-auto px-6 h-full flex flex-col justify-center relative z-10 text-white">
-        <h1 class="text-3xl font-bold tracking-tight">Cuestionario de Validación</h1>
-        <p class="text-white/80 text-sm mt-1">Tu opinión nos ayuda a validar las habilidades profesionales</p>
+        <h1 class="text-3xl font-bold tracking-tight">{{ $t('questionnaire.title') }}</h1>
+        <p class="text-white/80 text-sm mt-1">{{ $t('questionnaire.subtitle') }}</p>
       </div>
     </div>
 
@@ -191,17 +200,33 @@ const handleSubmit = async () => {
       <!-- Error State -->
       <div v-else-if="error" class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-red-200 dark:border-red-500/20 rounded-3xl p-8 text-center animate-fadeIn">
         <AlertTriangle class="w-12 h-12 text-red-500 mx-auto mb-4" />
-        <h2 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">¡Ups! Algo salió mal</h2>
+        <h2 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">{{ $t('questionnaire.errorTitle') }}</h2>
         <p class="text-zinc-600 dark:text-zinc-400 text-sm">{{ error }}</p>
       </div>
 
       <!-- Success State -->
-      <div v-else-if="submitted" class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl p-12 text-center animate-fadeIn">
+      <div v-else-if="submitted" class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl p-12 text-center animate-fadeIn shadow-xl">
         <div class="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
           <Check class="w-8 h-8 text-emerald-500" />
         </div>
-        <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-2">¡Muchas gracias!</h2>
-        <p class="text-zinc-600 dark:text-zinc-400 text-sm">Tus respuestas han sido registradas con éxito. Tu colaboración es muy valiosa.</p>
+        <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-2">{{ $t('questionnaire.successTitle') }}</h2>
+        <p class="text-zinc-600 dark:text-zinc-400 text-sm max-w-md mx-auto">{{ $t('questionnaire.successMsg') }}</p>
+        
+        <!-- Acciones Post-Envio -->
+        <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+          <RouterLink 
+            to="/login" 
+            class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/95 shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all duration-200"
+          >
+            {{ $t('questionnaire.goToLogin') }}
+          </RouterLink>
+          <a 
+            href="/" 
+            class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-700/80 hover:-translate-y-0.5 transition-all duration-200"
+          >
+            {{ $t('questionnaire.goHome') }}
+          </a>
+        </div>
       </div>
 
       <!-- Questionnaire Stepper Form -->
@@ -214,9 +239,9 @@ const handleSubmit = async () => {
               {{ currentStep + 1 }}
             </div>
             <div>
-              <p class="text-xs text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">Progreso Cuestionario</p>
+              <p class="text-xs text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">{{ $t('questionnaire.progress') }}</p>
               <h2 class="text-sm font-bold text-zinc-800 dark:text-zinc-200">
-                Sección {{ currentStep + 1 }} de {{ questionnaire.categories.length }}
+                {{ $t('questionnaire.section', { current: currentStep + 1, total: questionnaire.categories.length + 1 }) }}
               </h2>
             </div>
           </div>
@@ -224,8 +249,8 @@ const handleSubmit = async () => {
           <!-- Stepper Dots -->
           <div class="flex items-center space-x-2">
             <button
-              v-for="(cat, idx) in questionnaire.categories"
-              :key="cat.id"
+              v-for="(cat, idx) in (questionnaire.categories.length + 1)"
+              :key="idx"
               @click="currentStep = idx"
               class="w-3.5 h-3.5 rounded-full transition-all duration-300"
               :class="[
@@ -235,14 +260,16 @@ const handleSubmit = async () => {
                     ? 'bg-emerald-500/80 dark:bg-emerald-500/60'
                     : 'bg-zinc-200 dark:bg-zinc-800'
               ]"
-              :aria-label="'Ir a sección ' + (idx + 1)"
+              :aria-label="$t('questionnaire.ariaGoToSection', { index: idx + 1 })"
               :aria-current="idx === currentStep ? 'step' : undefined"
             ></button>
           </div>
         </div>
 
-        <!-- Category Step Container (Single Step Visible) -->
+        <!-- Step Containers -->
         <div class="relative overflow-hidden min-h-[400px]">
+          
+          <!-- Category Steps -->
           <div 
             v-for="(category, catIdx) in questionnaire.categories" 
             :key="category.id"
@@ -252,10 +279,12 @@ const handleSubmit = async () => {
             <div class="mb-8 border-b border-zinc-100 dark:border-zinc-800/80 pb-4">
               <div class="flex items-center gap-2">
                 <Award class="w-6 h-6 text-primary" />
-                <h2 class="text-2xl font-bold text-zinc-900 dark:text-white">{{ category.name }}</h2>
+                <h2 class="text-2xl font-bold text-zinc-900 dark:text-white">
+                  {{ $t('questionnaire.categories.' + category.code + '.name', category.name) }}
+                </h2>
               </div>
               <p v-if="category.description" class="text-zinc-500 dark:text-zinc-400 text-sm mt-2 leading-relaxed">
-                {{ category.description }}
+                {{ $t('questionnaire.categories.' + category.code + '.description', category.description) }}
               </p>
             </div>
 
@@ -266,7 +295,7 @@ const handleSubmit = async () => {
                 class="space-y-4"
               >
                 <label :for="'radiogroup-' + question.id" class="text-sm font-semibold text-zinc-700 dark:text-zinc-300 leading-normal block">
-                  {{ question.text }}
+                  {{ $t('questionnaire.questions.' + question.text, question.text) }}
                 </label>
                 
                 <!-- Rating Blocks -->
@@ -286,7 +315,7 @@ const handleSubmit = async () => {
                     type="button"
                     role="radio"
                     :aria-checked="answers[question.id] === rating"
-                    :aria-label="'Puntuar ' + rating + ' sobre 5'"
+                    :aria-label="$t('questionnaire.ariaRate', { rating: rating })"
                     class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     :class="[
                       answers[question.id] === rating 
@@ -298,38 +327,51 @@ const handleSubmit = async () => {
                   </button>
                   
                   <span class="ml-2 text-xs text-zinc-400 dark:text-zinc-500 font-bold" aria-live="polite">
-                    {{ answers[question.id] ? `${answers[question.id]} / 5` : 'Sin responder' }}
+                    {{ answers[question.id] ? $t('questionnaire.ariaScore', { score: answers[question.id] }) : $t('questionnaire.unanswered') }}
                   </span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Comments block (only visible on the last step before submitting) -->
-        <div 
-          v-show="currentStep === questionnaire.categories.length - 1" 
-          class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl p-6 md:p-8 shadow-sm space-y-4 animate-fadeIn"
-        >
-          <div class="flex items-center gap-2.5 border-b border-zinc-100 dark:border-zinc-800 pb-3">
-            <MessageSquare class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-bold text-zinc-900 dark:text-white">Comentarios o opinión adicional (Opcional)</h3>
+          <!-- Final step: Comments -->
+          <div 
+            v-show="currentStep === questionnaire.categories.length"
+            class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl p-8 shadow-sm transition-all duration-500 animate-fadeIn"
+          >
+            <div class="mb-8 border-b border-zinc-100 dark:border-zinc-800/80 pb-4">
+              <div class="flex items-center gap-2">
+                <MessageSquare class="w-6 h-6 text-primary" />
+                <h2 class="text-2xl font-bold text-zinc-900 dark:text-white">{{ $t('questionnaire.finishTitle') }}</h2>
+              </div>
+              <p class="text-zinc-500 dark:text-zinc-400 text-sm mt-2 leading-relaxed">
+                {{ $t('questionnaire.finishDesc') }}
+              </p>
+            </div>
+
+            <div class="space-y-4">
+              <label for="additional-comments" class="text-sm font-semibold text-zinc-700 dark:text-zinc-300 leading-normal block">
+                {{ $t('questionnaire.optionalComments') }}
+              </label>
+              <p class="text-zinc-400 dark:text-zinc-500 text-xs">
+                {{ $t('questionnaire.commentsDesc') }}
+              </p>
+              <textarea
+                id="additional-comments"
+                v-model="additionalComments"
+                rows="5"
+                :placeholder="$t('questionnaire.commentsPlaceholder')"
+                class="w-full p-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 resize-none"
+              ></textarea>
+            </div>
           </div>
-          <p class="text-zinc-500 dark:text-zinc-400 text-xs">
-            ¿Hay algo más que quieras añadir sobre el desempeño profesional o cualidades de este candidato? Tu comentario se guardará como referencia confidencial.
-          </p>
-          <textarea
-            v-model="additionalComments"
-            rows="4"
-            placeholder="Ej. Es un excelente profesional con gran capacidad de aprendizaje, actitud proactiva ante los retos y gran compañerismo en el día a día..."
-            class="w-full p-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 resize-none"
-          ></textarea>
+
         </div>
 
         <!-- Navigation & Submit Footer -->
-        <div class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-          <!-- Left: Previous button / Validation message -->
-          <div class="w-full sm:w-auto">
+        <div class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl p-6 flex flex-row items-center justify-between gap-4 shadow-sm">
+          <!-- Left: Previous button -->
+          <div :class="currentStep > 0 ? 'flex-1 sm:flex-initial' : 'hidden sm:block text-xs text-zinc-400 dark:text-zinc-500'">
             <Button
               v-if="currentStep > 0"
               @click="prevStep"
@@ -337,22 +379,22 @@ const handleSubmit = async () => {
               class="w-full sm:w-auto h-11 border-zinc-200 dark:border-zinc-800 rounded-xl px-6 flex items-center justify-center gap-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium"
             >
               <ArrowLeft class="w-4 h-4" />
-              <span>Anterior</span>
+              <span>{{ $t('questionnaire.back') }}</span>
             </Button>
-            <div v-else class="text-xs text-zinc-400 dark:text-zinc-500 font-medium text-center sm:text-left select-none">
-              Responde todas las preguntas de cada sección para avanzar.
+            <div v-else class="text-xs text-zinc-400 dark:text-zinc-500 font-medium select-none">
+              {{ $t('questionnaire.instruction') }}
             </div>
           </div>
 
           <!-- Right: Next / Submit button -->
-          <div class="w-full sm:w-auto">
+          <div :class="currentStep > 0 ? 'flex-1 sm:flex-initial text-right' : 'w-full sm:w-auto text-right'">
             <Button
-              v-if="currentStep < questionnaire.categories.length - 1"
+              v-if="currentStep < questionnaire.categories.length"
               @click="nextStep"
               :disabled="!isCurrentStepValid"
               class="w-full sm:w-auto h-11 bg-primary hover:bg-primary/90 text-white rounded-xl px-8 flex items-center justify-center gap-2 shadow-lg shadow-primary/10 disabled:opacity-50"
             >
-              <span>Siguiente</span>
+              <span>{{ $t('questionnaire.next') }}</span>
               <ArrowRight class="w-4 h-4" />
             </Button>
 
@@ -365,7 +407,7 @@ const handleSubmit = async () => {
               <span v-if="isSubmitting" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
               <template v-else>
                 <Check class="w-5 h-5" />
-                <span>Enviar Valoración</span>
+                <span>{{ $t('questionnaire.submit') }}</span>
               </template>
             </Button>
           </div>

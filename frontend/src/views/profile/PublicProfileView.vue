@@ -7,9 +7,12 @@ import { Briefcase, Calendar, Award, ArrowLeft, Download, Eye, ShieldCheck } fro
 import html2pdf from 'html2pdf.js';
 import { useAuthStore } from '@/stores/auth.store';
 
+import { useI18n } from 'vue-i18n';
+
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const { t } = useI18n();
 const slug = route.params.slug;
 const userId = ref(null);
 
@@ -31,27 +34,27 @@ const getMetricsForExperience = (expId) => {
 };
 
 const getTrustLevelLabel = (score) => {
-  if (score >= 80) return 'Excelente';
-  if (score >= 50) return 'Alta';
-  if (score >= 30) return 'Media';
-  return 'Básica';
+  if (score >= 80) return t('home.trustProtocol.level1');
+  if (score >= 50) return t('home.trustProtocol.level2');
+  if (score >= 30) return t('home.trustProtocol.level3');
+  return t('home.trustProtocol.level4');
 };
 
-const relationshipLabels = {
-  DIRECT_MANAGER: 'Jefe directo',
-  COLLEAGUE: 'Compañero/a',
-  SUBORDINATE: 'Subordinado/a',
-  CLIENT: 'Cliente',
-  OTHER: 'Otro/a'
-};
+const relationshipLabels = computed(() => ({
+  DIRECT_MANAGER: t('feedback.relationships.SUPERVISOR'),
+  COLLEAGUE: t('feedback.relationships.PEER'),
+  SUBORDINATE: t('feedback.relationships.SUBORDINATE'),
+  CLIENT: t('feedback.relationships.CLIENT'),
+  OTHER: t('feedback.relationships.OTHER')
+}));
 
-const categoryLabels = {
-  TEAMWORK: 'Trabajo en equipo',
-  SELF_CONFIDENCE: 'Autoconfianza',
-  PROACTIVITY: 'Proactividad',
-  INTEGRITY: 'Integridad',
-  FLEXIBILITY: 'Flexibilidad'
-};
+const categoryLabels = computed(() => ({
+  TEAMWORK: t('questionnaire.categories.TEAMWORK.name'),
+  SELF_CONFIDENCE: t('questionnaire.categories.SELF_CONFIDENCE.name'),
+  PROACTIVITY: t('questionnaire.categories.PROACTIVITY.name'),
+  INTEGRITY: t('questionnaire.categories.INTEGRITY.name'),
+  FLEXIBILITY: t('questionnaire.categories.FLEXIBILITY.name')
+}));
 
 onMounted(async () => {
   try {
@@ -123,11 +126,11 @@ const topSkill = computed(() => {
   if (!profile.value || !profile.value.skills) return null;
   const skills = profile.value.skills;
   const candidates = [
-    { key: 'teamwork', label: 'Trabajo en equipo' },
-    { key: 'proactivity', label: 'Proactividad' },
-    { key: 'integrity', label: 'Integridad' },
-    { key: 'selfConfidence', label: 'Autoconfianza' },
-    { key: 'flexibility', label: 'Flexibilidad' }
+    { key: 'teamwork', categoryKey: 'TEAMWORK' },
+    { key: 'proactivity', categoryKey: 'PROACTIVITY' },
+    { key: 'integrity', categoryKey: 'INTEGRITY' },
+    { key: 'selfConfidence', categoryKey: 'SELF_CONFIDENCE' },
+    { key: 'flexibility', categoryKey: 'FLEXIBILITY' }
   ];
   
   let best = candidates[0];
@@ -204,7 +207,7 @@ const topSkill = computed(() => {
         @click="router.back()"
         class="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 transition-colors"
       >
-        <ArrowLeft class="w-4 h-4" /> Volver
+        <ArrowLeft class="w-4 h-4" /> {{ $t('common.back') }}
       </button>
     </div>
 
@@ -217,7 +220,7 @@ const topSkill = computed(() => {
           class="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[hsl(228,15%,9%)] border border-white/5 text-zinc-400 hover:text-white hover:bg-[hsl(228,15%,12%)] transition-all duration-200 text-xs sm:text-sm font-semibold whitespace-nowrap"
         >
           <ArrowLeft class="w-4 h-4 flex-shrink-0" />
-          Volver
+          {{ $t('common.back') }}
         </button>
         
         <button 
@@ -239,14 +242,14 @@ const topSkill = computed(() => {
             <Eye class="w-5 h-5" />
           </div>
           <div>
-            <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Modo Lectura Activo</h4>
+            <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">{{ $t('extraProfile.readOnlyTitle') }}</h4>
             <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Estás visualizando el perfil público de este candidato. Las opciones de edición están desactivadas.
+              {{ $t('extraProfile.readOnlyDesc') }}
             </p>
           </div>
         </div>
         <div class="hidden sm:block px-3 py-1 bg-amber-500/15 border border-amber-500/25 rounded-lg text-[10px] font-bold uppercase tracking-widest text-amber-500">
-          Vista Candidato
+          {{ $t('extraProfile.candidateView') }}
         </div>
       </div>
 
@@ -284,13 +287,13 @@ const topSkill = computed(() => {
           <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
             <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
               <Award class="w-5 h-5 text-primary" />
-              Habilidades Blandas
+              {{ $t('profile.softSkillsTitle') }}
             </h2>
             <div v-if="profile.skills" class="h-80 flex items-center justify-center">
               <SkillsRadarChart :metrics="profile.skills" />
             </div>
             <div v-else class="text-center py-20 text-[hsl(220,10%,40%)]">
-              No hay métricas de habilidades disponibles.
+              {{ $t('dashboard.noFeedbackYet') }}
             </div>
           </div>
 
@@ -298,12 +301,12 @@ const topSkill = computed(() => {
           <div v-if="profile.skills" class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl space-y-5">
             <h3 class="text-lg font-bold text-white border-b border-white/5 pb-3 flex items-center gap-2">
               <ShieldCheck class="w-5 h-5 text-emerald-400" />
-              Resumen de Certificación
+              {{ $t('profile.verificationBadge') }}
             </h3>
             <div class="space-y-4">
               <!-- Global Average -->
               <div class="flex items-center justify-between">
-                <span class="text-zinc-400 text-sm">Media Global</span>
+                <span class="text-zinc-400 text-sm">{{ $t('dashboard.metrics.trustScore') }}</span>
                 <div class="flex items-center text-amber-400 gap-1.5">
                   <span class="text-sm font-bold text-white">{{ profile.skills.averageScore.toFixed(1) }}</span>
                   <div class="flex items-center">
@@ -316,18 +319,18 @@ const topSkill = computed(() => {
 
               <!-- References Count -->
               <div class="flex items-center justify-between">
-                <span class="text-zinc-400 text-sm">Referencias</span>
+                <span class="text-zinc-400 text-sm">{{ $t('dashboard.metrics.verifiedSkills') }}</span>
                 <span class="text-sm font-bold text-white flex items-center gap-1">
                   <ShieldCheck class="w-4 h-4 text-emerald-400" />
-                  {{ profile.totalReferencesCount }} validadas
+                  {{ profile.totalReferencesCount }}
                 </span>
               </div>
 
               <!-- Top Skill -->
               <div class="flex items-center justify-between" v-if="topSkill">
-                <span class="text-zinc-400 text-sm">Habilidad Destacada</span>
+                <span class="text-zinc-400 text-sm">Top Skill</span>
                 <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20">
-                  {{ topSkill.label }}
+                  {{ $t('questionnaire.categories.' + topSkill.categoryKey + '.name') }}
                 </span>
               </div>
             </div>
@@ -339,7 +342,7 @@ const topSkill = computed(() => {
         <div class="lg:col-span-7 xl:col-span-8 bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
           <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
             <Briefcase class="w-5 h-5 text-primary" />
-            Experiencia Profesional
+            {{ $t('experience.title') }}
           </h2>
           <div v-if="profile.experiences && profile.experiences.length > 0" class="space-y-6 relative before:absolute before:inset-y-0 before:left-2.5 before:w-px before:bg-white/5">
             <div v-for="exp in profile.experiences" :key="exp.id" class="relative pl-6 sm:pl-8 group">
@@ -351,7 +354,7 @@ const topSkill = computed(() => {
                 <p class="text-[hsl(220,10%,70%)] text-sm font-medium">{{ exp.companyName }} <span v-if="exp.department">· {{ exp.department }}</span></p>
                 <div class="flex items-center gap-2 text-xs text-[hsl(220,10%,50%)]">
                   <Calendar class="w-3.5 h-3.5" />
-                  <span>{{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Presente' }}</span>
+                  <span>{{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Present' }}</span>
                 </div>
                 <p class="text-sm text-[hsl(220,10%,60%)] mt-2 leading-relaxed whitespace-pre-wrap">{{ exp.functions }}</p>
 
@@ -369,7 +372,7 @@ const topSkill = computed(() => {
                         </svg>
                       </div>
                       <span class="text-xs text-[hsl(220,10%,55%)]">
-                        ({{ getMetricsForExperience(exp.id).referencesCount }} {{ getMetricsForExperience(exp.id).referencesCount === 1 ? 'referencia' : 'referencias' }})
+                        ({{ getMetricsForExperience(exp.id).referencesCount }})
                       </span>
                     </div>
 
@@ -384,7 +387,7 @@ const topSkill = computed(() => {
                         }"
                       >
                         <ShieldCheck class="w-3 h-3 mr-1" />
-                        Confianza: {{ getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }}
+                        {{ $t('extraProfile.trustLevelTag', { level: getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }) }}
                       </span>
                     </div>
 
@@ -393,7 +396,7 @@ const topSkill = computed(() => {
                       @click="toggleExperienceBreakdown(exp.id)"
                       class="text-xs text-primary hover:text-primary-hover font-semibold flex items-center gap-1 transition-all duration-200"
                     >
-                      <span>{{ expandedExperiences[exp.id] ? 'Ocultar detalles' : 'Ver detalles' }}</span>
+                      <span>{{ expandedExperiences[exp.id] ? $t('extraProfile.hideBreakdown') : $t('extraProfile.viewBreakdown') }}</span>
                       <Eye class="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -402,7 +405,7 @@ const topSkill = computed(() => {
                   <div v-if="expandedExperiences[exp.id]" class="mt-4 pt-4 border-t border-white/5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                     <!-- Soft Skills breakdown bars -->
                     <div class="space-y-3">
-                      <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Habilidades Blandas en este Rol</h4>
+                      <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ $t('extraProfile.softSkillsRole') }}</h4>
                       <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                         <div v-for="(val, skill) in getMetricsForExperience(exp.id).categoryAverages" :key="skill" class="space-y-1">
                           <div class="flex justify-between text-xs font-medium">
@@ -421,7 +424,7 @@ const topSkill = computed(() => {
 
                     <!-- Evaluators roles distribution -->
                     <div v-if="Object.keys(getMetricsForExperience(exp.id).relationshipCounts).length > 0" class="pt-3 border-t border-white/5">
-                      <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2.5">Distribución de Evaluadores</h4>
+                      <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2.5">{{ $t('extraProfile.evaluatorsDistribution') }}</h4>
                       <div class="flex flex-wrap gap-2">
                         <span 
                           v-for="(count, role) in getMetricsForExperience(exp.id).relationshipCounts" 
@@ -436,7 +439,7 @@ const topSkill = computed(() => {
 
                     <!-- Testimonios / Comentarios en el Perfil Público (Testimonials) -->
                     <div v-if="getMetricsForExperience(exp.id).testimonials && getMetricsForExperience(exp.id).testimonials.length > 0" class="pt-4 border-t border-white/5 space-y-3">
-                      <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Referencias y Testimonios Certificados</h4>
+                      <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ $t('extraProfile.reviewsReceived') }}</h4>
                       <div class="space-y-3">
                         <div 
                           v-for="t in getMetricsForExperience(exp.id).testimonials" 
@@ -482,10 +485,10 @@ const topSkill = computed(() => {
       </div>
       <div class="text-center space-y-2">
         <h3 class="text-xl font-bold tracking-tight bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">
-          Generando Informe Certificado...
+          {{ $t('extraProfile.generatingPdfTitle') }}
         </h3>
         <p class="text-xs text-zinc-400 max-w-xs leading-relaxed">
-          MiCaché B2B está compilando las referencias y habilidades blandas del candidato.
+          {{ $t('extraProfile.generatingPdfDesc') }}
         </p>
       </div>
     </div>
@@ -500,10 +503,10 @@ const topSkill = computed(() => {
         <!-- Tilted Diagonal Corporate Watermark -->
         <div class="absolute inset-0 pointer-events-none select-none z-0 flex flex-col justify-around items-center overflow-hidden">
           <div class="text-6xl font-black uppercase tracking-[0.25em] transform -rotate-45 select-none" style="color: rgba(24, 24, 27, 0.035);">
-            Verificado por MiCaché
+            Verified by MiCaché
           </div>
           <div class="text-6xl font-black uppercase tracking-[0.25em] transform -rotate-45 select-none" style="color: rgba(24, 24, 27, 0.035);">
-            Verificado por MiCaché
+            Verified by MiCaché
           </div>
         </div>
 
@@ -513,13 +516,13 @@ const topSkill = computed(() => {
             <div class="flex items-center justify-between border-b pb-6" style="border-color: #e4e4e7; margin-bottom: 30px;">
               <div>
                 <h2 class="text-2xl font-black tracking-tight" style="color: #f29727; margin: 0; line-height: 1.1;">MiCaché</h2>
-                <p class="text-xs font-semibold text-zinc-500 uppercase tracking-widest" style="margin: 4px 0 0 0;">Informe Profesional Certificado</p>
+                <p class="text-xs font-semibold text-zinc-500 uppercase tracking-widest" style="margin: 4px 0 0 0;">CERTIFIED PROFESSIONAL REPORT</p>
               </div>
               <div class="text-right">
                 <div class="inline-flex items-center px-3 py-1 rounded-full bg-green-50 border border-green-200 text-[10px] font-bold text-green-700 uppercase tracking-wider">
-                  ✓ Verificado
+                  ✓ VERIFIED
                 </div>
-                <p class="text-[10px] text-zinc-400" style="margin: 6px 0 0 0;">Emitido: {{ new Date().toLocaleDateString('es-ES') }}</p>
+                <p class="text-[10px] text-zinc-400" style="margin: 6px 0 0 0;">Issued: {{ new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }}</p>
               </div>
             </div>
 
@@ -536,7 +539,7 @@ const topSkill = computed(() => {
               <div class="flex-1 min-w-0">
                 <h3 class="text-xl font-extrabold text-zinc-950" style="margin: 0 0 4px 0; line-height: 1.2;">{{ profile.name }} {{ profile.surname }}</h3>
                 <p class="text-sm font-bold" style="color: #f29727; margin: 0 0 8px 0; line-height: 1.2;">{{ profile.jobTitle }}</p>
-                <p class="text-xs text-zinc-600 leading-relaxed" style="margin: 0; line-height: 1.5; word-wrap: break-word;">{{ profile.aboutMe || 'Sin descripción personal.' }}</p>
+                <p class="text-xs text-zinc-600 leading-relaxed" style="margin: 0; line-height: 1.5; word-wrap: break-word;">{{ profile.aboutMe || 'No personal biography provided.' }}</p>
               </div>
             </div>
 
@@ -544,14 +547,14 @@ const topSkill = computed(() => {
             <div style="margin-bottom: 30px;">
               <h3 class="text-sm font-black uppercase tracking-wider text-zinc-400 border-b pb-2" style="border-color: #e4e4e7; display: flex; align-items: center; margin: 0 0 16px 0;">
                 <Award class="w-4 h-4" style="color: #f29727; margin-right: 8px; display: inline-block; vertical-align: middle;" />
-                <span style="display: inline-block; vertical-align: middle;">Soft-Skills y Habilidades Blandas</span>
+                <span style="display: inline-block; vertical-align: middle;">SOFT SKILLS & COMPETENCIES</span>
               </h3>
               
               <div v-if="profile.skills" class="grid grid-cols-2 gap-x-8 gap-y-4">
                 <!-- Teamwork -->
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Trabajo en equipo</span>
+                    <span>Teamwork</span>
                     <span style="color: #f29727;">{{ (profile.skills.teamwork || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -566,7 +569,7 @@ const topSkill = computed(() => {
                 <!-- Proactivity -->
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Proactividad</span>
+                    <span>Proactivity</span>
                     <span style="color: #f29727;">{{ (profile.skills.proactivity || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -581,7 +584,7 @@ const topSkill = computed(() => {
                 <!-- Integrity -->
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Integridad</span>
+                    <span>Integrity</span>
                     <span style="color: #f29727;">{{ (profile.skills.integrity || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -596,7 +599,7 @@ const topSkill = computed(() => {
                 <!-- Confidence -->
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Confianza en sí mismo</span>
+                    <span>Self-Confidence</span>
                     <span style="color: #f29727;">{{ (profile.skills.selfConfidence || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -611,7 +614,7 @@ const topSkill = computed(() => {
                 <!-- Flexibility -->
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Flexibilidad</span>
+                    <span>Flexibility</span>
                     <span style="color: #f29727;">{{ (profile.skills.flexibility || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -625,7 +628,7 @@ const topSkill = computed(() => {
               </div>
 
               <div v-else class="text-center py-8 text-zinc-400 text-xs border border-dashed rounded-xl" style="border-color: #e4e4e7;">
-                No hay puntuaciones de habilidades blandas certificadas públicamente.
+                No certified soft skill scores available.
               </div>
             </div>
 
@@ -633,7 +636,7 @@ const topSkill = computed(() => {
             <div style="margin-bottom: 30px;">
               <h3 class="text-sm font-black uppercase tracking-wider text-zinc-400 border-b pb-2" style="border-color: #e4e4e7; display: flex; align-items: center; margin: 0 0 16px 0;">
                 <Briefcase class="w-4 h-4" style="color: #f29727; margin-right: 8px; display: inline-block; vertical-align: middle;" />
-                <span style="display: inline-block; vertical-align: middle;">Trayectoria Profesional Certificada</span>
+                <span style="display: inline-block; vertical-align: middle;">CERTIFIED WORK HISTORY</span>
               </h3>
               
               <div v-if="profile.experiences && profile.experiences.length > 0">
@@ -646,11 +649,11 @@ const topSkill = computed(() => {
                   <h4 class="text-sm font-bold text-zinc-900" style="margin: 0 0 2px 0;">{{ exp.position }}</h4>
                   <p class="text-xs font-semibold text-zinc-600" style="margin: 0 0 2px 0;">{{ exp.companyName }} <span v-if="exp.department">· {{ exp.department }}</span></p>
                   <p class="text-[10px] text-zinc-400 font-medium" style="margin: 0 0 6px 0;">
-                    {{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Presente' }}
+                    {{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Present' }}
                   </p>
                   <p class="text-xs text-zinc-500 leading-relaxed" style="margin: 0 0 8px 0; word-wrap: break-word; white-space: pre-wrap;">{{ exp.functions }}</p>
 
-                  <!-- Métricas Certificadas en el PDF (Nuevo feature) -->
+                  <!-- Métricas Certificadas en el PDF -->
                   <div v-if="getMetricsForExperience(exp.id)" class="p-3 bg-zinc-50 rounded-xl border border-zinc-200/60" style="margin-top: 8px;">
                     <div class="flex items-center justify-between flex-wrap" style="margin-bottom: 6px;">
                       <div class="flex items-center" style="gap: 8px;">
@@ -663,11 +666,11 @@ const topSkill = computed(() => {
                           </div>
                         </div>
                         <span class="text-[10px] text-zinc-500 font-semibold" style="margin-left: 6px;">
-                          ({{ getMetricsForExperience(exp.id).referencesCount }} {{ getMetricsForExperience(exp.id).referencesCount === 1 ? 'referencia' : 'referencias' }})
+                          ({{ getMetricsForExperience(exp.id).referencesCount }} {{ getMetricsForExperience(exp.id).referencesCount === 1 ? 'reference' : 'references' }})
                         </span>
                       </div>
                       <div class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-50 border text-emerald-700 border-emerald-200">
-                        ✓ Confianza: {{ getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }}
+                        ✓ Trust Level: {{ getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }}
                       </div>
                     </div>
                     <!-- Breakdown de Soft Skills en este rol (Compacto) -->
@@ -690,7 +693,7 @@ const topSkill = computed(() => {
 
                     <!-- Testimonios Cualitativos en el PDF (Perfil Público) -->
                     <div v-if="getMetricsForExperience(exp.id).testimonials && getMetricsForExperience(exp.id).testimonials.length > 0" style="margin-top: 12px; border-top: 1px solid #e4e4e7; padding-top: 8px;">
-                      <p style="font-size: 8px; font-weight: 800; color: #a1a1aa; text-transform: uppercase; tracking-wider; margin: 0 0 6px 0;">Referencias Certificadas</p>
+                      <p style="font-size: 8px; font-weight: 800; color: #a1a1aa; text-transform: uppercase; tracking-wider; margin: 0 0 6px 0;">Certified Referent Reviews</p>
                       <div style="display: flex; flex-direction: column; gap: 8px;">
                         <div 
                           v-for="t in getMetricsForExperience(exp.id).testimonials" 
@@ -698,8 +701,8 @@ const topSkill = computed(() => {
                           style="font-size: 10px; background-color: #fafafa; border: 1px solid #f4f4f5; padding: 8px; border-radius: 8px; font-family: inherit;"
                         >
                           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 8px; color: #71717a; font-weight: 600;">
-                            <span>Referente: {{ relationshipLabels[t.relationshipCode] || t.relationshipCode }}</span>
-                            <span style="color: #10b981;">Verificación: {{ getTrustLevelLabel(t.trustScore) }}</span>
+                            <span>Referent: {{ relationshipLabels[t.relationshipCode] || t.relationshipCode }} (Verified)</span>
+                            <span style="color: #10b981;">Trust Level: {{ getTrustLevelLabel(t.trustScore) }}</span>
                           </div>
                           <p style="margin: 0; color: #52525b; font-style: italic; line-height: 1.4;">
                             "{{ t.comment }}"
@@ -712,7 +715,7 @@ const topSkill = computed(() => {
                 </div>
               </div>
               <div v-else class="text-center py-8 text-zinc-400 text-xs border border-dashed rounded-xl" style="border-color: #e4e4e7;">
-                No se ha registrado experiencia profesional.
+                No professional experience registered.
               </div>
             </div>
           </div>
@@ -720,13 +723,13 @@ const topSkill = computed(() => {
           <!-- Bottom Footer Certificate -->
           <div class="pt-8 border-t flex justify-between items-end text-[9px] text-zinc-400" style="border-color: #e4e4e7; margin-top: 30px;">
             <div class="space-y-1 max-w-[70%]">
-              <p class="font-bold text-zinc-500 uppercase tracking-wide" style="margin: 0 0 2px 0;">Garantía de Autenticidad MiCaché B2B</p>
+              <p class="font-bold text-zinc-500 uppercase tracking-wide" style="margin: 0 0 2px 0;">MiCaché B2B Authenticity Guarantee</p>
               <p class="leading-relaxed" style="margin: 0;">
-                Este reporte ha sido certificado mediante el protocolo de feedback seguro de MiCaché. La valoración de habilidades blandas es el resultado de opiniones anonimizadas de compañeros y superiores validados.
+                This report has been certified using MiCaché's secure feedback protocol. The soft skills rating is the result of anonymized evaluations from verified peers and supervisors.
               </p>
             </div>
             <div class="text-right" v-if="userId">
-              <p class="font-semibold text-zinc-500" style="margin: 0 0 2px 0;">ID Candidato:</p>
+              <p class="font-semibold text-zinc-500" style="margin: 0 0 2px 0;">Candidate ID:</p>
               <p class="font-mono" style="margin: 0;">{{ userId.substring(0, 8) }}...{{ userId.substring(userId.length - 8) }}</p>
             </div>
           </div>

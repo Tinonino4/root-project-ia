@@ -3,13 +3,12 @@ import esTranslations from './locales/es.json';
 import enTranslations from './locales/en.json';
 
 const savedLocale = localStorage.getItem('locale');
-const browserLocale = navigator.language || navigator.userLanguage;
-const defaultLocale = savedLocale || (browserLocale?.startsWith('en') ? 'en' : 'es');
+const defaultLocale = savedLocale || 'en';
 
 const i18n = createI18n({
   legacy: false,
   locale: defaultLocale,
-  fallbackLocale: 'es',
+  fallbackLocale: 'en',
   globalInjection: true,
   messages: {
     es: esTranslations,

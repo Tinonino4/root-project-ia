@@ -46,15 +46,15 @@ const formatDate = (dateString) => {
     <!-- Header Actions -->
     <div class="flex items-center justify-between gap-3 w-full">
       <div>
-        <h2 class="text-2xl sm:text-3xl font-bold font-heading text-zinc-900 dark:text-white">Mis Experiencias</h2>
-        <p class="text-zinc-500 dark:text-zinc-400 mt-1 hidden sm:block">Añade y gestiona tu trayectoria profesional.</p>
+        <h2 class="text-2xl sm:text-3xl font-bold font-heading text-zinc-900 dark:text-white">{{ $t('experience.title') }}</h2>
+        <p class="text-zinc-500 dark:text-zinc-400 mt-1 hidden sm:block">{{ $t('experience.subtitle') }}</p>
       </div>
       <Button 
         @click="router.push('/experiences/new')" 
         class="bg-gradient-to-r from-primary to-orange-500 hover:scale-[1.02] active:scale-[0.98] transition-all text-white font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow-lg shadow-primary/20 flex-shrink-0"
       >
         <Plus class="w-4.5 h-4.5" />
-        <span class="text-xs sm:text-sm">Añadir</span>
+        <span class="text-xs sm:text-sm">{{ $t('experience.add') }}</span>
       </Button>
     </div>
 
@@ -82,7 +82,7 @@ const formatDate = (dateString) => {
     <!-- Error State -->
     <div v-else-if="experienceStore.error" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-lg flex items-center gap-3">
       <p>{{ experienceStore.error }}</p>
-      <Button variant="outline" @click="experienceStore.fetchExperiences()" class="ml-auto">Reintentar</Button>
+      <Button variant="outline" @click="experienceStore.fetchExperiences()" class="ml-auto">Retry</Button>
     </div>
 
     <!-- Empty State -->
@@ -90,11 +90,10 @@ const formatDate = (dateString) => {
       <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4">
         <Briefcase class="w-8 h-8" />
       </div>
-      <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Sin experiencias</h3>
-      <p class="text-zinc-500 max-w-md mx-auto mb-6">Aún no has añadido ninguna experiencia laboral. Empieza a construir tu perfil para que otros puedan valorarte.</p>
+      <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">{{ $t('experience.noExperiences') }}</h3>
       <Button @click="router.push('/experiences/new')" class="bg-primary hover:bg-primary/90 text-white gap-2">
         <Plus class="w-5 h-5" />
-        Añadir mi primera experiencia
+        {{ $t('experience.add') }}
       </Button>
     </div>
 
@@ -110,14 +109,14 @@ const formatDate = (dateString) => {
           <button 
             @click="router.push(`/experiences/${exp.id}/edit`)"
             class="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 rounded-xl transition-all border border-transparent hover:border-zinc-200 dark:hover:border-white/5"
-            title="Editar"
+            :title="$t('experience.edit')"
           >
             <Edit2 class="w-4 h-4" />
           </button>
           <button 
             @click="confirmDelete(exp.id)"
             class="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900/10"
-            title="Eliminar"
+            :title="$t('experience.delete')"
           >
             <Trash2 class="w-4 h-4" />
           </button>
@@ -161,24 +160,21 @@ const formatDate = (dateString) => {
           <div class="p-2 bg-red-500/10 dark:bg-red-500/20 rounded-xl">
             <AlertTriangle class="w-6 h-6 text-red-500" />
           </div>
-          <h3 class="text-lg font-bold text-zinc-900 dark:text-white">¿Eliminar experiencia?</h3>
+          <h3 class="text-lg font-bold text-zinc-900 dark:text-white">{{ $t('experience.confirmDelete') }}</h3>
         </div>
-        <p class="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-          ¿Estás seguro de que quieres eliminar esta experiencia? Esta acción no se puede deshacer y borrará todo el feedback asociado de forma permanente.
-        </p>
         <div class="flex justify-end gap-3 pt-2">
           <button 
             class="px-4 py-2 text-sm font-semibold rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors text-zinc-700 dark:text-zinc-300"
             @click="cancelDelete"
           >
-            Cancelar
+            {{ $t('profileEdit.cancel') }}
           </button>
           <Button 
             variant="destructive"
             class="px-4 py-2 text-sm font-semibold rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/20 border-0"
             @click="executeDelete"
           >
-            Eliminar
+            {{ $t('experience.delete') }}
           </Button>
         </div>
       </div>

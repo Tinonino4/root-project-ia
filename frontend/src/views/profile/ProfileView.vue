@@ -24,21 +24,27 @@ import {
   ExternalLink,
   Copy,
   Star,
-  AlertTriangle
+  AlertTriangle,
+  Share2,
+  Check
 } from 'lucide-vue-next';
 import html2pdf from 'html2pdf.js';
 import { toast } from 'vue-sonner';
 
 
+import { useI18n } from 'vue-i18n';
+
 const router = useRouter();
 const profileStore = useProfileStore();
 const authStore = useAuthStore();
+const { t } = useI18n();
 
 const publicProfileData = ref(null);
 const loading = ref(true);
 const error = ref(null);
 const isExporting = ref(false);
 const isGeneratingPDF = ref(false);
+const isCopied = ref(false);
 
 const expandedExperiences = ref({});
 
@@ -47,32 +53,32 @@ const toggleExperienceBreakdown = (expId) => {
 };
 
 const getMetricsForExperience = (expId) => {
-  if (!publicProfileData.value || !publicProfileData.value.experienceMetrics) return null;
-  return publicProfileData.value.experienceMetrics.find(m => m.experienceId === expId) || null;
+  if (!publicProfileData.value || !publicProfileData.value.experiencesWithMetrics) return null;
+  return publicProfileData.value.experiencesWithMetrics.find(m => m.experienceId === expId);
 };
 
 const getTrustLevelLabel = (score) => {
-  if (score >= 80) return 'Excelente';
-  if (score >= 50) return 'Alta';
-  if (score >= 30) return 'Media';
-  return 'Básica';
+  if (score >= 80) return t('home.trustProtocol.level1');
+  if (score >= 50) return t('home.trustProtocol.level2');
+  if (score >= 30) return t('home.trustProtocol.level3');
+  return t('home.trustProtocol.level4');
 };
 
-const relationshipLabels = {
-  DIRECT_MANAGER: 'Jefe directo',
-  COLLEAGUE: 'Compañero/a',
-  SUBORDINATE: 'Subordinado/a',
-  CLIENT: 'Cliente',
-  OTHER: 'Otro/a'
-};
+const relationshipLabels = computed(() => ({
+  DIRECT_MANAGER: t('feedback.relationships.SUPERVISOR'),
+  COLLEAGUE: t('feedback.relationships.PEER'),
+  SUBORDINATE: t('feedback.relationships.SUBORDINATE'),
+  CLIENT: t('feedback.relationships.CLIENT'),
+  OTHER: t('feedback.relationships.OTHER')
+}));
 
-const categoryLabels = {
-  TEAMWORK: 'Trabajo en equipo',
-  SELF_CONFIDENCE: 'Autoconfianza',
-  PROACTIVITY: 'Proactividad',
-  INTEGRITY: 'Integridad',
-  FLEXIBILITY: 'Flexibilidad'
-};
+const categoryLabels = computed(() => ({
+  TEAMWORK: t('questionnaire.categories.TEAMWORK.name'),
+  SELF_CONFIDENCE: t('questionnaire.categories.SELF_CONFIDENCE.name'),
+  PROACTIVITY: t('questionnaire.categories.PROACTIVITY.name'),
+  INTEGRITY: t('questionnaire.categories.INTEGRITY.name'),
+  FLEXIBILITY: t('questionnaire.categories.FLEXIBILITY.name')
+}));
 
 const privateProfile = computed(() => profileStore.profile);
 
@@ -105,19 +111,29 @@ const loadAllData = async () => {
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
-  return date.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+  return date.toLocaleDateString(t('locale') === 'es' ? 'es-ES' : 'en-US', { month: 'short', year: 'numeric' });
+};
+
+const formatBirthday = (dateString) => {
+  if (!dateString) return '';
+  const parts = dateString.split('T')[0].split('-');
+  if (parts.length === 3) {
+    const [year, month, day] = parts;
+    return `${day}-${month}-${year}`;
+  }
+  return dateString;
 };
 
 const copyProfileLink = () => {
   const slugOrId = privateProfile.value?.username || authStore.user?.id;
   const url = `${window.location.origin}/u/${slugOrId}`;
   navigator.clipboard.writeText(url).then(() => {
-    toast.success('¡Enlace copiado!', {
-      description: 'El enlace a tu perfil público se ha copiado al portapapeles.',
-    });
+    isCopied.value = true;
+    setTimeout(() => {
+      isCopied.value = false;
+    }, 2500);
   }).catch(err => {
     console.error('Error copying link:', err);
-    toast.error('No se pudo copiar el enlace.');
   });
 };
 
@@ -200,11 +216,11 @@ const topSkill = computed(() => {
   if (!publicProfileData.value || !publicProfileData.value.skills) return null;
   const skills = publicProfileData.value.skills;
   const candidates = [
-    { key: 'teamwork', label: 'Trabajo en equipo' },
-    { key: 'proactivity', label: 'Proactividad' },
-    { key: 'integrity', label: 'Integridad' },
-    { key: 'selfConfidence', label: 'Autoconfianza' },
-    { key: 'flexibility', label: 'Flexibilidad' }
+    { key: 'teamwork', categoryKey: 'TEAMWORK' },
+    { key: 'proactivity', categoryKey: 'PROACTIVITY' },
+    { key: 'integrity', categoryKey: 'INTEGRITY' },
+    { key: 'selfConfidence', categoryKey: 'SELF_CONFIDENCE' },
+    { key: 'flexibility', categoryKey: 'FLEXIBILITY' }
   ];
   
   let best = candidates[0];
@@ -288,7 +304,7 @@ const topSkill = computed(() => {
         <button 
           @click="router.push('/profile/edit')"
           class="absolute top-4 right-4 p-2.5 rounded-xl bg-white/5 border border-white/5 text-zinc-400 hover:text-white hover:bg-white/10 transition-all duration-200"
-          title="Editar información básica"
+          :title="$t('profileEdit.title')"
         >
           <Edit class="w-4 h-4" />
         </button>
@@ -304,42 +320,50 @@ const topSkill = computed(() => {
           <div class="flex-1 text-center md:text-left space-y-2">
             <h1 class="text-3xl font-bold text-white tracking-tight">{{ publicProfileData.name }} {{ publicProfileData.surname }}</h1>
             <p class="text-lg text-primary font-semibold flex flex-wrap items-center justify-center md:justify-start gap-3">
-              <span>{{ publicProfileData.jobTitle || 'Profesional' }}</span>
+              <span>{{ publicProfileData.jobTitle || $t('sidebar.professionalRole') }}</span>
               <span v-if="publicProfileData.totalReferencesCount > 0" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-lg select-none">
                 <ShieldCheck class="w-3.5 h-3.5 mr-1 text-emerald-400" />
-                {{ publicProfileData.totalReferencesCount }} {{ publicProfileData.totalReferencesCount === 1 ? 'Referencia Certificada' : 'Referencias Certificadas' }}
+                {{ publicProfileData.totalReferencesCount }} {{ publicProfileData.totalReferencesCount === 1 ? $t('extraProfile.certifiedReference') : $t('extraProfile.certifiedReferences') }}
               </span>
             </p>
             <p class="text-[hsl(220,10%,75%)] mt-4 max-w-2xl text-balance">
-              {{ publicProfileData.aboutMe || 'Sin descripción personal aún. Edita tu perfil para añadir una biografía profesional.' }}
+              {{ publicProfileData.aboutMe || $t('profile.noBio') }}
             </p>
 
             <!-- Actions Dock inside the Hero Card -->
-            <div class="pt-4 flex flex-wrap gap-2.5 justify-center md:justify-start">
-              <button 
+            <div class="pt-6 flex flex-wrap items-center justify-center md:justify-start gap-3">
+              <Button 
                 @click="copyProfileLink"
-                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white transition-all text-xs font-semibold whitespace-nowrap"
+                variant="outline"
+                size="sm"
+                class="bg-white/5 hover:bg-white/10 border-white/10 text-white rounded-xl h-10 px-4 flex items-center gap-2 transition-all duration-200"
               >
-                <Copy class="w-3.5 h-3.5" />
-                Compartir
-              </button>
-              
-              <button 
-                @click="router.push(`/u/${privateProfile?.username || authStore.user?.id}`)"
-                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white transition-all text-xs font-semibold whitespace-nowrap"
-              >
-                <ExternalLink class="w-3.5 h-3.5" />
-                Vista Pública
-              </button>
+                <Check v-if="isCopied" class="w-4 h-4 text-emerald-400" />
+                <Share2 v-else class="w-4 h-4 text-primary" />
+                <span :class="{ 'text-emerald-400 font-bold': isCopied }">
+                  {{ isCopied ? $t('common.copied') : $t('extraProfile.share') }}
+                </span>
+              </Button>
 
-              <button 
+              <Button 
+                @click="router.push(`/u/${privateProfile?.username || authStore.user?.id}`)"
+                variant="outline"
+                size="sm"
+                class="bg-white/5 hover:bg-white/10 border-white/10 text-white rounded-xl h-10 px-4 flex items-center gap-2"
+              >
+                <ExternalLink class="w-4 h-4 text-primary" />
+                <span>{{ $t('extraProfile.viewPublic') }}</span>
+              </Button>
+
+              <Button 
                 @click="exportPDF"
                 :disabled="isExporting"
-                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25 transition-all text-xs font-semibold disabled:opacity-50 whitespace-nowrap"
+                size="sm"
+                class="bg-gradient-to-r from-primary to-orange-500 hover:opacity-90 text-white rounded-xl h-10 px-4 flex items-center gap-2 shadow-lg shadow-primary/20 border-0"
               >
-                <Download class="w-3.5 h-3.5" :class="{'animate-bounce': isExporting}" />
-                {{ isExporting ? 'PDF...' : 'Descargar PDF' }}
-              </button>
+                <Download class="w-4 h-4" :class="{'animate-bounce': isExporting}" />
+                <span>{{ isExporting ? 'PDF...' : $t('extraProfile.downloadPdf') }}</span>
+              </Button>
             </div>
           </div>
         </div>
@@ -355,13 +379,13 @@ const topSkill = computed(() => {
           <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
             <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
               <Award class="w-5 h-5 text-primary" />
-              Habilidades Blandas
+              {{ $t('profile.softSkillsTitle') }}
             </h2>
-            <div v-if="publicProfileData.skills" class="h-80 flex items-center justify-center">
+            <div v-if="publicProfileData.skills" class="h-72 flex items-center justify-center">
               <SkillsRadarChart :metrics="publicProfileData.skills" />
             </div>
             <div v-else class="text-center py-20 text-zinc-500 text-sm italic">
-              No hay métricas de habilidades disponibles. Solicita feedback para generar tu gráfico.
+              {{ $t('dashboard.noMetrics') }}
             </div>
           </div>
 
@@ -369,12 +393,12 @@ const topSkill = computed(() => {
           <div v-if="publicProfileData.skills" class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl space-y-5">
             <h3 class="text-lg font-bold text-white border-b border-white/5 pb-3 flex items-center gap-2">
               <ShieldCheck class="w-5 h-5 text-emerald-400" />
-              Resumen de Certificación
+              {{ $t('profile.verificationBadge') }}
             </h3>
             <div class="space-y-4">
               <!-- Global Average -->
               <div class="flex items-center justify-between">
-                <span class="text-zinc-400 text-sm">Media Global</span>
+                <span class="text-zinc-400 text-sm">{{ $t('dashboard.metrics.trustScore') }}</span>
                 <div class="flex items-center text-amber-400 gap-1.5">
                   <span class="text-sm font-bold text-white">{{ publicProfileData.skills.averageScore.toFixed(1) }}</span>
                   <div class="flex items-center">
@@ -387,18 +411,18 @@ const topSkill = computed(() => {
 
               <!-- References Count -->
               <div class="flex items-center justify-between">
-                <span class="text-zinc-400 text-sm">Referencias</span>
+                <span class="text-zinc-400 text-sm">{{ $t('dashboard.metrics.verifiedSkills') }}</span>
                 <span class="text-sm font-bold text-white flex items-center gap-1">
                   <ShieldCheck class="w-4 h-4 text-emerald-400" />
-                  {{ publicProfileData.totalReferencesCount }} validadas
+                  {{ publicProfileData.totalReferencesCount }}
                 </span>
               </div>
 
               <!-- Top Skill -->
               <div class="flex items-center justify-between" v-if="topSkill">
-                <span class="text-zinc-400 text-sm">Habilidad Destacada</span>
+                <span class="text-zinc-400 text-sm">Top Skill</span>
                 <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20">
-                  {{ topSkill.label }}
+                  {{ $t('questionnaire.categories.' + topSkill.categoryKey + '.name') }}
                 </span>
               </div>
             </div>
@@ -409,39 +433,39 @@ const topSkill = computed(() => {
             <button 
               @click="router.push('/profile/edit')"
               class="absolute top-4 right-4 p-2 rounded-lg bg-white/5 border border-white/5 text-zinc-400 hover:text-white hover:bg-white/10 transition-all duration-200"
-              title="Editar datos de contacto"
+              :title="$t('profileEdit.title')"
             >
               <Edit class="w-4.5 h-4.5" />
             </button>
 
             <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
               <UserIcon class="w-5 h-5 text-primary" />
-              Información Personal
+              {{ $t('extraProfile.infoPersonal') }}
             </h2>
             
             <div class="space-y-4">
               <div class="flex items-start gap-3 text-zinc-300">
                 <Mail class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
                 <div class="space-y-0.5">
-                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">Email de Contacto</span>
-                  <span class="text-sm break-all font-medium">{{ privateProfile?.contactEmail || 'No especificado' }}</span>
+                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.contactEmail') }}</span>
+                  <span class="text-sm break-all font-medium">{{ privateProfile?.contactEmail || '-' }}</span>
                 </div>
               </div>
 
               <div class="flex items-start gap-3 text-zinc-300">
                 <Phone class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
                 <div class="space-y-0.5">
-                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">Teléfono</span>
-                  <span class="text-sm font-medium">{{ privateProfile?.phoneNumber || 'No especificado' }}</span>
+                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.phone') }}</span>
+                  <span class="text-sm font-medium">{{ privateProfile?.phoneNumber || '-' }}</span>
                 </div>
               </div>
 
               <div class="flex items-start gap-3 text-zinc-300">
                 <MapPin class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
                 <div class="space-y-0.5">
-                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">Ubicación</span>
+                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.city') }}</span>
                   <span class="text-sm font-medium">
-                    {{ privateProfile?.city || 'No especificada' }} 
+                    {{ privateProfile?.city || '-' }} 
                     <span class="text-zinc-500" v-if="privateProfile?.zipcode">({{ privateProfile.zipcode }})</span>
                   </span>
                 </div>
@@ -450,7 +474,7 @@ const topSkill = computed(() => {
               <div class="flex items-start gap-3 text-zinc-300" v-if="privateProfile?.education">
                 <GraduationCap class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
                 <div class="space-y-0.5">
-                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">Formación</span>
+                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.education') }}</span>
                   <span class="text-sm font-medium">{{ privateProfile.education }}</span>
                 </div>
               </div>
@@ -458,8 +482,8 @@ const topSkill = computed(() => {
               <div class="flex items-start gap-3 text-zinc-300" v-if="privateProfile?.birthday">
                 <Calendar class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
                 <div class="space-y-0.5">
-                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">Fecha de Nacimiento</span>
-                  <span class="text-sm font-medium">{{ privateProfile.birthday }}</span>
+                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('extraProfile.birthdayLabel') }}</span>
+                  <span class="text-sm font-medium">{{ formatBirthday(privateProfile.birthday) }}</span>
                 </div>
               </div>
             </div>
@@ -473,7 +497,7 @@ const topSkill = computed(() => {
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-white flex items-center gap-2">
                 <Briefcase class="w-5 h-5 text-primary" />
-                Experiencia Profesional
+                {{ $t('experience.title') }}
               </h2>
               <Button 
                 @click="router.push('/experiences/new')"
@@ -481,7 +505,7 @@ const topSkill = computed(() => {
                 class="bg-primary hover:bg-primary/95 text-white flex items-center gap-1 px-3"
               >
                 <Plus class="w-4 h-4" />
-                Añadir
+                {{ $t('extraProfile.addExperience') }}
               </Button>
             </div>
 
@@ -496,21 +520,21 @@ const topSkill = computed(() => {
                   <button 
                     @click="router.push(`/feedback/new?experienceId=${exp.id}`)"
                     class="p-1.5 text-zinc-400 hover:text-primary hover:bg-white/5 rounded-lg transition-colors"
-                    title="Solicitar Feedback"
+                    :title="$t('feedback.createTitle')"
                   >
                     <Star class="w-4 h-4 text-amber-500 fill-current" />
                   </button>
                   <button 
                     @click="router.push(`/experiences/${exp.id}/edit`)"
                     class="p-1.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                    title="Editar Experiencia"
+                    :title="$t('experience.editTitle')"
                   >
                     <Edit class="w-4 h-4" />
                   </button>
                   <button 
                     @click="confirmDelete(exp.id)"
                     class="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-white/5 rounded-lg transition-colors"
-                    title="Eliminar Experiencia"
+                    :title="$t('experience.delete')"
                   >
                     <Trash2 class="w-4 h-4" />
                   </button>
@@ -521,7 +545,7 @@ const topSkill = computed(() => {
                   <p class="text-[hsl(220,10%,70%)] text-sm font-medium pr-20 sm:pr-24">{{ exp.companyName }} <span v-if="exp.department">· {{ exp.department }}</span></p>
                   <div class="flex items-center gap-2 text-xs text-[hsl(220,10%,50%)]">
                     <Calendar class="w-3.5 h-3.5" />
-                    <span>{{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Presente' }}</span>
+                    <span>{{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Present' }}</span>
                   </div>
                   <p class="text-sm text-[hsl(220,10%,60%)] mt-2 leading-relaxed whitespace-pre-wrap">{{ exp.functions }}</p>
 
@@ -539,7 +563,7 @@ const topSkill = computed(() => {
                           </svg>
                         </div>
                         <span class="text-xs text-[hsl(220,10%,55%)]">
-                          ({{ getMetricsForExperience(exp.id).referencesCount }} {{ getMetricsForExperience(exp.id).referencesCount === 1 ? 'referencia' : 'referencias' }})
+                          ({{ getMetricsForExperience(exp.id).referencesCount }})
                         </span>
                       </div>
 
@@ -554,7 +578,7 @@ const topSkill = computed(() => {
                           }"
                         >
                           <ShieldCheck class="w-3 h-3 mr-1" />
-                          Confianza: {{ getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }}
+                          {{ $t('extraProfile.trustLevelTag', { level: getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }) }}
                         </span>
                       </div>
 
@@ -563,7 +587,7 @@ const topSkill = computed(() => {
                         @click="toggleExperienceBreakdown(exp.id)"
                         class="text-xs text-primary hover:text-primary-hover font-semibold flex items-center gap-1 transition-all duration-200"
                       >
-                        <span>{{ expandedExperiences[exp.id] ? 'Ocultar detalles' : 'Ver detalles' }}</span>
+                        <span>{{ expandedExperiences[exp.id] ? $t('extraProfile.hideBreakdown') : $t('extraProfile.viewBreakdown') }}</span>
                         <Eye class="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -572,7 +596,7 @@ const topSkill = computed(() => {
                     <div v-if="expandedExperiences[exp.id]" class="mt-4 pt-4 border-t border-white/5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                       <!-- Soft Skills breakdown bars -->
                       <div class="space-y-3">
-                        <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Habilidades Blandas en este Rol</h4>
+                        <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ $t('extraProfile.softSkillsRole') }}</h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                           <div v-for="(val, skill) in getMetricsForExperience(exp.id).categoryAverages" :key="skill" class="space-y-1">
                             <div class="flex justify-between text-xs font-medium">
@@ -591,7 +615,7 @@ const topSkill = computed(() => {
 
                       <!-- Evaluators roles distribution -->
                       <div v-if="Object.keys(getMetricsForExperience(exp.id).relationshipCounts).length > 0" class="pt-3 border-t border-white/5">
-                        <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2.5">Distribución de Evaluadores</h4>
+                        <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2.5">{{ $t('extraProfile.evaluatorsDistribution') }}</h4>
                         <div class="flex flex-wrap gap-2">
                           <span 
                             v-for="(count, role) in getMetricsForExperience(exp.id).relationshipCounts" 
@@ -606,18 +630,20 @@ const topSkill = computed(() => {
 
                       <!-- Testimonios / Comentarios (Testimonials) -->
                       <div v-if="getMetricsForExperience(exp.id).testimonials && getMetricsForExperience(exp.id).testimonials.length > 0" class="pt-4 border-t border-white/5 space-y-3">
-                        <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Opiniones y Comentarios Recibidos (Privado)</h4>
+                        <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ $t('extraProfile.reviewsReceived') }}</h4>
                         <div class="space-y-3">
                           <div 
                             v-for="t in getMetricsForExperience(exp.id).testimonials" 
                             :key="t.createdAt"
-                            class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2"
+                            class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2 relative"
                           >
-                            <div class="flex items-center justify-between text-xs">
-                              <span class="font-bold text-zinc-300">{{ t.evaluatorName }} {{ t.evaluatorSurname }} <span class="text-zinc-500 font-medium">({{ relationshipLabels[t.relationshipCode] || t.relationshipCode }})</span></span>
+                            <div class="flex items-center justify-between text-xs flex-wrap gap-2">
+                              <span class="font-bold text-zinc-300">
+                                {{ relationshipLabels[t.relationshipCode] || t.relationshipCode }}
+                              </span>
                               <span class="inline-flex items-center text-[10px] font-semibold text-emerald-400">
                                 <ShieldCheck class="w-3.5 h-3.5 mr-1" />
-                                Confianza: {{ getTrustLevelLabel(t.trustScore) }} ({{ t.trustScore }}%)
+                                {{ $t('extraProfile.trustLevelTag', { level: getTrustLevelLabel(t.trustScore) }) }}
                               </span>
                             </div>
                             <p class="text-xs text-zinc-400 italic leading-relaxed">
@@ -631,8 +657,8 @@ const topSkill = computed(() => {
                 </div>
               </div>
             </div>
-            <div v-else class="text-center py-20 text-zinc-500 text-sm italic">
-              No has registrado experiencia profesional. Haz clic en "Añadir" para registrar tu primera experiencia.
+            <div v-else class="text-center py-20 text-[hsl(220,10%,40%)]">
+              {{ $t('dashboard.noExperiencesYet') }}
             </div>
           </div>
         </div>
@@ -651,10 +677,10 @@ const topSkill = computed(() => {
       </div>
       <div class="text-center space-y-2">
         <h3 class="text-xl font-bold tracking-tight bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">
-          Generando tu Informe Certificado...
+          {{ $t('extraProfile.generatingPdfTitle') }}
         </h3>
         <p class="text-xs text-zinc-400 max-w-xs leading-relaxed">
-          MiCaché está compilando tu portafolio y habilidades blandas en un documento PDF.
+          {{ $t('extraProfile.generatingPdfDesc') }}
         </p>
       </div>
     </div>
@@ -669,10 +695,10 @@ const topSkill = computed(() => {
         <!-- Tilted Diagonal Corporate Watermark -->
         <div class="absolute inset-0 pointer-events-none select-none z-0 flex flex-col justify-around items-center overflow-hidden">
           <div class="text-6xl font-black uppercase tracking-[0.25em] transform -rotate-45 select-none" style="color: rgba(24, 24, 27, 0.035);">
-            Verificado por MiCaché
+            Verified by MiCaché
           </div>
           <div class="text-6xl font-black uppercase tracking-[0.25em] transform -rotate-45 select-none" style="color: rgba(24, 24, 27, 0.035);">
-            Verificado por MiCaché
+            Verified by MiCaché
           </div>
         </div>
 
@@ -682,13 +708,13 @@ const topSkill = computed(() => {
             <div class="flex items-center justify-between border-b pb-6" style="border-color: #e4e4e7; margin-bottom: 30px;">
               <div>
                 <h2 class="text-2xl font-black tracking-tight" style="color: #f29727; margin: 0; line-height: 1.1;">MiCaché</h2>
-                <p class="text-xs font-semibold text-zinc-500 uppercase tracking-widest" style="margin: 4px 0 0 0;">Informe Profesional Certificado</p>
+                <p class="text-xs font-semibold text-zinc-500 uppercase tracking-widest" style="margin: 4px 0 0 0;">CERTIFIED PROFESSIONAL REPORT</p>
               </div>
               <div class="text-right">
                 <div class="inline-flex items-center px-3 py-1 rounded-full bg-green-50 border border-green-200 text-[10px] font-bold text-green-700 uppercase tracking-wider">
-                  ✓ Verificado
+                  ✓ VERIFIED
                 </div>
-                <p class="text-[10px] text-zinc-400" style="margin: 6px 0 0 0;">Emitido: {{ new Date().toLocaleDateString('es-ES') }}</p>
+                <p class="text-[10px] text-zinc-400" style="margin: 6px 0 0 0;">Issued: {{ new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }}</p>
               </div>
             </div>
 
@@ -705,7 +731,7 @@ const topSkill = computed(() => {
               <div class="flex-1 min-w-0">
                 <h3 class="text-xl font-extrabold text-zinc-950" style="margin: 0 0 4px 0; line-height: 1.2;">{{ publicProfileData.name }} {{ publicProfileData.surname }}</h3>
                 <p class="text-sm font-bold" style="color: #f29727; margin: 0 0 8px 0; line-height: 1.2;">{{ publicProfileData.jobTitle }}</p>
-                <p class="text-xs text-zinc-600 leading-relaxed" style="margin: 0; line-height: 1.5; word-wrap: break-word;">{{ publicProfileData.aboutMe || 'Sin descripción personal.' }}</p>
+                <p class="text-xs text-zinc-600 leading-relaxed" style="margin: 0; line-height: 1.5; word-wrap: break-word;">{{ publicProfileData.aboutMe || 'No personal biography provided.' }}</p>
               </div>
             </div>
 
@@ -713,14 +739,14 @@ const topSkill = computed(() => {
             <div style="margin-bottom: 30px;">
               <h3 class="text-sm font-black uppercase tracking-wider text-zinc-400 border-b pb-2" style="border-color: #e4e4e7; display: flex; align-items: center; margin: 0 0 16px 0;">
                 <Award class="w-4 h-4" style="color: #f29727; margin-right: 8px; display: inline-block; vertical-align: middle;" />
-                <span style="display: inline-block; vertical-align: middle;">Soft-Skills y Habilidades Blandas</span>
+                <span style="display: inline-block; vertical-align: middle;">SOFT SKILLS & COMPETENCIES</span>
               </h3>
               
               <div v-if="publicProfileData.skills" class="grid grid-cols-2 gap-x-8 gap-y-4">
                 <!-- Teamwork -->
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Trabajo en equipo</span>
+                    <span>Teamwork</span>
                     <span style="color: #f29727;">{{ (publicProfileData.skills.teamwork || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -735,7 +761,7 @@ const topSkill = computed(() => {
                 <!-- Proactivity -->
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Proactividad</span>
+                    <span>Proactivity</span>
                     <span style="color: #f29727;">{{ (publicProfileData.skills.proactivity || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -750,7 +776,7 @@ const topSkill = computed(() => {
                 <!-- Integrity -->
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Integridad</span>
+                    <span>Integrity</span>
                     <span style="color: #f29727;">{{ (publicProfileData.skills.integrity || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -765,7 +791,7 @@ const topSkill = computed(() => {
                 <!-- Confidence -->
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Confianza en sí mismo</span>
+                    <span>Self-Confidence</span>
                     <span style="color: #f29727;">{{ (publicProfileData.skills.selfConfidence || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -780,7 +806,7 @@ const topSkill = computed(() => {
                 <!-- Flexibility -->
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Flexibilidad</span>
+                    <span>Flexibility</span>
                     <span style="color: #f29727;">{{ (publicProfileData.skills.flexibility || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -798,7 +824,7 @@ const topSkill = computed(() => {
             <div style="margin-bottom: 30px;">
               <h3 class="text-sm font-black uppercase tracking-wider text-zinc-400 border-b pb-2" style="border-color: #e4e4e7; display: flex; align-items: center; margin: 0 0 16px 0;">
                 <Briefcase class="w-4 h-4" style="color: #f29727; margin-right: 8px; display: inline-block; vertical-align: middle;" />
-                <span style="display: inline-block; vertical-align: middle;">Trayectoria Profesional Certificada</span>
+                <span style="display: inline-block; vertical-align: middle;">CERTIFIED WORK HISTORY</span>
               </h3>
               
               <div v-if="publicProfileData.experiences && publicProfileData.experiences.length > 0">
@@ -811,11 +837,11 @@ const topSkill = computed(() => {
                   <h4 class="text-sm font-bold text-zinc-900" style="margin: 0 0 2px 0;">{{ exp.position }}</h4>
                   <p class="text-xs font-semibold text-zinc-600" style="margin: 0 0 2px 0;">{{ exp.companyName }} <span v-if="exp.department">· {{ exp.department }}</span></p>
                   <p class="text-[10px] text-zinc-400 font-medium" style="margin: 0 0 6px 0;">
-                    {{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Presente' }}
+                    {{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Present' }}
                   </p>
                   <p class="text-xs text-zinc-500 leading-relaxed" style="margin: 0 0 8px 0; word-wrap: break-word; white-space: pre-wrap;">{{ exp.functions }}</p>
 
-                  <!-- Métricas Certificadas en el PDF (Nuevo feature) -->
+                  <!-- Métricas Certificadas en el PDF -->
                   <div v-if="getMetricsForExperience(exp.id)" class="p-3 bg-zinc-50 rounded-xl border border-zinc-200/60" style="margin-top: 8px;">
                     <div class="flex items-center justify-between flex-wrap" style="margin-bottom: 6px;">
                       <div class="flex items-center" style="gap: 8px;">
@@ -828,11 +854,11 @@ const topSkill = computed(() => {
                           </div>
                         </div>
                         <span class="text-[10px] text-zinc-500 font-semibold" style="margin-left: 6px;">
-                          ({{ getMetricsForExperience(exp.id).referencesCount }} {{ getMetricsForExperience(exp.id).referencesCount === 1 ? 'referencia' : 'referencias' }})
+                          ({{ getMetricsForExperience(exp.id).referencesCount }} {{ getMetricsForExperience(exp.id).referencesCount === 1 ? 'reference' : 'references' }})
                         </span>
                       </div>
                       <div class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-50 border text-emerald-700 border-emerald-200">
-                        ✓ Confianza: {{ getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }}
+                        ✓ Trust Level: {{ getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }}
                       </div>
                     </div>
 
@@ -856,7 +882,7 @@ const topSkill = computed(() => {
 
                     <!-- Testimonios Cualitativos en el PDF -->
                     <div v-if="getMetricsForExperience(exp.id).testimonials && getMetricsForExperience(exp.id).testimonials.length > 0" style="margin-top: 12px; border-top: 1px solid #e4e4e7; padding-top: 8px;">
-                      <p style="font-size: 8px; font-weight: 800; color: #a1a1aa; text-transform: uppercase; tracking-wider; margin: 0 0 6px 0;">Comentarios Certificados de Referentes</p>
+                      <p style="font-size: 8px; font-weight: 800; color: #a1a1aa; text-transform: uppercase; tracking-wider; margin: 0 0 6px 0;">Certified Referent Reviews</p>
                       <div style="display: flex; flex-direction: column; gap: 8px;">
                         <div 
                           v-for="t in getMetricsForExperience(exp.id).testimonials" 
@@ -864,8 +890,8 @@ const topSkill = computed(() => {
                           style="font-size: 10px; background-color: #fafafa; border: 1px solid #f4f4f5; padding: 8px; border-radius: 8px; font-family: inherit;"
                         >
                           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 8px; color: #71717a; font-weight: 600;">
-                            <span>Referente: {{ relationshipLabels[t.relationshipCode] || t.relationshipCode }} (Verificado)</span>
-                            <span style="color: #10b981;">Confianza: {{ getTrustLevelLabel(t.trustScore) }}</span>
+                            <span>Referent: {{ relationshipLabels[t.relationshipCode] || t.relationshipCode }} (Verified)</span>
+                            <span style="color: #10b981;">Trust Level: {{ getTrustLevelLabel(t.trustScore) }}</span>
                           </div>
                           <p style="margin: 0; color: #52525b; font-style: italic; line-height: 1.4;">
                             "{{ t.comment }}"
@@ -882,13 +908,13 @@ const topSkill = computed(() => {
           <!-- Bottom Footer Certificate -->
           <div class="pt-8 border-t flex justify-between items-end text-[9px] text-zinc-400" style="border-color: #e4e4e7; margin-top: 30px;">
             <div class="space-y-1 max-w-[70%]">
-              <p class="font-bold text-zinc-500 uppercase tracking-wide" style="margin: 0 0 2px 0;">Garantía de Autenticidad MiCaché B2B</p>
+              <p class="font-bold text-zinc-500 uppercase tracking-wide" style="margin: 0 0 2px 0;">MiCaché B2B Authenticity Guarantee</p>
               <p class="leading-relaxed" style="margin: 0;">
-                Este reporte ha sido certificado mediante el protocolo de feedback seguro de MiCaché. La valoración de habilidades blandas es el resultado de opiniones anonimizadas de compañeros y superiores validados.
+                This report has been certified using MiCaché's secure feedback protocol. The soft skills rating is the result of anonymized evaluations from verified peers and supervisors.
               </p>
             </div>
             <div class="text-right">
-              <p class="font-semibold text-zinc-500" style="margin: 0 0 2px 0;">ID Candidato:</p>
+              <p class="font-semibold text-zinc-500" style="margin: 0 0 2px 0;">Candidate ID:</p>
               <p class="font-mono" style="margin: 0;">{{ authStore.user?.id.substring(0, 8) }}...{{ authStore.user?.id.substring(authStore.user?.id.length - 8) }}</p>
             </div>
           </div>

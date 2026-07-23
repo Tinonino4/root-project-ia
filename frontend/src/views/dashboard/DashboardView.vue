@@ -26,12 +26,16 @@ import {
   Copy,
   ExternalLink,
   Share2,
-  ArrowUpRight
+  ArrowUpRight,
+  Check
 } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import SkillsRadarChart from '@/components/dashboard/SkillsRadarChart.vue';
 import html2pdf from 'html2pdf.js';
 import { toast } from 'vue-sonner';
+
+import { switchLanguage } from '@/i18n';
+import { useI18n } from 'vue-i18n';
 
 const router = useRouter();
 const profileStore = useProfileStore();
@@ -39,6 +43,9 @@ const experienceStore = useExperienceStore();
 const analyticsStore = useAnalyticsStore();
 const feedbackStore = useFeedbackStore();
 const authStore = useAuthStore();
+const { t } = useI18n();
+
+const isCopied = ref(false);
 
 onMounted(async () => {
   await Promise.all([
@@ -93,20 +100,20 @@ const recentRequests = computed(() => {
 const copyProfileLink = () => {
   const url = `${window.location.origin}/u/${authStore.user?.id}`;
   navigator.clipboard.writeText(url).then(() => {
-    toast.success('¡Enlace copiado!', {
-      description: 'El enlace a tu perfil público se ha copiado al portapapeles.',
-    });
+    isCopied.value = true;
+    setTimeout(() => {
+      isCopied.value = false;
+    }, 2500);
   }).catch(err => {
     console.error('Error copying link:', err);
-    toast.error('No se pudo copiar el enlace.');
   });
 };
 
 const getTrustLabel = (score) => {
-  if (score >= 80) return 'Excelente';
-  if (score >= 50) return 'Alta';
-  if (score >= 30) return 'Media';
-  return 'Básica';
+  if (score >= 80) return t('home.trustProtocol.level1');
+  if (score >= 50) return t('home.trustProtocol.level2');
+  if (score >= 30) return t('home.trustProtocol.level3');
+  return t('home.trustProtocol.level4');
 };
 
 const exportToPDF = () => {
@@ -375,10 +382,10 @@ const exportToPDF = () => {
             </div>
             <div class="space-y-1">
               <h1 class="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white font-heading">
-                ¡Hola de nuevo, <span class="text-primary">{{ profile?.name }}</span>!
+                {{ $t('dashboard.welcome', { name: profile?.name || '' }) }}
               </h1>
               <p class="text-zinc-500 dark:text-zinc-400 text-sm">
-                Tu perfil profesional está activo. Gestionalo y solicita feedback para seguir acumulando referencias.
+                {{ $t('dashboard.subtitle') }}
               </p>
             </div>
           </div>
@@ -388,14 +395,14 @@ const exportToPDF = () => {
               @click="router.push('/profile')"
               class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/10 transition-all duration-200 text-sm font-semibold whitespace-nowrap"
             >
-              Ver Mi Perfil
+              {{ $t('profile.title') }}
             </button>
             <Button 
               @click="router.push('/feedback/new')"
               class="w-full sm:w-auto bg-primary hover:bg-primary/95 text-white flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-semibold shadow-lg shadow-primary/20 whitespace-nowrap"
             >
               <Plus class="w-4 h-4" />
-              Pedir Feedback
+              {{ $t('dashboard.quickActions.requestFeedback') }}
             </Button>
           </div>
         </div>
@@ -412,7 +419,7 @@ const exportToPDF = () => {
               <!-- Stat 1: Soft Skill Score -->
               <div class="bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between h-32">
                 <div class="flex justify-between items-start">
-                  <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Promedio Habilidades</span>
+                  <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{{ $t('dashboard.metrics.verifiedSkills') }}</span>
                   <div class="p-1.5 bg-primary/10 rounded-lg text-primary">
                     <Award class="w-4.5 h-4.5" />
                   </div>
@@ -426,28 +433,28 @@ const exportToPDF = () => {
               <!-- Stat 2: Certified Refs -->
               <div class="bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between h-32">
                 <div class="flex justify-between items-start">
-                  <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Referencias Certificadas</span>
+                  <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{{ $t('dashboard.metrics.completedFeedback') }}</span>
                   <div class="p-1.5 bg-emerald-500/10 rounded-lg text-emerald-500">
                     <ShieldCheck class="w-4.5 h-4.5" />
                   </div>
                 </div>
                 <div class="mt-2">
                   <span class="text-3xl font-black text-zinc-900 dark:text-white">{{ certifiedRefs }}</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold ml-1.5">en tu perfil</span>
+                  <span class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold ml-1.5">{{ $t('profile.verificationBadge') }}</span>
                 </div>
               </div>
 
               <!-- Stat 3: Pending Requests -->
               <div class="bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between h-32">
                 <div class="flex justify-between items-start">
-                  <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Solicitudes Pendientes</span>
+                  <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{{ $t('dashboard.metrics.pendingRequests') }}</span>
                   <div class="p-1.5 bg-amber-500/10 rounded-lg text-amber-500">
                     <Clock class="w-4.5 h-4.5" />
                   </div>
                 </div>
                 <div class="mt-2">
                   <span class="text-3xl font-black text-zinc-900 dark:text-white">{{ pendingRequests }}</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold ml-1.5">esperando</span>
+                  <span class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold ml-1.5">{{ $t('feedback.status.PENDING') }}</span>
                 </div>
               </div>
 
@@ -456,7 +463,7 @@ const exportToPDF = () => {
             <!-- Quick Actions Panel -->
             <div class="bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 rounded-3xl p-6 shadow-sm">
               <h2 class="text-lg font-bold text-zinc-900 dark:text-white uppercase tracking-wider mb-4 font-heading">
-                Acciones Rápidas
+                {{ $t('dashboard.quickActions.title') }}
               </h2>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <button 
@@ -464,10 +471,13 @@ const exportToPDF = () => {
                   class="flex items-center justify-between p-4 rounded-xl bg-zinc-50 dark:bg-white/[0.02] hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200/50 dark:border-white/5 text-left group transition-all duration-300"
                 >
                   <div class="space-y-0.5">
-                    <span class="text-sm font-bold text-zinc-900 dark:text-white block">Compartir mi Perfil</span>
-                    <span class="text-xs text-zinc-500 dark:text-zinc-400">Copia tu enlace público al portapapeles</span>
+                    <span class="text-sm font-bold block" :class="isCopied ? 'text-emerald-400' : 'text-zinc-900 dark:text-white'">
+                      {{ isCopied ? $t('common.copied') : $t('profile.copyPublicUrl') }}
+                    </span>
+                    <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.copyLink') }}</span>
                   </div>
-                  <Copy class="w-5 h-5 text-zinc-400 group-hover:text-primary transition-colors" />
+                  <Check v-if="isCopied" class="w-5 h-5 text-emerald-400" />
+                  <Copy v-else class="w-5 h-5 text-zinc-400 group-hover:text-primary transition-colors" />
                 </button>
 
                 <button 
@@ -475,8 +485,8 @@ const exportToPDF = () => {
                   class="flex items-center justify-between p-4 rounded-xl bg-zinc-50 dark:bg-white/[0.02] hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200/50 dark:border-white/5 text-left group transition-all duration-300"
                 >
                   <div class="space-y-0.5">
-                    <span class="text-sm font-bold text-zinc-900 dark:text-white block">Ver Perfil Público</span>
-                    <span class="text-xs text-zinc-500 dark:text-zinc-400">Visualiza tu portafolio como un reclutador</span>
+                    <span class="text-sm font-bold text-zinc-900 dark:text-white block">{{ $t('dashboard.openPublic') }}</span>
+                    <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.publicProfileLink') }}</span>
                   </div>
                   <ExternalLink class="w-5 h-5 text-zinc-400 group-hover:text-primary transition-colors" />
                 </button>
@@ -487,13 +497,13 @@ const exportToPDF = () => {
             <div class="bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 rounded-3xl p-6 shadow-sm space-y-4">
               <div class="flex items-center justify-between">
                 <h2 class="text-lg font-bold text-zinc-900 dark:text-white uppercase tracking-wider font-heading">
-                  Solicitudes Recientes
+                  {{ $t('dashboard.recentFeedback') }}
                 </h2>
                 <button 
                   @click="router.push('/feedback')"
                   class="text-xs text-primary font-bold hover:underline flex items-center gap-1.5"
                 >
-                  Ver Todas
+                  {{ $t('feedback.listTitle') }}
                   <ArrowUpRight class="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -513,19 +523,19 @@ const exportToPDF = () => {
                       v-if="req.finished" 
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                     >
-                      Completada ({{ getTrustLabel(req.trustScore) }})
+                      {{ $t('feedback.status.COMPLETED') }} ({{ getTrustLabel(req.trustScore) }})
                     </span>
                     <span 
                       v-else 
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400"
                     >
-                      Pendiente
+                      {{ $t('feedback.status.PENDING') }}
                     </span>
                   </div>
                 </div>
               </div>
               <div v-else class="text-center py-8 text-zinc-500 dark:text-zinc-400 text-sm italic">
-                No has enviado ninguna solicitud de feedback todavía.
+                {{ $t('dashboard.noFeedbackYet') }}
               </div>
             </div>
 
@@ -540,10 +550,10 @@ const exportToPDF = () => {
                 <span class="p-1.5 rounded-lg bg-primary/10 text-primary">
                   <ShieldCheck class="w-5 h-5" />
                 </span>
-                <span class="text-sm font-bold tracking-wide uppercase text-zinc-500 dark:text-zinc-400">Mi Caché Profesional</span>
+                <span class="text-sm font-bold tracking-wide uppercase text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.radarTitle') }}</span>
               </div>
               <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                Este radar interactivo resume tus habilidades blandas. Los datos proceden del feedback certificado de tus compañeros.
+                {{ $t('dashboard.radarSubtitle') }}
               </p>
             </div>
 
@@ -551,14 +561,14 @@ const exportToPDF = () => {
             <div class="w-full relative aspect-square flex items-center justify-center p-2 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-white/[0.02]">
               <SkillsRadarChart v-if="metrics" :metrics="metrics" />
               <div v-else class="text-center py-20 text-zinc-500 text-sm italic">
-                Aún no tienes valoraciones. Envía solicitudes para revelar tu radar de habilidades.
+                {{ $t('dashboard.noFeedbackYet') }}
               </div>
             </div>
 
             <div class="mt-6 flex items-start gap-2.5 bg-primary/5 dark:bg-primary/[0.03] border border-primary/10 p-3 rounded-xl" v-if="metrics">
               <HelpCircle class="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
               <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                <strong>¿Sabías qué?</strong> Puedes descargar un informe certificado completo en PDF con tu historial completo desde el apartado **Mi Perfil**.
+                <strong>{{ $t('extraFeedback.didYouKnow') }}</strong> {{ $t('extraFeedback.didYouKnowPdf') }}
               </p>
             </div>
           </div>
@@ -602,13 +612,13 @@ const exportToPDF = () => {
         </div>
         <div class="grid grid-cols-2 gap-8">
           <div>
-            <h2 class="text-lg font-bold text-zinc-800 mb-4 uppercase border-b pb-2" style="border-color: #e4e4e7;">Habilidades Blandas</h2>
+            <h2 class="text-lg font-bold text-zinc-800 mb-4 uppercase border-b pb-2" style="border-color: #e4e4e7;">Soft Skills</h2>
             <div class="w-full h-64">
               <SkillsRadarChart v-if="metrics" :metrics="metrics" />
             </div>
           </div>
           <div>
-            <h2 class="text-lg font-bold text-zinc-800 mb-4 uppercase border-b pb-2" style="border-color: #e4e4e7;">Experiencia</h2>
+            <h2 class="text-lg font-bold text-zinc-800 mb-4 uppercase border-b pb-2" style="border-color: #e4e4e7;">Work Experience</h2>
             <div class="space-y-4">
               <div v-for="exp in experiences" :key="exp.id">
                 <h3 class="text-md font-bold text-zinc-900">{{ exp.position }}</h3>
