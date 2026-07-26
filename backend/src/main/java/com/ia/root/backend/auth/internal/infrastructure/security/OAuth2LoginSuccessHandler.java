@@ -72,8 +72,36 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String token = jwtProvider.generateTokenFromEmail(email); 
         String refreshToken = authService.createRefreshToken(user);
         
-        String targetUrl = frontendUrl + "/oauth2/redirect?token=" + token + "&refreshToken=" + refreshToken;
+        String targetBaseUrl = determineFrontendUrl(request);
+        String targetUrl = targetBaseUrl + "/oauth2/redirect?token=" + token + "&refreshToken=" + refreshToken;
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
+    }
+
+    private String determineFrontendUrl(HttpServletRequest request) {
+        int serverPort = request.getServerPort();
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+
+        // 1. Si Spring's ForwardedHeaderFilter ya procesó la petición a puerto 3000:
+        if (serverPort == 3000) {
+            return scheme + "://" + serverName + ":3000";
+        }
+
+        // 2. Comprobar cabeceras HTTP directas por si acaso
+        String xForwardedHost = request.getHeader("X-Forwarded-Host");
+        String xForwardedPort = request.getHeader("X-Forwarded-Port");
+        String xForwardedProto = request.getHeader("X-Forwarded-Proto");
+        String host = request.getHeader("Host");
+
+        if ("3000".equals(xForwardedPort) || 
+            (xForwardedHost != null && xForwardedHost.contains(":3000")) || 
+            (host != null && host.contains(":3000"))) {
+            String proto = (xForwardedProto != null && !xForwardedProto.isEmpty()) ? xForwardedProto : scheme;
+            String hostname = (xForwardedHost != null && !xForwardedHost.isEmpty()) ? xForwardedHost.split(":")[0] : (host != null ? host.split(":")[0] : serverName);
+            return proto + "://" + hostname + ":3000";
+        }
+
+        return frontendUrl;
     }
 
     private String fetchGitHubEmail(String accessToken) {

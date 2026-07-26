@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,12 +27,34 @@ public class ProfessionalService {
 
     public UserProfile getProfile(UUID userId) {
         return userProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
+                .orElseGet(() -> userProfileRepository.findById(userId)
+                        .orElseThrow(() -> new IllegalArgumentException("Profile not found")));
     }
 
     public UserProfile getProfileByUsername(String username) {
         return userProfileRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
+    }
+
+    public UserProfile findProfileByIdOrUserIdOrUsername(String identifier) {
+        if (identifier == null || identifier.isBlank()) {
+            throw new IllegalArgumentException("Profile not found");
+        }
+        Optional<UserProfile> profileByUsername = userProfileRepository.findByUsername(identifier);
+        if (profileByUsername.isPresent()) {
+            return profileByUsername.get();
+        }
+        try {
+            UUID uuid = UUID.fromString(identifier);
+            Optional<UserProfile> profileByUserId = userProfileRepository.findByUserId(uuid);
+            if (profileByUserId.isPresent()) {
+                return profileByUserId.get();
+            }
+            return userProfileRepository.findById(uuid)
+                    .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Profile not found");
+        }
     }
 
     @Transactional

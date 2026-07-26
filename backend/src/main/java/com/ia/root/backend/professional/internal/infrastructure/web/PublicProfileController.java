@@ -37,19 +37,11 @@ public class PublicProfileController {
     }
 
     @GetMapping("/{userIdOrUsername}")
-    @Operation(summary = "Obtener perfil público por ID de usuario o nombre de usuario amigable")
+    @Operation(summary = "Obtener perfil público por ID de usuario, ID de perfil o nombre de usuario amigable")
     public ResponseEntity<PublicProfileDTO> getPublicProfile(@PathVariable String userIdOrUsername) {
         try {
-            UUID userId;
-            UserProfile profile;
-            try {
-                userId = UUID.fromString(userIdOrUsername);
-                profile = professionalService.getProfile(userId);
-            } catch (IllegalArgumentException e) {
-                // No es un UUID válido, intentamos buscar por username
-                profile = professionalService.getProfileByUsername(userIdOrUsername);
-                userId = profile.getUserId();
-            }
+            UserProfile profile = professionalService.findProfileByIdOrUserIdOrUsername(userIdOrUsername);
+            UUID userId = profile.getUserId();
 
             List<Experience> experiences = professionalService.getExperiences(userId);
             SkillsData skillsData = skillsMetricsService.getSkillsData(userId);
@@ -72,7 +64,7 @@ public class PublicProfileController {
 
             return ResponseEntity.ok(dto);
         } catch (IllegalArgumentException e) {
-            if (e.getMessage().equals("Profile not found")) {
+            if ("Profile not found".equals(e.getMessage())) {
                 return ResponseEntity.notFound().build();
             }
             throw e;

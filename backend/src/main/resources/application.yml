@@ -84,6 +84,7 @@ app:
       - "https://micache.es"
       - "http://www.micache.es"
       - "https://www.micache.es"
+      - "https://www.micache.es:3000"
       - "http://37.27.197.244"
 
 logging:
