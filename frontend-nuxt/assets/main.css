@@ -1,5 +1,4 @@
-/* ─── Font: Inter (única fuente del proyecto) ─────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* ─── Font: Inter (Auto-hospedada por @nuxt/fonts) ─────────────────────────── */
 
 @tailwind base;
 @tailwind components;

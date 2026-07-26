@@ -21,7 +21,16 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@vueuse/nuxt',
     '@nuxtjs/sitemap',
+    '@nuxt/image',
+    '@nuxt/fonts',
+    '@nuxtjs/color-mode'
   ],
+
+  colorMode: {
+    classSuffix: '',
+    preference: 'system',
+    fallback: 'light'
+  },
 
   site: {
     url: process.env.NUXT_PUBLIC_SITE_URL || 'https://www.micache.es',
