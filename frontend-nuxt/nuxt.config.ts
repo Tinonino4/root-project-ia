@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   ],
 
   site: {
-    url: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://www.micache.es',
     name: 'Caché - Referencias Profesionales Verificadas',
   },
 
@@ -52,6 +52,10 @@ export default defineNuxtConfig({
   ],
 
   i18n: {
+    compilation: {
+      strictMessage: false,
+      escapeHtml: false
+    },
     bundle: {
       optimizeTranslationDirective: false
     },

@@ -90,7 +90,7 @@ const pageDesc = computed(() => {
   return profile.value ? t('seo.profileDesc', { name: profileFullName.value }) : t('seo.defaultDescription')
 })
 
-const pageImage = computed(() => getAbsoluteImageUrl(profile.value?.avatarUrl))
+const pageImage = computed(() => getAbsoluteImageUrl(profile.value?.photoUrl || profile.value?.avatarUrl))
 
 useSeoMeta({
   title: () => pageTitle.value,
