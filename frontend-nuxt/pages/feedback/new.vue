@@ -103,15 +103,14 @@ const handleSubmit = async () => {
   isSubmitting.value = true
   successMessage.value = ''
   errorMessage.value = ''
-  
   try {
     await feedbackStore.createRequest({
       targetName: form.value.targetName,
       targetSurname: form.value.targetSurname,
       targetEmail: form.value.targetEmail,
       targetPhone: form.value.targetPhone,
-      relationshipId: parseInt(form.value.relationshipId, 10),
-      experienceId: form.value.experienceId,
+      relationshipId: parseInt(form.value.relationshipId as string, 10),
+      experienceId: String(form.value.experienceId),
       stillWorksThere: form.value.stillWorksThere,
       extraAnswers: form.value.extraAnswers
     })

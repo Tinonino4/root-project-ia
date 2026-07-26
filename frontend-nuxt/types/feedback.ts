@@ -23,13 +23,23 @@ export interface FeedbackRequest {
   urlToken?: string
   createdAt?: string
   updatedAt?: string
+  targetName?: string
+  targetSurname?: string
+  targetEmail?: string
+  finished?: boolean
+  trustScore?: number
 }
 
 export interface CreateFeedbackRequestPayload {
-  evaluatorEmail: string
-  evaluatorName?: string
-  relationshipCode: string
-  experienceId: number | string
+  targetName: string
+  targetSurname: string
+  targetEmail: string
+  targetPhone?: string
+  relationshipId: number
+  experienceId: string
+  stillWorksThere: boolean
+  extraAnswers?: boolean
+  emailLanguage?: string
 }
 
 export interface ToggleVisibilityPayload {
