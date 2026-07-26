@@ -1,4 +1,5 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+const backendTarget = process.env.NUXT_BACKEND_URL || process.env.BACKEND_URL || 'http://localhost:8080'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
@@ -96,19 +97,19 @@ export default defineNuxtConfig({
         }
       },
       '/api/**': {
-        proxy: 'http://localhost:8080/api/**'
+        proxy: `${backendTarget}/api/**`
       },
       '/uploads/**': {
-        proxy: 'http://localhost:8080/uploads/**'
+        proxy: `${backendTarget}/uploads/**`
       }
     },
     devProxy: {
       '/api': {
-        target: 'http://localhost:8080/api',
+        target: `${backendTarget}/api`,
         changeOrigin: true
       },
       '/uploads': {
-        target: 'http://localhost:8080/uploads',
+        target: `${backendTarget}/uploads`,
         changeOrigin: true
       }
     }
