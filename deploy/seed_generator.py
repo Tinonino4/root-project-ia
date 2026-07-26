@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 def generate_seed():
     # Pre-calculated BCrypt hash for the password "password123"
-    bcrypt_password_hash = "$2a$10$8.Kclm2eC92T6j5K2TzJ.O1FkE/kK07i28x6xN1p2p3m/KzR345ae"
+    bcrypt_password_hash = "$2a$10$mw.3LsS7MqvrS2tY2.V2TeyXsOpEegKdMMuYm7cv7EN47gQXTenxC"
 
     # Lists for generating realistic Spanish/European profiles
     first_names = [
