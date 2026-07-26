@@ -152,13 +152,12 @@ const getTrustLabel = (score: number) => {
           <div class="relative z-10 max-w-3xl space-y-4 text-center md:text-left">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/20 text-primary uppercase tracking-wider">
               <Sparkles class="w-3.5 h-3.5" />
-              Primeros Pasos
+              {{ $t('dashboard.onboarding.badge') }}
             </span>
             <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white font-heading">
-              Tu reputación no se cuenta, <span class="text-primary">se demuestra.</span>
+              {{ $t('dashboard.onboarding.titlePrefix') }} <span class="text-primary">{{ $t('dashboard.onboarding.titleHighlight') }}</span>
             </h1>
-            <p class="text-zinc-600 dark:text-zinc-300 text-base md:text-lg leading-relaxed max-w-2xl">
-              ¡Bienvenido a <span class="font-bold text-zinc-900 dark:text-white">Mi Caché</span>! Estás a muy pocos pasos de desbloquear un radar interactivo de habilidades blandas basado en valoraciones reales y 100% anónimas de tus colegas. Cero spam, puro valor profesional.
+            <p class="text-zinc-600 dark:text-zinc-300 text-base md:text-lg leading-relaxed max-w-2xl" v-html="$t('dashboard.onboarding.welcomeText')">
             </p>
           </div>
         </div>
@@ -168,7 +167,7 @@ const getTrustLabel = (score: number) => {
           <div class="lg:col-span-7 space-y-6">
             <h2 class="text-xl font-bold tracking-wide text-zinc-900 dark:text-white uppercase font-heading flex items-center gap-2">
               <Award class="w-5 h-5 text-primary" />
-              Tu Plan de Reputación
+              {{ $t('dashboard.onboarding.planTitle') }}
             </h2>
             
             <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800 space-y-8">
@@ -184,13 +183,13 @@ const getTrustLabel = (score: number) => {
                   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                       <div class="flex items-center gap-2 mb-1">
-                        <span class="text-xs font-bold text-primary uppercase tracking-wider">Paso 1</span>
-                        <span v-if="!isNewUser" class="text-xs font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">Completado</span>
-                        <span v-else class="text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full">Requerido</span>
+                        <span class="text-xs font-bold text-primary uppercase tracking-wider">{{ $t('dashboard.onboarding.step', { num: 1 }) }}</span>
+                        <span v-if="!isNewUser" class="text-xs font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">{{ $t('dashboard.onboarding.statusCompleted') }}</span>
+                        <span v-else class="text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full">{{ $t('dashboard.onboarding.statusRequired') }}</span>
                       </div>
-                      <h3 class="text-lg font-bold text-zinc-900 dark:text-white">Completa tu Perfil Profesional</h3>
+                      <h3 class="text-lg font-bold text-zinc-900 dark:text-white">{{ $t('dashboard.onboarding.step1Title') }}</h3>
                       <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-md">
-                        Define tu cargo actual, educación e imagen. Así tus colegas sabrán exactamente a quién están valorando.
+                        {{ $t('dashboard.onboarding.step1Desc') }}
                       </p>
                     </div>
                     <Button 
@@ -200,7 +199,7 @@ const getTrustLabel = (score: number) => {
                       class="flex-shrink-0"
                     >
                       <UserPlus class="w-4 h-4 mr-2" />
-                      {{ !isNewUser ? 'Editar Perfil' : 'Crear Perfil' }}
+                      {{ !isNewUser ? $t('dashboard.onboarding.editProfile') : $t('dashboard.onboarding.createProfile') }}
                     </Button>
                   </div>
                 </div>
@@ -217,13 +216,13 @@ const getTrustLabel = (score: number) => {
                   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                       <div class="flex items-center gap-2 mb-1">
-                        <span class="text-xs font-bold text-primary uppercase tracking-wider">Paso 2</span>
-                        <span v-if="hasExperiences" class="text-xs font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">Completado</span>
-                        <span v-else class="text-xs font-medium text-zinc-400 bg-zinc-100 dark:bg-white/5 px-2 py-0.5 rounded-full">Pendiente</span>
+                        <span class="text-xs font-bold text-primary uppercase tracking-wider">{{ $t('dashboard.onboarding.step', { num: 2 }) }}</span>
+                        <span v-if="hasExperiences" class="text-xs font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">{{ $t('dashboard.onboarding.statusCompleted') }}</span>
+                        <span v-else class="text-xs font-medium text-zinc-400 bg-zinc-100 dark:bg-white/5 px-2 py-0.5 rounded-full">{{ $t('dashboard.onboarding.statusPending') }}</span>
                       </div>
-                      <h3 class="text-lg font-bold text-zinc-900 dark:text-white">Añade tu Trayectoria Laboral</h3>
+                      <h3 class="text-lg font-bold text-zinc-900 dark:text-white">{{ $t('dashboard.onboarding.step2Title') }}</h3>
                       <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-md">
-                        Registra tus trabajos previos o actuales. El feedback de tus compañeros irá asociado a estas experiencias.
+                        {{ $t('dashboard.onboarding.step2Desc') }}
                       </p>
                     </div>
                     <Button 
@@ -234,7 +233,7 @@ const getTrustLabel = (score: number) => {
                       class="flex-shrink-0"
                     >
                       <Plus class="w-4 h-4 mr-2" />
-                      Añadir Experiencia
+                      {{ $t('dashboard.onboarding.addExperience') }}
                     </Button>
                   </div>
                 </div>
@@ -251,13 +250,13 @@ const getTrustLabel = (score: number) => {
                   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                       <div class="flex items-center gap-2 mb-1">
-                        <span class="text-xs font-bold text-primary uppercase tracking-wider">Paso 3</span>
-                        <span v-if="hasFeedback" class="text-xs font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">Completado</span>
-                        <span v-else class="text-xs font-medium text-zinc-400 bg-zinc-100 dark:bg-white/5 px-2 py-0.5 rounded-full">Pendiente</span>
+                        <span class="text-xs font-bold text-primary uppercase tracking-wider">{{ $t('dashboard.onboarding.step', { num: 3 }) }}</span>
+                        <span v-if="hasFeedback" class="text-xs font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">{{ $t('dashboard.onboarding.statusCompleted') }}</span>
+                        <span v-else class="text-xs font-medium text-zinc-400 bg-zinc-100 dark:bg-white/5 px-2 py-0.5 rounded-full">{{ $t('dashboard.onboarding.statusPending') }}</span>
                       </div>
-                      <h3 class="text-lg font-bold text-zinc-900 dark:text-white">Solicita tu Primer Feedback</h3>
+                      <h3 class="text-lg font-bold text-zinc-900 dark:text-white">{{ $t('dashboard.onboarding.step3Title') }}</h3>
                       <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-md">
-                        Envía solicitudes dinámicas a tus excompañeros para que valoren de forma anónima tus habilidades interpersonales en un par de clics.
+                        {{ $t('dashboard.onboarding.step3Desc') }}
                       </p>
                     </div>
                     <Button 
@@ -268,7 +267,7 @@ const getTrustLabel = (score: number) => {
                       class="flex-shrink-0 bg-primary hover:bg-primary/90 text-white"
                     >
                       <ArrowRight class="w-4 h-4 mr-2" />
-                      Solicitar Feedback
+                      {{ $t('dashboard.onboarding.requestFeedback') }}
                     </Button>
                   </div>
                 </div>
@@ -285,13 +284,13 @@ const getTrustLabel = (score: number) => {
                 <span class="p-1.5 rounded-lg bg-primary/10 text-primary">
                   <ShieldCheck class="w-5 h-5" />
                 </span>
-                <span class="text-sm font-bold tracking-wide uppercase text-zinc-500 dark:text-zinc-400">Demostración en Vivo</span>
+                <span class="text-sm font-bold tracking-wide uppercase text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.onboarding.liveDemo') }}</span>
               </div>
               <h3 class="text-xl font-bold text-zinc-900 dark:text-white font-heading">
-                Tu Futuro Caché Profesional
+                {{ $t('dashboard.onboarding.futureTitle') }}
               </h3>
               <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                Una vez recibas valoraciones, tus 5 pilares de Habilidades Blandas se consolidarán en este radar interactivo y exportable en PDF de forma instantánea.
+                {{ $t('dashboard.onboarding.futureDesc') }}
               </p>
             </div>
 
@@ -307,8 +306,7 @@ const getTrustLabel = (score: number) => {
 
             <div class="mt-6 flex items-start gap-2.5 bg-primary/5 dark:bg-primary/[0.03] border border-primary/10 p-3 rounded-xl">
               <HelpCircle class="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-              <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                <strong>¿Sabías qué?</strong> El radar blinda tu privacidad. Jamás revelamos quién te dio qué puntuación para garantizar respuestas honestas y de calidad.
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed" v-html="$t('dashboard.onboarding.didYouKnow')">
               </p>
             </div>
           </div>
