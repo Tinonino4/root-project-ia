@@ -2,7 +2,7 @@
 
 ## Stack Tecnológico
 - Backend: Java 21+ / Spring Boot 4.0.5 (Ecosistema Spring 7, Clean Architecture)
-- Frontend: Vue3 o React Native
+- Frontend: Nuxt 3 (Vue 3 SSR)
 - Base de Datos: PostgreSQL
 
 ## Base de Datos (Entorno Local)
@@ -20,12 +20,12 @@ PGPASSWORD="postgrespassword" psql -U postgres -h localhost -p 5432 -d root_ia_d
 ```
 ## Comandos de Construcción (Deterministas)
 - Backend: `mvn clean install`
-- Frontend: `npm run build`
+- Frontend: `cd frontend-nuxt && npm run build`
 
 ## Convenciones Críticas de Nomenclatura
 - (A definir según las necesidades del proyecto)
 
 ## Enrutamiento de Agentes (Triggers)
 - Modificaciones en `backend/**/*.java` ➔ Invocar a `@spring-eng`
-- Modificaciones en `frontend/**/*.vue` o `frontend/**/*.tsx` ➔ Invocar a `@vue-eng` / `@react-eng`
+- Modificaciones en `frontend-nuxt/**/*.vue` o `frontend-nuxt/**/*.ts` ➔ Invocar a `@vue-eng`
 - Modificaciones en `backend/src/main/resources/db/migration/**/*.sql` ➔ Invocar a `@db-admin`
