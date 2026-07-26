@@ -32,6 +32,9 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@nuxt/fonts": "^0.14.0",
+    "@nuxt/image": "^2.0.0",
+    "@nuxtjs/color-mode": "^4.0.1",
     "@nuxtjs/sitemap": "^7.6.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.1",
