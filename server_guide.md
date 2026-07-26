@@ -14,14 +14,11 @@ ssh root@37.27.197.244
 
 ---
 
-## 2. Arquitectura de Despliegue Paralelo (Migración Front)
-
-Para realizar una migración progresiva y comparaciones manuales en vivo sin romper el sitio en producción:
+## 2. Arquitectura de Despliegue (Nuxt 3 en Producción)
 
 | Servicio | URL de Acceso | Tipo | Directorio en VPS | Puerto Interno |
 | :--- | :--- | :--- | :--- | :--- |
-| **Vue 3 (Legacy / Producción)** | `https://www.micache.es` | Estático SPA | `/var/www/micache/` | Nginx Directo (443) |
-| **Nuxt 3 (SSR / Desarrollo)** | `https://www.micache.es:3000` | Node SSR (PM2) | `/var/www/micache-nuxt/` | PM2 en `127.0.0.1:3001` |
+| **Nuxt 3 (SSR / Producción)** | `https://www.micache.es` | Node SSR (PM2) | `/var/www/micache-nuxt/` | PM2 en `127.0.0.1:3001` (Nginx Proxy 443) |
 | **Backend Spring Boot** | Interfaz `/api/` | Java JAR | `/var/web/micache/backend.jar` | Systemd en `127.0.0.1:8080` |
 
 Ambos frontends comparten los mismos endpoints de backend (`/api/`), autenticación OAuth2 (`/oauth2/`) y carpeta de avatares/archivos (`/uploads/`).
