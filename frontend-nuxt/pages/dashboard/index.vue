@@ -79,12 +79,12 @@ const mockMetrics = {
 const isExporting = ref(false)
 const isGeneratingPDF = ref(false)
 
-const certifiedRefs = computed(() => requests.value.filter(r => r.finished && r.visible).length)
-const pendingRequests = computed(() => requests.value.filter(r => !r.finished).length)
+const certifiedRefs = computed(() => (requests.value || []).filter(r => r.finished && r.visible).length)
+const pendingRequests = computed(() => (requests.value || []).filter(r => !r.finished).length)
 
 const recentRequests = computed(() => {
-  return [...requests.value]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  return [...(requests.value || [])]
+    .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
     .slice(0, 4)
 })
 
@@ -452,7 +452,7 @@ const getTrustLabel = (score: number) => {
                       {{ req.targetName }} {{ req.targetSurname || '' }}
                     </span>
                     <span class="text-xs text-zinc-500 dark:text-zinc-400 block break-all">
-                      {{ req.targetEmail }} · {{ formatDate(req.createdAt) }}
+                      {{ req.targetEmail }} · {{ formatDate(req.createdAt || '') }}
                     </span>
                   </div>
                   <div>
@@ -460,13 +460,13 @@ const getTrustLabel = (score: number) => {
                       v-if="req.finished" 
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border"
                       :class="{
-                        'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20': req.trustScore >= 80,
-                        'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20': req.trustScore >= 50 && req.trustScore < 80,
-                        'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20': req.trustScore >= 30 && req.trustScore < 50,
-                        'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20': req.trustScore < 30
+                        'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20': (req.trustScore ?? 0) >= 80,
+                        'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20': (req.trustScore ?? 0) >= 50 && (req.trustScore ?? 0) < 80,
+                        'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20': (req.trustScore ?? 0) >= 30 && (req.trustScore ?? 0) < 50,
+                        'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20': (req.trustScore ?? 0) < 30
                       }"
                     >
-                      {{ $t('feedback.status.COMPLETED') }} ({{ getTrustLabel(req.trustScore) }})
+                      {{ $t('feedback.status.COMPLETED') }} ({{ getTrustLabel(req.trustScore ?? 0) }})
                     </span>
                     <span 
                       v-else 

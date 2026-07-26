@@ -34,7 +34,7 @@ const fetchCandidates = async () => {
 
   try {
     const data = await $api('/recruiter/candidates', { query: { query: trimmedQuery } })
-    candidates.value = data
+    candidates.value = data as any[]
   } catch (err) {
     console.error('Error searching candidates:', err)
     error.value = 'Ocurrió un error al realizar la búsqueda. Por favor, inténtelo de nuevo.'

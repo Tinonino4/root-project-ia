@@ -142,7 +142,7 @@ const exportPDF = async () => {
       
       const opt = {
         margin:       [10, 10, 15, 10],
-        filename:     `informe_micache_${profile.value.name}_${profile.value.surname}.pdf`,
+        filename:     `informe_micache_${profile.value?.name || 'usuario'}_${profile.value?.surname || ''}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { 
           scale: 2.0, 
@@ -305,7 +305,7 @@ const goBack = () => {
             <h1 class="text-3xl font-bold text-white tracking-tight">{{ profile.name }} {{ profile.surname }}</h1>
             <p class="text-lg text-primary font-semibold flex flex-wrap items-center justify-center md:justify-start gap-3">
               <span>{{ profile.jobTitle || $t('sidebar.professionalRole') }}</span>
-              <span v-if="profile.totalReferencesCount > 0" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-lg select-none">
+              <span v-if="(profile.totalReferencesCount ?? 0) > 0" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-lg select-none">
                 <ShieldCheck class="w-3.5 h-3.5 mr-1 text-emerald-400" />
                 {{ profile.totalReferencesCount }} {{ profile.totalReferencesCount === 1 ? $t('extraProfile.certifiedReference') : $t('extraProfile.certifiedReferences') }}
               </span>
@@ -387,7 +387,7 @@ const goBack = () => {
             {{ $t('experience.title') }}
           </h2>
 
-          <div v-if="profile.experiences?.length > 0" class="space-y-6 relative before:absolute before:inset-y-0 before:left-2.5 before:w-px before:bg-white/5">
+          <div v-if="(profile.experiences?.length ?? 0) > 0" class="space-y-6 relative before:absolute before:inset-y-0 before:left-2.5 before:w-px before:bg-white/5">
             <div v-for="exp in profile.experiences" :key="exp.id" class="relative pl-6 sm:pl-8 group">
               <!-- Timeline dot -->
               <div class="absolute left-2.5 top-2.5 w-3 h-3 rounded-full bg-primary -translate-x-1/2 group-hover:scale-125 transition-transform duration-200"></div>
@@ -408,14 +408,14 @@ const goBack = () => {
                     <div class="flex items-center gap-2">
                       <div class="flex items-center text-amber-400">
                         <span class="text-sm font-bold text-white mr-1.5">
-                          {{ getMetricsForExperience(exp.id).averageScore?.toFixed(1) }}
+                          {{ getMetricsForExperience(exp.id)?.averageScore?.toFixed(1) }}
                         </span>
-                        <svg v-for="star in 5" :key="star" class="w-3.5 h-3.5" :class="star <= Math.round(getMetricsForExperience(exp.id).averageScore || 0) ? 'fill-current' : 'text-zinc-700'" viewBox="0 0 20 20" fill="currentColor">
+                        <svg v-for="star in 5" :key="star" class="w-3.5 h-3.5" :class="star <= Math.round(getMetricsForExperience(exp.id)?.averageScore || 0) ? 'fill-current' : 'text-zinc-700'" viewBox="0 0 20 20" fill="currentColor">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                       </div>
                       <span class="text-xs text-[hsl(220,10%,55%)]">
-                        ({{ getMetricsForExperience(exp.id).referencesCount }})
+                        ({{ getMetricsForExperience(exp.id)?.referencesCount }})
                       </span>
                     </div>
 
@@ -423,14 +423,14 @@ const goBack = () => {
                     <div class="flex items-center gap-1.5">
                       <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold"
                         :class="{
-                          'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': getMetricsForExperience(exp.id).averageTrustScore >= 80,
-                          'bg-amber-500/10 text-amber-400 border border-amber-500/20': getMetricsForExperience(exp.id).averageTrustScore >= 50 && getMetricsForExperience(exp.id).averageTrustScore < 80,
-                          'bg-orange-500/10 text-orange-400 border border-orange-500/20': getMetricsForExperience(exp.id).averageTrustScore >= 30 && getMetricsForExperience(exp.id).averageTrustScore < 50,
-                          'bg-rose-500/10 text-rose-400 border border-rose-500/20': getMetricsForExperience(exp.id).averageTrustScore < 30
+                          'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) >= 80,
+                          'bg-amber-500/10 text-amber-400 border border-amber-500/20': (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) >= 50 && (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) < 80,
+                          'bg-orange-500/10 text-orange-400 border border-orange-500/20': (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) >= 30 && (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) < 50,
+                          'bg-rose-500/10 text-rose-400 border border-rose-500/20': (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) < 30
                         }"
                       >
                         <ShieldCheck class="w-3 h-3 mr-1" />
-                        {{ $t('extraProfile.trustLevelTag', { level: getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }) }}
+                        {{ $t('extraProfile.trustLevelTag', { level: getTrustLevelLabel(getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) }) }}
                       </span>
                     </div>
 
@@ -450,15 +450,15 @@ const goBack = () => {
                     <div class="space-y-3">
                       <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ $t('extraProfile.softSkillsRole') }}</h4>
                       <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
-                        <div v-for="(val, skill) in getMetricsForExperience(exp.id).categoryAverages" :key="skill" class="space-y-1">
+                        <div v-for="(val, skill) in getMetricsForExperience(exp.id)?.categoryAverages" :key="skill" class="space-y-1">
                           <div class="flex justify-between text-xs font-medium">
                             <span class="text-zinc-400">{{ categoryLabels[skill] || skill }}</span>
-                            <span class="text-white font-bold">{{ val.toFixed(1) }}/5.0</span>
+                            <span class="text-white font-bold">{{ (val ?? 0).toFixed(1) }}/5.0</span>
                           </div>
                           <div class="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
                             <div 
                               class="h-full bg-gradient-to-r from-primary to-orange-500 rounded-full transition-all duration-500" 
-                              :style="{ width: (val * 20) + '%' }"
+                              :style="{ width: ((val ?? 0) * 20) + '%' }"
                             ></div>
                           </div>
                         </div>
@@ -466,11 +466,11 @@ const goBack = () => {
                     </div>
 
                     <!-- Evaluators roles distribution -->
-                    <div v-if="getMetricsForExperience(exp.id).relationshipCounts && Object.keys(getMetricsForExperience(exp.id).relationshipCounts).length > 0" class="pt-3 border-t border-white/5">
+                    <div v-if="getMetricsForExperience(exp.id)?.relationshipCounts && Object.keys(getMetricsForExperience(exp.id)?.relationshipCounts || {}).length > 0" class="pt-3 border-t border-white/5">
                       <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2.5">{{ $t('extraProfile.evaluatorsDistribution') }}</h4>
                       <div class="flex flex-wrap gap-2">
                         <span 
-                          v-for="(count, role) in getMetricsForExperience(exp.id).relationshipCounts" 
+                          v-for="(count, role) in getMetricsForExperience(exp.id)?.relationshipCounts" 
                           :key="role" 
                           class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs bg-white/[0.02] border border-white/5 text-zinc-300 font-medium select-none"
                         >
@@ -481,11 +481,11 @@ const goBack = () => {
                     </div>
 
                     <!-- Testimonials -->
-                    <div v-if="getMetricsForExperience(exp.id).testimonials && getMetricsForExperience(exp.id).testimonials.length > 0" class="pt-4 border-t border-white/5 space-y-3">
+                    <div v-if="getMetricsForExperience(exp.id)?.testimonials && (getMetricsForExperience(exp.id)?.testimonials?.length ?? 0) > 0" class="pt-4 border-t border-white/5 space-y-3">
                       <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ $t('extraProfile.reviewsReceived') }}</h4>
                       <div class="space-y-3">
                         <div 
-                          v-for="t in getMetricsForExperience(exp.id).testimonials" 
+                          v-for="t in getMetricsForExperience(exp.id)?.testimonials" 
                           :key="t.createdAt"
                           class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2 relative"
                         >
@@ -577,19 +577,19 @@ const goBack = () => {
               </div>
             </div>
 
-            <!-- Candidate Info block -->
+             <!-- Candidate Info block -->
             <div class="flex items-start bg-zinc-50 border rounded-2xl p-6" style="border-color: #e4e4e7; margin-bottom: 30px;">
               <div 
                 class="w-20 h-20 rounded-full flex items-center justify-center font-bold text-2xl flex-shrink-0 shadow-inner overflow-hidden"
                 style="background-color: rgba(242, 151, 39, 0.1); color: #f29727; border: 1px solid rgba(242, 151, 39, 0.2); margin-right: 24px;"
               >
-                <img v-if="profile.photoUrl" :src="profile.photoUrl" alt="Avatar" loading="lazy" class="w-full h-full object-cover" crossorigin="anonymous" />
-                <span v-else>{{ profile.name?.charAt(0) }}{{ profile.surname?.charAt(0) }}</span>
+                <img v-if="profile?.photoUrl" :src="profile.photoUrl" alt="Avatar" loading="lazy" class="w-full h-full object-cover" crossorigin="anonymous" />
+                <span v-else>{{ profile?.name?.charAt(0) }}{{ profile?.surname?.charAt(0) }}</span>
               </div>
               <div class="flex-1 min-w-0">
-                <h3 class="text-xl font-extrabold text-zinc-950" style="margin: 0 0 4px 0; line-height: 1.2;">{{ profile.name }} {{ profile.surname }}</h3>
-                <p class="text-sm font-bold" style="color: #f29727; margin: 0 0 8px 0; line-height: 1.2;">{{ profile.jobTitle }}</p>
-                <p class="text-xs text-zinc-600 leading-relaxed" style="margin: 0; line-height: 1.5; word-wrap: break-word;">{{ profile.aboutMe || 'No personal biography provided.' }}</p>
+                <h3 class="text-xl font-extrabold text-zinc-950" style="margin: 0 0 4px 0; line-height: 1.2;">{{ profile?.name }} {{ profile?.surname }}</h3>
+                <p class="text-sm font-bold" style="color: #f29727; margin: 0 0 8px 0; line-height: 1.2;">{{ profile?.jobTitle }}</p>
+                <p class="text-xs text-zinc-600 leading-relaxed" style="margin: 0; line-height: 1.5; word-wrap: break-word;">{{ profile?.aboutMe || 'No personal biography provided.' }}</p>
               </div>
             </div>
 
@@ -600,16 +600,16 @@ const goBack = () => {
                 <span style="display: inline-block; vertical-align: middle;">SOFT SKILLS & COMPETENCIES</span>
               </h3>
               
-              <div v-if="profile.skills" class="grid grid-cols-2 gap-x-8 gap-y-4">
+              <div v-if="profile?.skills" class="grid grid-cols-2 gap-x-8 gap-y-4">
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
                     <span>Teamwork</span>
-                    <span style="color: #f29727;">{{ (profile.skills.teamwork || 0).toFixed(1) }} / 5.0</span>
+                    <span style="color: #f29727;">{{ (profile?.skills?.teamwork || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
                     <div 
                       class="h-full rounded-full" 
-                      :style="{ width: `${((profile.skills.teamwork || 0) / 5) * 100}%` }"
+                      :style="{ width: `${((profile?.skills?.teamwork || 0) / 5) * 100}%` }"
                       style="background: linear-gradient(90deg, #f29727 0%, #f5712d 100%);"
                     ></div>
                   </div>
@@ -618,12 +618,12 @@ const goBack = () => {
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
                     <span>Proactivity</span>
-                    <span style="color: #f29727;">{{ (profile.skills.proactivity || 0).toFixed(1) }} / 5.0</span>
+                    <span style="color: #f29727;">{{ (profile?.skills?.proactivity || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
                     <div 
                       class="h-full rounded-full" 
-                      :style="{ width: `${((profile.skills.proactivity || 0) / 5) * 100}%` }"
+                      :style="{ width: `${((profile?.skills?.proactivity || 0) / 5) * 100}%` }"
                       style="background: linear-gradient(90deg, #f29727 0%, #f5712d 100%);"
                     ></div>
                   </div>
@@ -632,12 +632,12 @@ const goBack = () => {
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
                     <span>Integrity</span>
-                    <span style="color: #f29727;">{{ (profile.skills.integrity || 0).toFixed(1) }} / 5.0</span>
+                    <span style="color: #f29727;">{{ (profile?.skills?.integrity || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
                     <div 
                       class="h-full rounded-full" 
-                      :style="{ width: `${((profile.skills.integrity || 0) / 5) * 100}%` }"
+                      :style="{ width: `${((profile?.skills?.integrity || 0) / 5) * 100}%` }"
                       style="background: linear-gradient(90deg, #f29727 0%, #f5712d 100%);"
                     ></div>
                   </div>
@@ -646,12 +646,12 @@ const goBack = () => {
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
                     <span>Self-Confidence</span>
-                    <span style="color: #f29727;">{{ (profile.skills.selfConfidence || 0).toFixed(1) }} / 5.0</span>
+                    <span style="color: #f29727;">{{ (profile?.skills?.selfConfidence || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
                     <div 
                       class="h-full rounded-full" 
-                      :style="{ width: `${((profile.skills.selfConfidence || 0) / 5) * 100}%` }"
+                      :style="{ width: `${((profile?.skills?.selfConfidence || 0) / 5) * 100}%` }"
                       style="background: linear-gradient(90deg, #f29727 0%, #f5712d 100%);"
                     ></div>
                   </div>
@@ -660,12 +660,12 @@ const goBack = () => {
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
                     <span>Flexibility</span>
-                    <span style="color: #f29727;">{{ (profile.skills.flexibility || 0).toFixed(1) }} / 5.0</span>
+                    <span style="color: #f29727;">{{ (profile?.skills?.flexibility || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
                     <div 
                       class="h-full rounded-full" 
-                      :style="{ width: `${((profile.skills.flexibility || 0) / 5) * 100}%` }"
+                      :style="{ width: `${((profile?.skills?.flexibility || 0) / 5) * 100}%` }"
                       style="background: linear-gradient(90deg, #f29727 0%, #f5712d 100%);"
                     ></div>
                   </div>
@@ -680,7 +680,7 @@ const goBack = () => {
                 <span style="display: inline-block; vertical-align: middle;">CERTIFIED WORK HISTORY</span>
               </h3>
               
-              <div v-if="profile.experiences && profile.experiences.length > 0">
+              <div v-if="profile?.experiences && profile.experiences.length > 0">
                 <div 
                   v-for="exp in profile.experiences" 
                   :key="exp.id" 
@@ -699,27 +699,27 @@ const goBack = () => {
                     <div class="flex items-center justify-between flex-wrap" style="margin-bottom: 6px;">
                       <div class="flex items-center" style="gap: 8px;">
                         <div class="flex items-center text-amber-500">
-                          <strong class="text-xs text-zinc-800" style="margin-right: 6px;">{{ getMetricsForExperience(exp.id).averageScore?.toFixed(1) }} / 5.0</strong>
+                          <strong class="text-xs text-zinc-800" style="margin-right: 6px;">{{ getMetricsForExperience(exp.id)?.averageScore?.toFixed(1) }} / 5.0</strong>
                           <div class="flex items-center" style="gap: 2px;">
-                            <svg v-for="star in 5" :key="star" class="w-3 h-3" :style="{ color: star <= Math.round(getMetricsForExperience(exp.id).averageScore || 0) ? '#f59e0b' : '#e4e4e7' }" fill="currentColor" viewBox="0 0 20 20">
+                            <svg v-for="star in 5" :key="star" class="w-3 h-3" :style="{ color: star <= Math.round(getMetricsForExperience(exp.id)?.averageScore || 0) ? '#f59e0b' : '#e4e4e7' }" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
                           </div>
                         </div>
                         <span class="text-[10px] text-zinc-500 font-semibold" style="margin-left: 6px;">
-                          ({{ getMetricsForExperience(exp.id).referencesCount }} {{ getMetricsForExperience(exp.id).referencesCount === 1 ? 'reference' : 'references' }})
+                          ({{ getMetricsForExperience(exp.id)?.referencesCount }} {{ getMetricsForExperience(exp.id)?.referencesCount === 1 ? 'reference' : 'references' }})
                         </span>
                       </div>
                       <div 
                         class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border"
                         :class="{
-                          'bg-emerald-50 text-emerald-700 border-emerald-200': getMetricsForExperience(exp.id).averageTrustScore >= 80,
-                          'bg-amber-50 text-amber-700 border-amber-200': getMetricsForExperience(exp.id).averageTrustScore >= 50 && getMetricsForExperience(exp.id).averageTrustScore < 80,
-                          'bg-orange-50 text-orange-700 border-orange-200': getMetricsForExperience(exp.id).averageTrustScore >= 30 && getMetricsForExperience(exp.id).averageTrustScore < 50,
-                          'bg-rose-50 text-rose-700 border-rose-200': getMetricsForExperience(exp.id).averageTrustScore < 30
+                          'bg-emerald-50 text-emerald-700 border-emerald-200': (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) >= 80,
+                          'bg-amber-50 text-amber-700 border-amber-200': (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) >= 50 && (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) < 80,
+                          'bg-orange-50 text-orange-700 border-orange-200': (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) >= 30 && (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) < 50,
+                          'bg-rose-50 text-rose-700 border-rose-200': (getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) < 30
                         }"
                       >
-                        ✓ Trust Level: {{ getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }}
+                        ✓ Trust Level: {{ getTrustLevelLabel(getMetricsForExperience(exp.id)?.averageTrustScore ?? 0) }}
                       </div>
                     </div>
                   </div>

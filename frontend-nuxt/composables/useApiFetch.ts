@@ -33,12 +33,13 @@ export function useApiFetch<T = unknown>(
   }
 
   const baseURL = config.public.apiBaseUrl || '/api'
+  const { headers: customHeaders, ...restOpts } = opts
 
-  return useFetch<T>(url, {
+  return useFetch<T>(url as any, {
     baseURL,
     headers: {
       ...defaultHeaders,
-      ...(opts.headers as Record<string, string> | undefined),
+      ...(customHeaders as Record<string, string> | undefined),
     },
     async onResponseError({ response }) {
       const status = response.status
@@ -71,7 +72,7 @@ export function useApiFetch<T = unknown>(
           navigateTo('/login')
         }
       } else {
-        const serverMessage = response._data?.message || response._data?.error || null
+        const serverMessage = (response._data as any)?.message || (response._data as any)?.error || null
         if (status === 400) {
           toast.error('Solicitud incorrecta', { description: serverMessage || 'Revisa los datos enviados.' })
         } else if (status === 403) {
@@ -87,7 +88,7 @@ export function useApiFetch<T = unknown>(
         }
       }
     },
-    ...opts,
+    ...(restOpts as any),
   })
 }
 
@@ -122,16 +123,17 @@ export async function $api<T = unknown>(
   }
 
   const baseURL = config.public.apiBaseUrl || '/api'
+  const { headers: customHeaders, _retry, ...restOpts } = opts
 
   try {
-    return await $fetch<T>(url, {
+    return (await $fetch(url as any, {
       baseURL,
       headers: {
         ...defaultHeaders,
-        ...(opts.headers as Record<string, string> | undefined),
+        ...(customHeaders as Record<string, string> | undefined),
       },
-      ...opts,
-    })
+      ...(restOpts as any),
+    } as any)) as unknown as T
   } catch (error: unknown) {
     const fetchError = error as FetchError
     const response = fetchError.response
@@ -149,16 +151,16 @@ export async function $api<T = unknown>(
               if (refreshRes.refreshToken) {
                 refreshToken.value = refreshRes.refreshToken
               }
-              return await $fetch<T>(url, {
+              return (await $fetch(url as any, {
                 baseURL,
                 headers: {
                   ...defaultHeaders,
                   Authorization: `Bearer ${refreshRes.accessToken}`,
-                  ...(opts.headers as Record<string, string> | undefined),
+                  ...(customHeaders as Record<string, string> | undefined),
                 },
-                ...opts,
+                ...(restOpts as any),
                 _retry: true,
-              })
+              } as any)) as unknown as T
             }
           } catch (e) {
             token.value = null

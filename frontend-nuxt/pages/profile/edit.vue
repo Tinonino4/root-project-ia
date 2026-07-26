@@ -39,9 +39,10 @@ onMounted(async () => {
       await profileStore.fetchProfile()
     }
     if (profileStore.profile) {
+      const currentProfile = profileStore.profile as any
       Object.keys(formData.value).forEach(key => {
-        if (profileStore.profile[key] !== undefined && profileStore.profile[key] !== null) {
-          formData.value[key] = profileStore.profile[key]
+        if (currentProfile[key] !== undefined && currentProfile[key] !== null) {
+          (formData.value as any)[key] = currentProfile[key]
         }
       })
     }

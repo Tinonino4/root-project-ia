@@ -37,7 +37,7 @@ const cancelDelete = () => {
   experienceToDelete.value = null
 }
 
-const formatDate = (dateString?: string) => {
+const formatDate = (dateString?: string | null) => {
   if (!dateString) return 'Presente'
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short' }
   return new Date(dateString).toLocaleDateString('es-ES', options)

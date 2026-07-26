@@ -3,7 +3,7 @@ export const REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 // 7 days in seconds
 
 export const getCookieOptions = <T = string>(maxAgeSeconds: number = DEFAULT_SESSION_MAX_AGE) => ({
   sameSite: 'lax' as const,
-  secure: process.env.NODE_ENV === 'production',
+  secure: typeof process !== 'undefined' && process.env ? process.env.NODE_ENV === 'production' : false,
   maxAge: maxAgeSeconds,
   path: '/',
 })

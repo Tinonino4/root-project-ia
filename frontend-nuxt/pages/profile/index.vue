@@ -48,8 +48,9 @@ const toggleExperienceBreakdown = (expId: string | number) => {
 }
 
 const getMetricsForExperience = (expId: string | number) => {
-  if (!publicProfileData.value || !publicProfileData.value.experienceMetrics) return null
-  return publicProfileData.value.experienceMetrics.find((m: any) => m.experienceId === expId) || null
+  const profile = publicProfileData.value
+  if (!profile || !profile.experienceMetrics) return null
+  return profile.experienceMetrics.find((m: any) => m.experienceId === expId) || null
 }
 
 const getTrustLevelLabel = (score: number) => {
@@ -181,7 +182,7 @@ const exportPDF = async () => {
       
       const opt = {
         margin:       [10, 10, 15, 10],
-        filename:     `informe_micache_${publicProfileData.value.name}_${publicProfileData.value.surname}.pdf`,
+        filename:     `informe_micache_${publicProfileData.value?.name || 'usuario'}_${publicProfileData.value?.surname || ''}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { 
           scale: 2.0, 
@@ -212,8 +213,9 @@ const exportPDF = async () => {
 }
 
 const topSkill = computed(() => {
-  if (!publicProfileData.value || !publicProfileData.value.skills) return null
-  const skills = publicProfileData.value.skills
+  const profile = publicProfileData.value
+  if (!profile || !profile.skills) return null
+  const skills = profile.skills
   const candidates = [
     { key: 'teamwork', categoryKey: 'TEAMWORK' },
     { key: 'proactivity', categoryKey: 'PROACTIVITY' },
@@ -297,7 +299,7 @@ const topSkill = computed(() => {
             <h1 class="text-3xl font-bold text-white tracking-tight">{{ publicProfileData.name }} {{ publicProfileData.surname }}</h1>
             <p class="text-lg text-primary font-semibold flex flex-wrap items-center justify-center md:justify-start gap-3">
               <span>{{ publicProfileData.jobTitle || $t('sidebar.professionalRole') }}</span>
-              <span v-if="publicProfileData.totalReferencesCount > 0" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-lg select-none">
+              <span v-if="(publicProfileData.totalReferencesCount ?? 0) > 0" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-lg select-none">
                 <ShieldCheck class="w-3.5 h-3.5 mr-1 text-emerald-400" />
                 {{ publicProfileData.totalReferencesCount }} {{ publicProfileData.totalReferencesCount === 1 ? $t('extraProfile.certifiedReference') : $t('extraProfile.certifiedReferences') }}
               </span>
@@ -426,7 +428,7 @@ const topSkill = computed(() => {
                 <Mail class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
                 <div class="space-y-0.5">
                   <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.contactEmail') }}</span>
-                  <span class="text-sm break-all font-medium">{{ privateProfile?.contactEmail || publicProfileData.contactEmail || '-' }}</span>
+                  <span class="text-sm break-all font-medium">{{ (privateProfile as any)?.contactEmail || publicProfileData.contactEmail || '-' }}</span>
                 </div>
               </div>
 
@@ -434,7 +436,7 @@ const topSkill = computed(() => {
                 <Phone class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
                 <div class="space-y-0.5">
                   <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.phone') }}</span>
-                  <span class="text-sm font-medium">{{ privateProfile?.phoneNumber || '-' }}</span>
+                  <span class="text-sm font-medium">{{ (privateProfile as any)?.phoneNumber || '-' }}</span>
                 </div>
               </div>
 
@@ -443,25 +445,25 @@ const topSkill = computed(() => {
                 <div class="space-y-0.5">
                   <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.city') }}</span>
                   <span class="text-sm font-medium">
-                    {{ privateProfile?.city || '-' }} 
-                    <span class="text-zinc-500" v-if="privateProfile?.zipcode">({{ privateProfile.zipcode }})</span>
+                    {{ (privateProfile as any)?.city || '-' }} 
+                    <span class="text-zinc-500" v-if="(privateProfile as any)?.zipcode">({{ (privateProfile as any).zipcode }})</span>
                   </span>
                 </div>
               </div>
 
-              <div class="flex items-start gap-3 text-zinc-300" v-if="privateProfile?.education">
+              <div class="flex items-start gap-3 text-zinc-300" v-if="(privateProfile as any)?.education">
                 <GraduationCap class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
                 <div class="space-y-0.5">
                   <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.education') }}</span>
-                  <span class="text-sm font-medium">{{ privateProfile.education }}</span>
+                  <span class="text-sm font-medium">{{ (privateProfile as any).education }}</span>
                 </div>
               </div>
 
-              <div class="flex items-start gap-3 text-zinc-300" v-if="privateProfile?.birthday">
+              <div class="flex items-start gap-3 text-zinc-300" v-if="(privateProfile as any)?.birthday">
                 <Calendar class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
                 <div class="space-y-0.5">
                   <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('extraProfile.birthdayLabel') }}</span>
-                  <span class="text-sm font-medium">{{ formatBirthday(privateProfile.birthday) }}</span>
+                  <span class="text-sm font-medium">{{ formatBirthday((privateProfile as any).birthday) }}</span>
                 </div>
               </div>
             </div>
@@ -864,7 +866,7 @@ const topSkill = computed(() => {
               </div>
               <div class="text-right">
                 <p class="font-semibold text-zinc-500" style="margin: 0 0 2px 0;">Candidate ID:</p>
-                <p class="font-mono" style="margin: 0;">{{ authStore.user?.id?.substring(0, 8) }}...{{ authStore.user?.id?.substring(authStore.user?.id?.length - 8) }}</p>
+                <p class="font-mono" style="margin: 0;">{{ String(authStore.user?.id || '').substring(0, 8) }}...{{ String(authStore.user?.id || '').slice(-8) }}</p>
               </div>
             </div>
           </div>

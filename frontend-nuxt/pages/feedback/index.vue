@@ -22,13 +22,14 @@ const loading = computed(() => feedbackStore.loading)
 
 const activeTab = ref('all')
 
-const completedCount = computed(() => requests.value.filter(r => r.finished).length)
-const pendingCount = computed(() => requests.value.filter(r => !r.finished).length)
+const completedCount = computed(() => (requests.value || []).filter(r => r.finished).length)
+const pendingCount = computed(() => (requests.value || []).filter(r => !r.finished).length)
 
 const filteredRequests = computed(() => {
-  if (activeTab.value === 'completed') return requests.value.filter(r => r.finished)
-  if (activeTab.value === 'pending') return requests.value.filter(r => !r.finished)
-  return requests.value
+  const reqs = requests.value || []
+  if (activeTab.value === 'completed') return reqs.filter(r => r.finished)
+  if (activeTab.value === 'pending') return reqs.filter(r => !r.finished)
+  return reqs
 })
 
 const toastState = ref({
@@ -298,21 +299,21 @@ const relationshipIdLabels = computed<Record<number, string>>(() => ({
             <div class="space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
               <div class="flex justify-between">
                 <span>{{ $t('feedback.date') }}:</span>
-                <span class="font-medium">{{ formatDate(req.createdAt) }}</span>
+                <span class="font-medium">{{ formatDate(req.createdAt || '') }}</span>
               </div>
               <div v-if="req.finished" class="flex justify-between items-center pt-1.5 border-t border-zinc-100 dark:border-zinc-800/40 mt-1.5">
                 <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $t('feedback.referralTrust') }}:</span>
                 <span 
                   class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border"
                   :class="{
-                    'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20': req.trustScore >= 80,
-                    'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20': req.trustScore >= 50 && req.trustScore < 80,
-                    'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20': req.trustScore >= 30 && req.trustScore < 50,
-                    'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20': req.trustScore < 30
+                    'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20': (req.trustScore ?? 0) >= 80,
+                    'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20': (req.trustScore ?? 0) >= 50 && (req.trustScore ?? 0) < 80,
+                    'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20': (req.trustScore ?? 0) >= 30 && (req.trustScore ?? 0) < 50,
+                    'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20': (req.trustScore ?? 0) < 30
                   }"
                 >
                   <ShieldCheck class="w-3.5 h-3.5 mr-1" />
-                  {{ getTrustLabel(req.trustScore) }} ({{ req.trustScore }}%)
+                  {{ getTrustLabel(req.trustScore ?? 0) }} ({{ req.trustScore ?? 0 }}%)
                 </span>
               </div>
             </div>

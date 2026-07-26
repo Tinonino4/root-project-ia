@@ -21,7 +21,9 @@ const { data: qData, error: fetchError, status } = await useAsyncData(
 
 const questionnaire = computed(() => qData.value)
 const loading = computed(() => status.value === 'pending')
-const error = computed(() => fetchError.value ? (fetchError.value.message || t('questionnaire.errorMsg')) : null)
+const fetchErrorMsg = computed(() => fetchError.value ? (fetchError.value.message || t('questionnaire.errorMsg')) : null)
+const submitError = ref<string | null>(null)
+const error = computed(() => submitError.value || fetchErrorMsg.value)
 const isSubmitting = ref(false)
 const submitted = ref(false)
 
@@ -71,6 +73,7 @@ const isCurrentStepValid = computed(() => {
     return true
   }
   const currentCategory = questionnaire.value.categories[currentStep.value]
+  if (!currentCategory) return false
   for (const question of currentCategory.questions) {
     if (answers.value[question.id] === null) {
       return false
@@ -94,7 +97,7 @@ const isFormValid = computed(() => {
 const setRating = (questionId: string, rating: number) => {
   answers.value[questionId] = rating
   setTimeout(() => {
-    if (isCurrentStepValid.value && currentStep.value < questionnaire.value.categories.length) {
+    if (isCurrentStepValid.value && currentStep.value < (questionnaire.value?.categories.length ?? 0)) {
       currentStep.value++
       if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' })
     }
@@ -102,7 +105,7 @@ const setRating = (questionId: string, rating: number) => {
 }
 
 const nextStep = () => {
-  if (currentStep.value < questionnaire.value.categories.length) {
+  if (currentStep.value < (questionnaire.value?.categories.length ?? 0)) {
     currentStep.value++
     if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -118,12 +121,12 @@ const prevStep = () => {
 const handleSubmit = async () => {
   if (!isFormValid.value) return
   isSubmitting.value = true
-  error.value = null
+  submitError.value = null
   
   try {
     const skillAnswers = Object.entries(answers.value).map(([questionId, rating]) => ({
       questionId,
-      rating
+      rating: rating ?? 0
     }))
     
     const payload = {
@@ -141,7 +144,7 @@ const handleSubmit = async () => {
     if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' })
   } catch (e: unknown) {
     const err = e as { message?: string }
-    error.value = err.message || t('questionnaire.submitError')
+    submitError.value = err.message || t('questionnaire.submitError')
   } finally {
     isSubmitting.value = false
   }
@@ -207,14 +210,14 @@ const handleSubmit = async () => {
             <div>
               <p class="text-xs text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">{{ $t('questionnaire.progress') }}</p>
               <h2 class="text-sm font-bold text-zinc-800 dark:text-zinc-200">
-                {{ $t('questionnaire.section', { current: currentStep + 1, total: questionnaire.categories.length + 1 }) }}
+                {{ $t('questionnaire.section', { current: currentStep + 1, total: (questionnaire?.categories.length ?? 0) + 1 }) }}
               </h2>
             </div>
           </div>
 
           <div class="flex items-center space-x-2">
             <button
-              v-for="(cat, idx) in (questionnaire.categories.length + 1)"
+              v-for="(cat, idx) in ((questionnaire?.categories.length ?? 0) + 1)"
               :key="idx"
               @click="currentStep = idx"
               class="w-3.5 h-3.5 rounded-full transition-all duration-300"
@@ -232,7 +235,7 @@ const handleSubmit = async () => {
         <div class="relative overflow-hidden min-h-[400px]">
           
           <div 
-            v-for="(category, catIdx) in questionnaire.categories" 
+            v-for="(category, catIdx) in questionnaire?.categories" 
             :key="category.id"
             v-show="catIdx === currentStep"
             class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl shadow-sm p-8"
@@ -269,7 +272,7 @@ const handleSubmit = async () => {
                     v-for="rating in 5" 
                     :key="rating"
                     :id="'btn-' + question.id + '-' + rating"
-                    @click="setRating(question.id, rating)"
+                    @click="setRating(String(question.id), rating)"
                     type="button"
                     role="radio"
                     :aria-checked="answers[question.id] === rating"
@@ -292,7 +295,7 @@ const handleSubmit = async () => {
           </div>
 
           <div 
-            v-show="currentStep === questionnaire.categories.length"
+            v-show="currentStep === (questionnaire?.categories.length ?? 0)"
             class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl p-8 shadow-sm"
           >
             <div class="mb-8 border-b border-zinc-100 dark:border-zinc-800/80 pb-4">
@@ -342,7 +345,7 @@ const handleSubmit = async () => {
 
           <div :class="currentStep > 0 ? 'flex-1 sm:flex-initial text-right' : 'w-full sm:w-auto text-right'">
             <Button
-              v-if="currentStep < questionnaire.categories.length"
+              v-if="currentStep < (questionnaire?.categories.length ?? 0)"
               @click="nextStep"
               :disabled="!isCurrentStepValid"
               class="w-full sm:w-auto h-11 bg-primary hover:bg-primary/90 text-white rounded-xl px-8 flex items-center justify-center gap-2 shadow-lg shadow-primary/10 disabled:opacity-50"
