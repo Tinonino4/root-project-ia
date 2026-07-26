@@ -1,8 +1,0 @@
-User-agent: *
-Allow: /
-Allow: /u/
-Disallow: /api/
-Disallow: /recruiter/
-Disallow: /dashboard/
-
-Sitemap: https://www.micache.es/sitemap.xml

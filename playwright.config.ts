@@ -2,8 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Configuración de Playwright E2E orientada al despliegue en VPS (Producción).
- * - Vue 3: https://www.micache.es
- * - Nuxt 3: https://www.micache.es:3000
+ * - Nuxt 3: https://www.micache.es
  */
 export default defineConfig({
   testDir: './e2e/tests',
@@ -30,17 +29,10 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'vue',
-      use: {
-        ...devices['Desktop Chrome'],
-        baseURL: process.env.VUE_URL || 'https://www.micache.es',
-      },
-    },
-    {
       name: 'nuxt',
       use: {
         ...devices['Desktop Chrome'],
-        baseURL: process.env.NUXT_URL || 'https://www.micache.es:3000',
+        baseURL: process.env.NUXT_URL || 'https://www.micache.es',
       },
     },
   ],
