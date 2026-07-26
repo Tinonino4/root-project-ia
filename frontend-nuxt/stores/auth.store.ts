@@ -10,10 +10,10 @@ export interface User {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = useCookie<string | null>('token', { default: () => null })
-  const refreshToken = useCookie<string | null>('refreshToken', { default: () => null })
-  const user = useCookie<User | null>('user', { default: () => null })
-  const lastActivity = useCookie<string | null>('lastActivity', { default: () => null })
+  const token = useCookie<string | null>('token', { default: () => null, ...TOKEN_COOKIE_OPTIONS })
+  const refreshToken = useCookie<string | null>('refreshToken', { default: () => null, ...REFRESH_TOKEN_COOKIE_OPTIONS })
+  const user = useCookie<User | null>('user', { default: () => null, ...USER_COOKIE_OPTIONS })
+  const lastActivity = useCookie<string | null>('lastActivity', { default: () => null, ...LAST_ACTIVITY_COOKIE_OPTIONS })
 
   const loading = ref(false)
   const error = ref<string | null>(null)

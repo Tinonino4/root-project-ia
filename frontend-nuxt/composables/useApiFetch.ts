@@ -2,20 +2,20 @@ import { toast } from 'vue-sonner'
 
 export function useApiFetch<T = any>(url: string | Ref<string> | (() => string), opts: any = {}) {
   const config = useRuntimeConfig()
-  const token = useCookie<string | null>('token')
-  const refreshToken = useCookie<string | null>('refreshToken')
-  const lastActivity = useCookie<string | null>('lastActivity')
+  const token = useCookie<string | null>('token', TOKEN_COOKIE_OPTIONS)
+  const refreshToken = useCookie<string | null>('refreshToken', REFRESH_TOKEN_COOKIE_OPTIONS)
+  const lastActivity = useCookie<string | null>('lastActivity', LAST_ACTIVITY_COOKIE_OPTIONS)
 
   const INACTIVITY_TIMEOUT = 12 * 60 * 60 * 1000 // 12 hours
 
   // Check inactivity
   if (import.meta.client && token.value && lastActivity.value) {
     const last = parseInt(lastActivity.value, 10)
-    if (!isNaN(last) && Date.now() - last > INACTIVITY_TIMEOUT) {
+    if (isNaN(last) || Date.now() - last > INACTIVITY_TIMEOUT) {
       token.value = null
       refreshToken.value = null
       lastActivity.value = null
-      useCookie('user').value = null
+      useCookie('user', USER_COOKIE_OPTIONS).value = null
       navigateTo('/login')
     } else {
       lastActivity.value = Date.now().toString()
@@ -56,12 +56,14 @@ export function useApiFetch<T = any>(url: string | Ref<string> | (() => string),
           } catch (e) {
             token.value = null
             refreshToken.value = null
-            useCookie('user').value = null
+            lastActivity.value = null
+            useCookie('user', USER_COOKIE_OPTIONS).value = null
             navigateTo('/login')
           }
         } else {
           token.value = null
-          useCookie('user').value = null
+          lastActivity.value = null
+          useCookie('user', USER_COOKIE_OPTIONS).value = null
           navigateTo('/login')
         }
       } else {
@@ -87,19 +89,19 @@ export function useApiFetch<T = any>(url: string | Ref<string> | (() => string),
 
 export async function $api<T = any>(url: string, opts: any = {}): Promise<T> {
   const config = useRuntimeConfig()
-  const token = useCookie<string | null>('token')
-  const refreshToken = useCookie<string | null>('refreshToken')
-  const lastActivity = useCookie<string | null>('lastActivity')
+  const token = useCookie<string | null>('token', TOKEN_COOKIE_OPTIONS)
+  const refreshToken = useCookie<string | null>('refreshToken', REFRESH_TOKEN_COOKIE_OPTIONS)
+  const lastActivity = useCookie<string | null>('lastActivity', LAST_ACTIVITY_COOKIE_OPTIONS)
 
   const INACTIVITY_TIMEOUT = 12 * 60 * 60 * 1000
 
   if (import.meta.client && token.value && lastActivity.value) {
     const last = parseInt(lastActivity.value, 10)
-    if (!isNaN(last) && Date.now() - last > INACTIVITY_TIMEOUT) {
+    if (isNaN(last) || Date.now() - last > INACTIVITY_TIMEOUT) {
       token.value = null
       refreshToken.value = null
       lastActivity.value = null
-      useCookie('user').value = null
+      useCookie('user', USER_COOKIE_OPTIONS).value = null
       navigateTo('/login')
       throw new Error('Sesión expirada')
     } else {
@@ -153,13 +155,15 @@ export async function $api<T = any>(url: string, opts: any = {}): Promise<T> {
           } catch (e) {
             token.value = null
             refreshToken.value = null
-            useCookie('user').value = null
+            lastActivity.value = null
+            useCookie('user', USER_COOKIE_OPTIONS).value = null
             navigateTo('/login')
             throw e
           }
         } else {
           token.value = null
-          useCookie('user').value = null
+          lastActivity.value = null
+          useCookie('user', USER_COOKIE_OPTIONS).value = null
           navigateTo('/login')
         }
       } else {

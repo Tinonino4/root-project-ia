@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware((to) => {
-  const token = useCookie<string | null>('token')
-  const lastActivity = useCookie<string | null>('lastActivity')
+  const token = useCookie<string | null>('token', TOKEN_COOKIE_OPTIONS)
+  const lastActivity = useCookie<string | null>('lastActivity', LAST_ACTIVITY_COOKIE_OPTIONS)
 
   const INACTIVITY_TIMEOUT = 12 * 60 * 60 * 1000
 
@@ -18,10 +18,10 @@ export default defineNuxtRouteMiddleware((to) => {
   // Check 12h inactivity timeout
   if (token.value && lastActivity.value) {
     const last = parseInt(lastActivity.value, 10)
-    if (!isNaN(last) && Date.now() - last > INACTIVITY_TIMEOUT) {
+    if (isNaN(last) || Date.now() - last > INACTIVITY_TIMEOUT) {
       token.value = null
-      useCookie('refreshToken').value = null
-      useCookie('user').value = null
+      useCookie('refreshToken', REFRESH_TOKEN_COOKIE_OPTIONS).value = null
+      useCookie('user', USER_COOKIE_OPTIONS).value = null
       lastActivity.value = null
       if (!isPublicRoute) {
         return navigateTo('/login')
@@ -41,3 +41,4 @@ export default defineNuxtRouteMiddleware((to) => {
     return navigateTo('/dashboard')
   }
 })
+
