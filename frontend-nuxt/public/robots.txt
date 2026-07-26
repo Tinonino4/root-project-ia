@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /profile/edit
+Disallow: /experiences/
+Disallow: /feedback/
+Disallow: /recruiter/
+
+Sitemap: /sitemap.xml
