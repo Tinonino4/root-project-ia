@@ -288,7 +288,7 @@ const topSkill = computed(() => {
         <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
           <!-- Avatar -->
           <div class="w-32 h-32 rounded-full bg-[hsl(228,15%,15%)] flex items-center justify-center text-4xl font-bold text-primary border-2 border-white/10 shadow-inner flex-shrink-0">
-            <NuxtImg v-if="publicProfileData.photoUrl" :src="publicProfileData.photoUrl" alt="Avatar" format="webp" loading="lazy" class="w-full h-full rounded-full object-cover" />
+            <img v-if="publicProfileData.photoUrl" :src="publicProfileData.photoUrl" alt="Avatar" loading="lazy" class="w-full h-full rounded-full object-cover" />
             <span v-else>{{ publicProfileData.name?.charAt(0) }}{{ publicProfileData.surname?.charAt(0) }}</span>
           </div>
 
@@ -710,7 +710,7 @@ const topSkill = computed(() => {
                 class="w-20 h-20 rounded-full flex items-center justify-center font-bold text-2xl flex-shrink-0 shadow-inner overflow-hidden"
                 style="background-color: rgba(242, 151, 39, 0.1); color: #f29727; border: 1px solid rgba(242, 151, 39, 0.2); margin-right: 24px;"
               >
-                <NuxtImg v-if="publicProfileData.photoUrl" :src="publicProfileData.photoUrl" alt="Avatar" format="webp" loading="lazy" class="w-full h-full object-cover" crossorigin="anonymous" />
+                <img v-if="publicProfileData.photoUrl" :src="publicProfileData.photoUrl" alt="Avatar" loading="lazy" class="w-full h-full object-cover" crossorigin="anonymous" />
                 <span v-else>{{ publicProfileData.name?.charAt(0) }}{{ publicProfileData.surname?.charAt(0) }}</span>
               </div>
               <div class="flex-1 min-w-0">

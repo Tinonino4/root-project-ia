@@ -322,7 +322,7 @@ const getTrustLabel = (score: number) => {
           
           <div class="flex items-center gap-5 text-center md:text-left flex-col md:flex-row">
             <div class="w-20 h-20 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border-2 border-primary/30 flex items-center justify-center flex-shrink-0">
-              <NuxtImg v-if="profile?.photoUrl" :src="profile.photoUrl" alt="Avatar" format="webp" loading="lazy" class="w-full h-full object-cover" />
+              <img v-if="profile?.photoUrl" :src="profile.photoUrl" alt="Avatar" loading="lazy" class="w-full h-full object-cover" />
               <UserIcon v-else class="w-10 h-10 text-zinc-400" />
             </div>
             <div class="space-y-1">
