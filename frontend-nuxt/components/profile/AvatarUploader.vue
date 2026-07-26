@@ -89,10 +89,12 @@ const onFileChange = async (event: Event) => {
       @click="triggerFileInput"
       class="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white dark:border-zinc-900 shadow-lg cursor-pointer group bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 hover:border-primary/50 dark:hover:border-primary/50"
     >
-      <img 
+      <NuxtImg 
         v-if="modelValue" 
         :src="getFullUrl(modelValue)" 
         alt="Foto de Perfil" 
+        format="webp" 
+        loading="eager" 
         class="w-full h-full object-cover" 
       />
       <div v-else class="w-full h-full flex items-center justify-center text-zinc-400 dark:text-zinc-600">

@@ -42,7 +42,7 @@ const testimonials = [
     <!-- Mobile Header -->
     <header class="md:hidden flex items-center justify-center px-6 pt-8 pb-4">
       <NuxtLink to="/">
-        <img src="/logo-cache.png" alt="Caché Logo" class="h-10 w-auto object-contain" />
+        <NuxtImg src="/logo-cache.png" alt="Caché Logo" format="webp" loading="eager" class="h-10 w-auto object-contain" />
       </NuxtLink>
     </header>
 
@@ -87,7 +87,7 @@ const testimonials = [
 
         <div class="relative z-10 animate-in fade-in slide-in-from-top-4 duration-700">
           <NuxtLink to="/">
-            <img src="/logo-cache.png" alt="Caché Logo" class="h-11 w-auto object-contain" />
+            <NuxtImg src="/logo-cache.png" alt="Caché Logo" format="webp" loading="eager" class="h-11 w-auto object-contain" />
           </NuxtLink>
         </div>
 

@@ -186,7 +186,7 @@ const clearSearch = () => {
           <div class="space-y-4">
             <div class="flex items-start gap-4">
               <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-primary/10 to-orange-500/10 border border-primary/20 flex items-center justify-center font-bold text-lg text-primary flex-shrink-0 overflow-hidden">
-                <img v-if="candidate.photoUrl" :src="candidate.photoUrl" alt="Avatar" class="w-full h-full object-cover" />
+                <NuxtImg v-if="candidate.photoUrl" :src="candidate.photoUrl" alt="Avatar" format="webp" loading="lazy" class="w-full h-full object-cover" />
                 <span v-else>{{ candidate.name?.charAt(0) }}{{ candidate.surname?.charAt(0) }}</span>
               </div>
 

@@ -33,7 +33,7 @@ const navLinks = [
         <div class="flex items-center justify-between h-16">
           
           <NuxtLink to="/" class="flex items-center">
-            <img src="/logo-cache.png" alt="Caché" class="h-9 w-auto object-contain" />
+            <NuxtImg src="/logo-cache.png" alt="Caché" format="webp" loading="eager" class="h-9 w-auto object-contain" />
           </NuxtLink>
 
           <nav class="hidden md:flex items-center gap-6">
@@ -162,7 +162,7 @@ const navLinks = [
 
     <footer class="border-t border-white/5 py-10 mt-20">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-        <img src="/logo-cache.png" alt="Caché" class="h-8 w-auto object-contain opacity-70" />
+        <NuxtImg src="/logo-cache.png" alt="Caché" format="webp" loading="lazy" class="h-8 w-auto object-contain opacity-70" />
         <p class="text-xs text-[hsl(220,10%,40%)] text-center">
           © 2025 Caché. {{ $t('footer.tagline') }}
         </p>

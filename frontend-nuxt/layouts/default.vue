@@ -58,7 +58,7 @@ const navigation = computed(() => [
     <header class="md:hidden flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-30">
       <div class="flex items-center gap-2">
         <NuxtLink to="/dashboard">
-          <img src="/logo-cache.png" alt="Caché Logo" class="h-8 w-auto object-contain" />
+          <NuxtImg src="/logo-cache.png" alt="Caché Logo" format="webp" loading="eager" class="h-8 w-auto object-contain" />
         </NuxtLink>
       </div>
       
@@ -97,7 +97,7 @@ const navigation = computed(() => [
       <div class="flex flex-col h-full overflow-hidden">
         <div class="hidden md:flex items-center gap-2 p-6 border-b border-zinc-100 dark:border-zinc-800 flex-shrink-0">
           <NuxtLink to="/dashboard">
-            <img src="/logo-cache.png" alt="Caché Logo" class="h-8 w-auto object-contain" />
+            <NuxtImg src="/logo-cache.png" alt="Caché Logo" format="webp" loading="eager" class="h-8 w-auto object-contain" />
           </NuxtLink>
         </div>
 
