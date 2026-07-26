@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { Briefcase, Calendar, Award, ArrowLeft, Download, ShieldCheck, Eye } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth.store'
+import type { UserProfile, ExperienceMetric, TopSkill } from '~/types'
 
 definePageMeta({
   layout: 'public'
@@ -15,7 +16,7 @@ const idOrSlug = computed(() => route.params.id as string)
 
 const { data: profileData, error: fetchError, status } = await useAsyncData(
   `public-profile-${idOrSlug.value}`,
-  () => $api(`/public/profile/${idOrSlug.value}`),
+  () => $api<UserProfile>(`/public/profile/${idOrSlug.value}`),
   { watch: [idOrSlug] }
 )
 
@@ -33,9 +34,9 @@ const toggleExperienceBreakdown = (expId: string | number) => {
   expandedExperiences.value[expId] = !expandedExperiences.value[expId]
 }
 
-const getMetricsForExperience = (expId: string | number) => {
+const getMetricsForExperience = (expId: string | number): ExperienceMetric | null => {
   if (!profile.value || !profile.value.experienceMetrics) return null
-  return profile.value.experienceMetrics.find((m: any) => m.experienceId === expId) || null
+  return profile.value.experienceMetrics.find((m: ExperienceMetric) => m.experienceId === expId) || null
 }
 
 const getTrustLevelLabel = (score: number) => {
@@ -162,7 +163,7 @@ const exportPDF = async () => {
           isExporting.value = false
           isGeneratingPDF.value = false
         })
-        .catch((err: any) => {
+        .catch((err: unknown) => {
           console.error('Error al exportar PDF:', err)
           isExporting.value = false
           isGeneratingPDF.value = false

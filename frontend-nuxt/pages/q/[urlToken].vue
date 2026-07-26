@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Check, AlertTriangle, ArrowLeft, ArrowRight, Award, MessageSquare } from 'lucide-vue-next'
 import { Button } from '~/components/ui/button'
+import type { QuestionnaireData, QuestionnaireCategory, QuestionnaireQuestion } from '~/types'
 
 definePageMeta({
   layout: 'public'
@@ -14,7 +15,7 @@ const { t } = useI18n()
 
 const { data: qData, error: fetchError, status } = await useAsyncData(
   `questionnaire-${urlToken.value}`,
-  () => $api(`/questionnaire/${urlToken.value}`),
+  () => $api<QuestionnaireData>(`/questionnaire/${urlToken.value}`),
   { watch: [urlToken] }
 )
 
@@ -31,8 +32,8 @@ const additionalComments = ref('')
 watchEffect(() => {
   if (qData.value?.categories) {
     const initialAnswers: Record<string, number | null> = {}
-    qData.value.categories.forEach((category: any) => {
-      category.questions.forEach((question: any) => {
+    qData.value.categories.forEach((category: QuestionnaireCategory) => {
+      category.questions.forEach((question: QuestionnaireQuestion) => {
         initialAnswers[question.id] = answers.value[question.id] ?? null
       })
     })
@@ -138,7 +139,8 @@ const handleSubmit = async () => {
     })
     submitted.value = true
     if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' })
-  } catch (err: any) {
+  } catch (e: unknown) {
+    const err = e as { message?: string }
     error.value = err.message || t('questionnaire.submitError')
   } finally {
     isSubmitting.value = false

@@ -1,13 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import type { User, AuthResponse, RefreshTokenResponse } from '~/types'
 
-export interface User {
-  id?: number | string
-  name?: string
-  email?: string
-  role?: string
-  [key: string]: any
-}
+export type { User }
 
 export const useAuthStore = defineStore('auth', () => {
   const token = useCookie<string | null>('token', { default: () => null, ...TOKEN_COOKIE_OPTIONS })
@@ -44,7 +39,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await $api<any>('/auth/login', {
+      const response = await $api<AuthResponse>('/auth/login', {
         method: 'POST',
         body: { email, password }
       })
@@ -54,8 +49,9 @@ export const useAuthStore = defineStore('auth', () => {
         response.refreshToken
       )
       return response
-    } catch (e: any) {
-      error.value = e.response?._data?.message || e.message || 'Error de inicio de sesión'
+    } catch (e: unknown) {
+      const err = e as { response?: { _data?: { message?: string } }; message?: string }
+      error.value = err.response?._data?.message || err.message || 'Error de inicio de sesión'
       throw e
     } finally {
       loading.value = false
@@ -66,13 +62,14 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await $api<any>('/auth/register', {
+      const response = await $api<AuthResponse>('/auth/register', {
         method: 'POST',
         body: { name, email, password, role }
       })
       return response
-    } catch (e: any) {
-      error.value = e.response?._data?.message || e.message || 'Error en el registro'
+    } catch (e: unknown) {
+      const err = e as { response?: { _data?: { message?: string } }; message?: string }
+      error.value = err.response?._data?.message || err.message || 'Error en el registro'
       throw e
     } finally {
       loading.value = false
@@ -83,13 +80,14 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await $api<any>('/auth/confirm', {
+      const response = await $api<{ message?: string }>('/auth/confirm', {
         method: 'POST',
         body: { email, code }
       })
       return response
-    } catch (e: any) {
-      error.value = e.response?._data?.message || e.message || 'Error al confirmar la cuenta'
+    } catch (e: unknown) {
+      const err = e as { response?: { _data?: { message?: string } }; message?: string }
+      error.value = err.response?._data?.message || err.message || 'Error al confirmar la cuenta'
       throw e
     } finally {
       loading.value = false
@@ -100,13 +98,14 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await $api<any>('/auth/forgot-password', {
+      const response = await $api<{ message?: string }>('/auth/forgot-password', {
         method: 'POST',
         body: { email }
       })
       return response
-    } catch (e: any) {
-      error.value = e.response?._data?.message || e.message || 'Error al solicitar recuperación'
+    } catch (e: unknown) {
+      const err = e as { response?: { _data?: { message?: string } }; message?: string }
+      error.value = err.response?._data?.message || err.message || 'Error al solicitar recuperación'
       throw e
     } finally {
       loading.value = false
@@ -117,13 +116,14 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await $api<any>('/auth/reset-password', {
+      const response = await $api<{ message?: string }>('/auth/reset-password', {
         method: 'POST',
         body: { email, code, newPassword }
       })
       return response
-    } catch (e: any) {
-      error.value = e.response?._data?.message || e.message || 'Error al resetear la contraseña'
+    } catch (e: unknown) {
+      const err = e as { response?: { _data?: { message?: string } }; message?: string }
+      error.value = err.response?._data?.message || err.message || 'Error al resetear la contraseña'
       throw e
     } finally {
       loading.value = false
@@ -136,7 +136,7 @@ export const useAuthStore = defineStore('auth', () => {
       throw new Error('No refresh token available')
     }
     try {
-      const response = await $api<any>('/auth/refresh-token', {
+      const response = await $api<RefreshTokenResponse>('/auth/refresh-token', {
         method: 'POST',
         body: { refreshToken: refreshToken.value }
       })
@@ -160,11 +160,12 @@ export const useAuthStore = defineStore('auth', () => {
       if (currentToken) {
         headers['Authorization'] = `Bearer ${currentToken}`
       }
-      const response = await $api<any>('/professional/profile', { headers })
+      const response = await $api<User>('/professional/profile', { headers })
       user.value = response
       return response
-    } catch (e: any) {
-      error.value = e.response?._data?.message || e.response?._data?.error || 'Error al obtener los datos del perfil de usuario.'
+    } catch (e: unknown) {
+      const err = e as { response?: { _data?: { message?: string; error?: string } } }
+      error.value = err.response?._data?.message || err.response?._data?.error || 'Error al obtener los datos del perfil de usuario.'
       logout()
       throw e
     } finally {

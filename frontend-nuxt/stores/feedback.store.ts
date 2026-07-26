@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import type { FeedbackCategory, FeedbackRelationship, FeedbackRequest, CreateFeedbackRequestPayload } from '~/types'
 
 export const useFeedbackStore = defineStore('feedback', () => {
-  const requests = ref<any[]>([])
-  const categories = ref<any[]>([])
-  const relationships = ref<any[]>([])
+  const requests = ref<FeedbackRequest[]>([])
+  const categories = ref<FeedbackCategory[]>([])
+  const relationships = ref<FeedbackRelationship[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -12,11 +13,12 @@ export const useFeedbackStore = defineStore('feedback', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await $api('/feedback/categories')
+      const data = await $api<FeedbackCategory[]>('/feedback/categories')
       categories.value = data
       return data
-    } catch (err: any) {
-      error.value = err.message || 'Error al cargar categorías'
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string }
+      error.value = errorObj.message || 'Error al cargar categorías'
     } finally {
       loading.value = false
     }
@@ -26,11 +28,12 @@ export const useFeedbackStore = defineStore('feedback', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await $api('/feedback/relationships')
+      const data = await $api<FeedbackRelationship[]>('/feedback/relationships')
       relationships.value = data
       return data
-    } catch (err: any) {
-      error.value = err.message || 'Error al cargar relaciones'
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string }
+      error.value = errorObj.message || 'Error al cargar relaciones'
     } finally {
       loading.value = false
     }
@@ -40,11 +43,12 @@ export const useFeedbackStore = defineStore('feedback', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await $api('/feedback/requests')
+      const data = await $api<FeedbackRequest[]>('/feedback/requests')
       requests.value = data
       return data
-    } catch (err: any) {
-      error.value = err.message || 'Error al cargar solicitudes'
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string }
+      error.value = errorObj.message || 'Error al cargar solicitudes'
     } finally {
       loading.value = false
     }
@@ -54,37 +58,39 @@ export const useFeedbackStore = defineStore('feedback', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await $api(`/feedback/requests/experience/${experienceId}`)
+      const data = await $api<FeedbackRequest[]>(`/feedback/requests/experience/${experienceId}`)
       return data
-    } catch (err: any) {
-      error.value = err.message || 'Error al cargar solicitudes de la experiencia'
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string }
+      error.value = errorObj.message || 'Error al cargar solicitudes de la experiencia'
       return []
     } finally {
       loading.value = false
     }
   }
 
-  async function createRequest(requestData: any) {
+  async function createRequest(requestData: CreateFeedbackRequestPayload) {
     loading.value = true
     error.value = null
     try {
-      const data = await $api('/feedback/requests', {
+      const data = await $api<FeedbackRequest>('/feedback/requests', {
         method: 'POST',
         body: requestData
       })
       requests.value.push(data)
       return data
-    } catch (err: any) {
-      error.value = err.message || 'Error al crear solicitud'
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string }
+      error.value = errorObj.message || 'Error al crear solicitud'
       throw err
     } finally {
       loading.value = false
     }
   }
 
-  async function getCompletedCount(expId: number | string) {
+  async function getCompletedCount(expId: number | string): Promise<number> {
     try {
-      return await $api(`/feedback/requests/experience/${expId}/count`)
+      return await $api<number>(`/feedback/requests/experience/${expId}/count`)
     } catch (err) {
       console.error('Error getting completed count', err)
       return 0
@@ -95,7 +101,7 @@ export const useFeedbackStore = defineStore('feedback', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await $api(`/feedback/requests/${requestId}/visibility`, {
+      const data = await $api<FeedbackRequest>(`/feedback/requests/${requestId}/visibility`, {
         method: 'PATCH',
         body: { visible }
       })
@@ -104,8 +110,9 @@ export const useFeedbackStore = defineStore('feedback', () => {
         requests.value[index] = data
       }
       return data
-    } catch (err: any) {
-      error.value = err.message || 'Error al cambiar la visibilidad'
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string }
+      error.value = errorObj.message || 'Error al cambiar la visibilidad'
       throw err
     } finally {
       loading.value = false
@@ -119,8 +126,9 @@ export const useFeedbackStore = defineStore('feedback', () => {
       await $api(`/feedback/requests/${requestId}/remind`, {
         method: 'POST'
       })
-    } catch (err: any) {
-      error.value = err.message || 'Error al enviar recordatorio'
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string }
+      error.value = errorObj.message || 'Error al enviar recordatorio'
       throw err
     } finally {
       loading.value = false
@@ -135,8 +143,9 @@ export const useFeedbackStore = defineStore('feedback', () => {
         method: 'DELETE'
       })
       requests.value = requests.value.filter(r => r.id !== requestId)
-    } catch (err: any) {
-      error.value = err.message || 'Error al eliminar solicitud'
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string }
+      error.value = errorObj.message || 'Error al eliminar solicitud'
       throw err
     } finally {
       loading.value = false

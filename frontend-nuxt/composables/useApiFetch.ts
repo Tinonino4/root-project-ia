@@ -1,6 +1,11 @@
 import { toast } from 'vue-sonner'
+import type { UseFetchOptions } from 'nuxt/app'
+import type { FetchOptions, FetchError } from 'ofetch'
 
-export function useApiFetch<T = any>(url: string | Ref<string> | (() => string), opts: any = {}) {
+export function useApiFetch<T = unknown>(
+  url: string | Ref<string> | (() => string),
+  opts: UseFetchOptions<T> & { _retry?: boolean } = {}
+) {
   const config = useRuntimeConfig()
   const token = useCookie<string | null>('token', TOKEN_COOKIE_OPTIONS)
   const refreshToken = useCookie<string | null>('refreshToken', REFRESH_TOKEN_COOKIE_OPTIONS)
@@ -33,7 +38,7 @@ export function useApiFetch<T = any>(url: string | Ref<string> | (() => string),
     baseURL,
     headers: {
       ...defaultHeaders,
-      ...opts.headers,
+      ...(opts.headers as Record<string, string> | undefined),
     },
     async onResponseError({ response }) {
       const status = response.status
@@ -50,10 +55,9 @@ export function useApiFetch<T = any>(url: string | Ref<string> | (() => string),
               if (refreshRes.refreshToken) {
                 refreshToken.value = refreshRes.refreshToken
               }
-              // Retry can be triggered
               return
             }
-          } catch (e) {
+          } catch {
             token.value = null
             refreshToken.value = null
             lastActivity.value = null
@@ -87,7 +91,10 @@ export function useApiFetch<T = any>(url: string | Ref<string> | (() => string),
   })
 }
 
-export async function $api<T = any>(url: string, opts: any = {}): Promise<T> {
+export async function $api<T = unknown>(
+  url: string,
+  opts: FetchOptions & { _retry?: boolean } = {}
+): Promise<T> {
   const config = useRuntimeConfig()
   const token = useCookie<string | null>('token', TOKEN_COOKIE_OPTIONS)
   const refreshToken = useCookie<string | null>('refreshToken', REFRESH_TOKEN_COOKIE_OPTIONS)
@@ -121,12 +128,13 @@ export async function $api<T = any>(url: string, opts: any = {}): Promise<T> {
       baseURL,
       headers: {
         ...defaultHeaders,
-        ...opts.headers,
+        ...(opts.headers as Record<string, string> | undefined),
       },
       ...opts,
     })
-  } catch (error: any) {
-    const response = error.response
+  } catch (error: unknown) {
+    const fetchError = error as FetchError
+    const response = fetchError.response
     if (response) {
       const status = response.status
       if (status === 401 && !opts._retry) {
@@ -146,7 +154,7 @@ export async function $api<T = any>(url: string, opts: any = {}): Promise<T> {
                 headers: {
                   ...defaultHeaders,
                   Authorization: `Bearer ${refreshRes.accessToken}`,
-                  ...opts.headers,
+                  ...(opts.headers as Record<string, string> | undefined),
                 },
                 ...opts,
                 _retry: true,
