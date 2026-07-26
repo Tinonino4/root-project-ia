@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import SkillsRadarChart from '~/components/dashboard/SkillsRadarChart.vue'
 import { Briefcase, Calendar, Award, ArrowLeft, Download, ShieldCheck, Eye } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth.store'
 
@@ -297,7 +296,7 @@ const goBack = () => {
       <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl relative">
         <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
           <div class="w-32 h-32 rounded-full bg-[hsl(228,15%,15%)] flex items-center justify-center text-4xl font-bold text-primary border-2 border-white/10 shadow-inner flex-shrink-0">
-            <img v-if="profile.photoUrl" :src="profile.photoUrl" alt="Avatar" class="w-full h-full rounded-full object-cover" />
+            <NuxtImg v-if="profile.photoUrl" :src="profile.photoUrl" alt="Avatar" format="webp" loading="lazy" class="w-full h-full rounded-full object-cover" />
             <span v-else>{{ profile.name?.charAt(0) }}{{ profile.surname?.charAt(0) }}</span>
           </div>
 
@@ -331,7 +330,7 @@ const goBack = () => {
             </h2>
             <div v-if="profile.skills" class="h-80 flex items-center justify-center">
               <ClientOnly>
-                <SkillsRadarChart :metrics="profile.skills" />
+                <LazySkillsRadarChart :metrics="profile.skills" />
               </ClientOnly>
             </div>
             <div v-else class="text-center py-20 text-[hsl(220,10%,40%)]">
@@ -583,7 +582,7 @@ const goBack = () => {
                 class="w-20 h-20 rounded-full flex items-center justify-center font-bold text-2xl flex-shrink-0 shadow-inner overflow-hidden"
                 style="background-color: rgba(242, 151, 39, 0.1); color: #f29727; border: 1px solid rgba(242, 151, 39, 0.2); margin-right: 24px;"
               >
-                <img v-if="profile.photoUrl" :src="profile.photoUrl" alt="Avatar" class="w-full h-full object-cover" crossorigin="anonymous" />
+                <NuxtImg v-if="profile.photoUrl" :src="profile.photoUrl" alt="Avatar" format="webp" loading="lazy" class="w-full h-full object-cover" crossorigin="anonymous" />
                 <span v-else>{{ profile.name?.charAt(0) }}{{ profile.surname?.charAt(0) }}</span>
               </div>
               <div class="flex-1 min-w-0">

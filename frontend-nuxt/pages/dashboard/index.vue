@@ -24,7 +24,6 @@ import {
   Check
 } from 'lucide-vue-next'
 import { Button } from '~/components/ui/button'
-import SkillsRadarChart from '~/components/dashboard/SkillsRadarChart.vue'
 
 definePageMeta({
   layout: 'default'
@@ -296,7 +295,7 @@ const getTrustLabel = (score: number) => {
 
             <div class="w-full relative aspect-square flex items-center justify-center p-2 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-white/[0.02]">
               <ClientOnly>
-                <SkillsRadarChart :metrics="mockMetrics" />
+                <LazySkillsRadarChart :metrics="mockMetrics" />
               </ClientOnly>
               <div class="absolute top-3 right-3 bg-zinc-900/80 dark:bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 flex items-center gap-1 shadow-lg">
                 <Star class="w-3 h-3 text-amber-400 fill-current" />
@@ -323,7 +322,7 @@ const getTrustLabel = (score: number) => {
           
           <div class="flex items-center gap-5 text-center md:text-left flex-col md:flex-row">
             <div class="w-20 h-20 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border-2 border-primary/30 flex items-center justify-center flex-shrink-0">
-              <img v-if="profile?.photoUrl" :src="profile.photoUrl" alt="Avatar" class="w-full h-full object-cover" />
+              <NuxtImg v-if="profile?.photoUrl" :src="profile.photoUrl" alt="Avatar" format="webp" loading="lazy" class="w-full h-full object-cover" />
               <UserIcon v-else class="w-10 h-10 text-zinc-400" />
             </div>
             <div class="space-y-1">
@@ -502,7 +501,7 @@ const getTrustLabel = (score: number) => {
 
             <div class="w-full relative aspect-square flex items-center justify-center p-2 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-white/[0.02]">
               <ClientOnly>
-                <SkillsRadarChart v-if="metrics" :metrics="metrics" />
+                <LazySkillsRadarChart v-if="metrics" :metrics="metrics" />
                 <div v-else class="text-center py-20 text-zinc-500 text-sm italic">
                   {{ $t('dashboard.noFeedbackYet') }}
                 </div>
