@@ -12,6 +12,8 @@ export default defineNuxtRouteMiddleware((to) => {
     to.path.startsWith('/auth/') ||
     to.path.startsWith('/oauth2/') ||
     to.path.startsWith('/q/') ||
+    to.path.startsWith('/questionnaire/') ||
+    to.path.startsWith('/f/') ||
     to.path.startsWith('/u/') ||
     to.path.startsWith('/profile/public/')
 

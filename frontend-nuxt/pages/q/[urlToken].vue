@@ -6,7 +6,8 @@ import { Button } from '~/components/ui/button'
 import type { QuestionnaireData, QuestionnaireCategory, QuestionnaireQuestion } from '~/types'
 
 definePageMeta({
-  layout: 'public'
+  layout: 'public',
+  alias: ['/questionnaire/:urlToken', '/f/:urlToken']
 })
 
 const route = useRoute()
