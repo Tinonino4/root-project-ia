@@ -119,7 +119,8 @@ Analizando la discrepancia entre el diseño original y el estado actual del cód
     *   Modificar [FeedbackListView.vue](file:///home/tino/Projects/root-project-ia/frontend/src/views/feedback/FeedbackListView.vue) agregando una pestaña de "Solicitudes Pendientes".
     *   Añadir un endpoint en el backend para reenviar el correo de solicitud (ejecutando de nuevo el servicio de Brevo) y otro para dar de baja la solicitud (`DELETE /api/feedback/request/{id}`).
 
-### 4. Notificaciones de Feedback Completado al Candidato
+### 4. V
+
 *   **Gap Actual:** Cuando el referente envía el cuestionario, el estado se actualiza en el backend, pero el candidato no se entera de que tiene una nueva recomendación a menos que entre a revisar el dashboard de forma manual.
 *   **Acción MVP:**
     *   Agregar un disparador en el listener de `FeedbackCompletedEvent` que envíe un correo transaccional de Brevo al candidato notificándole: *"¡Tu perfil ha sido actualizado! [Nombre del Referente] ha completado el cuestionario de tu experiencia en [Empresa]."*
