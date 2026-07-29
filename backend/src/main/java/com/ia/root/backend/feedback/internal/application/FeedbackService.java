@@ -24,6 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import com.ia.root.backend.feedback.internal.domain.model.BehavioralQuestion;
+import com.ia.root.backend.feedback.internal.domain.model.BehavioralResponse;
+import com.ia.root.backend.feedback.internal.domain.repository.BehavioralQuestionRepository;
+import com.ia.root.backend.feedback.internal.domain.repository.BehavioralResponseRepository;
+
 @Service
 @Transactional(readOnly = true)
 public class FeedbackService {
@@ -32,6 +37,8 @@ public class FeedbackService {
     private final FeedbackResponseRepository feedbackResponseRepository;
     private final SkillCategoryRepository skillCategoryRepository;
     private final RelationshipTypeRepository relationshipTypeRepository;
+    private final BehavioralQuestionRepository behavioralQuestionRepository;
+    private final BehavioralResponseRepository behavioralResponseRepository;
     private final ApplicationEventPublisher events;
     private final JdbcTemplate jdbcTemplate;
     private final ReferenceTrustCalculator trustCalculator;
@@ -40,6 +47,8 @@ public class FeedbackService {
                            FeedbackResponseRepository feedbackResponseRepository,
                            SkillCategoryRepository skillCategoryRepository,
                            RelationshipTypeRepository relationshipTypeRepository,
+                           BehavioralQuestionRepository behavioralQuestionRepository,
+                           BehavioralResponseRepository behavioralResponseRepository,
                            ApplicationEventPublisher events,
                            JdbcTemplate jdbcTemplate,
                            ReferenceTrustCalculator trustCalculator) {
@@ -47,6 +56,8 @@ public class FeedbackService {
         this.feedbackResponseRepository = feedbackResponseRepository;
         this.skillCategoryRepository = skillCategoryRepository;
         this.relationshipTypeRepository = relationshipTypeRepository;
+        this.behavioralQuestionRepository = behavioralQuestionRepository;
+        this.behavioralResponseRepository = behavioralResponseRepository;
         this.events = events;
         this.jdbcTemplate = jdbcTemplate;
         this.trustCalculator = trustCalculator;
@@ -163,18 +174,32 @@ public class FeedbackService {
             throw new IllegalArgumentException("Este cuestionario ya fue completado");
         }
 
-        List<SkillCategory> categories = skillCategoryRepository.findAllByOrderByPositionAsc();
+        String candidateName = lookupUserName(cr.getUserId());
+        String companyName = lookupExperienceCompanyName(cr.getExperienceId());
+        String relationshipCode = lookupRelationshipCode(cr.getRelationshipId());
 
-        List<QuestionnaireViewDTO.CategoryDTO> categoryDTOs = categories.stream()
-            .map(cat -> new QuestionnaireViewDTO.CategoryDTO(
-                cat.getId(), cat.getCode(), cat.getName(), cat.getDescription(),
-                cat.getQuestions().stream()
-                    .map(q -> new QuestionnaireViewDTO.QuestionDTO(q.getId(), q.getQuestionText(), q.getPosition()))
+        List<BehavioralQuestion> questions = behavioralQuestionRepository
+            .findByRelationshipTypeIdOrderByPositionAsc(cr.getRelationshipId());
+
+        List<QuestionnaireViewDTO.BehavioralQuestionDTO> questionDTOs = questions.stream()
+            .map(q -> new QuestionnaireViewDTO.BehavioralQuestionDTO(
+                q.getId(),
+                q.getQuestionCode(),
+                q.getQuestionType(),
+                q.getQuestionText(),
+                q.getPosition(),
+                q.getOptions().stream()
+                    .map(o -> new QuestionnaireViewDTO.OptionDTO(o.getId(), o.getOptionCode(), o.getOptionText(), o.getPosition()))
                     .toList()
             ))
             .toList();
 
-        return new QuestionnaireViewDTO(cr.getId(), cr.getUserId(), cr.getExperienceId(), categoryDTOs);
+        return new QuestionnaireViewDTO(
+            cr.getId(), cr.getUserId(), candidateName,
+            cr.getExperienceId(), companyName,
+            cr.getRelationshipId(), relationshipCode,
+            questionDTOs
+        );
     }
 
     @Transactional
@@ -186,11 +211,18 @@ public class FeedbackService {
             throw new IllegalArgumentException("Este cuestionario ya fue completado");
         }
 
-        List<FeedbackResponse> responses = dto.skillAnswers().stream()
-            .map(a -> FeedbackResponse.create(cr.getId(), a.questionId(), a.rating()))
-            .toList();
-
-        feedbackResponseRepository.saveAllAndFlush(responses);
+        if (dto.answers() != null) {
+            for (SubmitQuestionnaireDTO.BehavioralAnswer ans : dto.answers()) {
+                if (ans.selectedOptionIds() != null) {
+                    for (UUID optionId : ans.selectedOptionIds()) {
+                        behavioralResponseRepository.save(
+                            BehavioralResponse.create(cr.getId(), ans.questionId(), optionId)
+                        );
+                    }
+                }
+            }
+        }
+        behavioralResponseRepository.flush();
 
         // Calcular Trust Score
         int score = 0;
@@ -222,7 +254,12 @@ public class FeedbackService {
         cr.setTrustScore(score);
         cr.setTrustLevel(level);
 
-        cr.markFinished(dto.extraAnswers());
+        java.util.Map<String, Object> extra = dto.extraAnswers() != null ? new java.util.HashMap<>(dto.extraAnswers()) : new java.util.HashMap<>();
+        if (dto.comments() != null && !dto.comments().isBlank()) {
+            extra.put("comments", dto.comments().trim());
+        }
+
+        cr.markFinished(extra);
         cacheRequestRepository.saveAndFlush(cr);
 
         events.publishEvent(new FeedbackCompletedEvent(cr.getId(), cr.getUserId(), cr.getExperienceId()));
@@ -239,24 +276,55 @@ public class FeedbackService {
         ));
     }
 
+    private String lookupRelationshipCode(int relationshipId) {
+        try {
+            return jdbcTemplate.queryForObject(
+                "SELECT code FROM relationship_types WHERE id = ?", String.class, relationshipId
+            );
+        } catch (Exception e) {
+            return "OTHER";
+        }
+    }
+
     // ── Cross-module reads via JDBC ─────────────────────────
 
     private String lookupUserName(UUID userId) {
-        return jdbcTemplate.queryForObject(
-            "SELECT name FROM users WHERE id = ?", String.class, userId
-        );
+        try {
+            String fullName = jdbcTemplate.queryForObject(
+                "SELECT CONCAT(name, ' ', surname) FROM user_profiles WHERE user_id = ?", String.class, userId
+            );
+            if (fullName != null && !fullName.isBlank()) {
+                return fullName.trim();
+            }
+        } catch (Exception ignored) {}
+
+        try {
+            return jdbcTemplate.queryForObject(
+                "SELECT email FROM users WHERE id = ?", String.class, userId
+            );
+        } catch (Exception e) {
+            return "Profesional";
+        }
     }
 
     private String lookupUserEmail(UUID userId) {
-        return jdbcTemplate.queryForObject(
-            "SELECT email FROM users WHERE id = ?", String.class, userId
-        );
+        try {
+            return jdbcTemplate.queryForObject(
+                "SELECT email FROM users WHERE id = ?", String.class, userId
+            );
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     private String lookupExperienceCompanyName(UUID experienceId) {
-        return jdbcTemplate.queryForObject(
-            "SELECT company_name FROM experiences WHERE id = ?", String.class, experienceId
-        );
+        try {
+            return jdbcTemplate.queryForObject(
+                "SELECT company_name FROM experiences WHERE id = ?", String.class, experienceId
+            );
+        } catch (Exception e) {
+            return "Empresa";
+        }
     }
 
     // ── Toggle Visibility ───────────────────────────────────

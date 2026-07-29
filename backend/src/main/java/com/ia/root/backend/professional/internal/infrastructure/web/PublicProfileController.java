@@ -45,6 +45,8 @@ public class PublicProfileController {
 
             List<Experience> experiences = professionalService.getExperiences(userId);
             SkillsData skillsData = skillsMetricsService.getSkillsData(userId);
+            var skillsMultiLayer = skillsMetricsService.getMultiLayerSkillsData(userId);
+            var archetype = skillsMetricsService.getArchetypeData(userId);
             long totalRefs = experienceMetricsService.getTotalReferencesCount(userId);
             List<ExperienceMetricsDTO> experienceMetrics = experienceMetricsService.getExperienceMetrics(userId);
 
@@ -58,6 +60,8 @@ public class PublicProfileController {
                 profile.getUsername(),
                 experiences,
                 skillsData,
+                skillsMultiLayer,
+                archetype,
                 totalRefs,
                 experienceMetrics
             );
