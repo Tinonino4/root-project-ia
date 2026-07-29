@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore, skipHydrate } from 'pinia'
 import { ref, computed } from 'vue'
 import type { User, AuthResponse, RefreshTokenResponse } from '~/types'
 
@@ -174,9 +174,10 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   return {
-    token,
-    refreshToken,
-    user,
+    token: skipHydrate(token),
+    refreshToken: skipHydrate(refreshToken),
+    user: skipHydrate(user),
+    lastActivity: skipHydrate(lastActivity),
     loading,
     error,
     isAuthenticated,

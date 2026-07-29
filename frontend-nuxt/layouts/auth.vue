@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-
-const { locale, setLocale } = useI18n()
-const currentLocale = computed(() => locale.value)
-
-const changeLang = (lang: 'es' | 'en') => {
-  setLocale(lang)
-}
+import Logo from '~/components/ui/Logo.vue'
+import LanguageSwitcher from '~/components/ui/LanguageSwitcher.vue'
 
 const testimonials = [
   { initials: 'AM', gradient: 'from-primary to-accent' },
@@ -22,27 +17,14 @@ const testimonials = [
   <div class="min-h-screen flex flex-col bg-[hsl(228,16%,7%)] font-sans selection:bg-primary/30 text-[hsl(220,14%,94%)] relative">
 
     <!-- Language Selector Floating Top Right -->
-    <div class="absolute top-4 right-4 z-50 flex items-center gap-1 bg-white/10 dark:bg-zinc-900/80 backdrop-blur-md border border-white/10 rounded-lg p-1">
-      <button
-        @click="changeLang('es')"
-        class="px-2 py-1 text-xs font-bold rounded transition-all"
-        :class="currentLocale === 'es' ? 'bg-primary text-white' : 'text-zinc-400 hover:text-white'"
-      >
-        ES
-      </button>
-      <button
-        @click="changeLang('en')"
-        class="px-2 py-1 text-xs font-bold rounded transition-all"
-        :class="currentLocale === 'en' ? 'bg-primary text-white' : 'text-zinc-400 hover:text-white'"
-      >
-        EN
-      </button>
+    <div class="absolute top-4 right-4 z-50">
+      <LanguageSwitcher theme="dark" variant="pill" />
     </div>
 
     <!-- Mobile Header -->
     <header class="md:hidden flex items-center justify-center px-6 pt-8 pb-4">
       <NuxtLink to="/">
-        <NuxtImg src="/logo-cache.png" alt="Caché Logo" format="webp" loading="eager" class="h-10 w-auto object-contain" />
+        <Logo variant="full" size="md" interactive />
       </NuxtLink>
     </header>
 
@@ -87,7 +69,7 @@ const testimonials = [
 
         <div class="relative z-10 animate-in fade-in slide-in-from-top-4 duration-700">
           <NuxtLink to="/">
-            <NuxtImg src="/logo-cache.png" alt="Caché Logo" format="webp" loading="eager" class="h-11 w-auto object-contain" />
+            <Logo variant="full" size="lg" interactive />
           </NuxtLink>
         </div>
 

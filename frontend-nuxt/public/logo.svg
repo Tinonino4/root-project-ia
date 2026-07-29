@@ -1,0 +1,56 @@
+<svg viewBox="0 0 200 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoPrimaryGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="50%" stop-color="#F29727" />
+      <stop offset="100%" stop-color="#EA580C" />
+    </linearGradient>
+    <linearGradient id="logoRingGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F29727" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#EA580C" stop-opacity="0.75" />
+    </linearGradient>
+  </defs>
+
+  <!-- Isotipo Mark -->
+  <g transform="translate(6, 6)">
+    <!-- Órbita Exterior 360° -->
+    <path
+      d="M18 4C10.268 4 4 10.268 4 18C4 23.52 7.19 28.29 11.83 30.5"
+      stroke="url(#logoRingGrad)"
+      stroke-width="3"
+      stroke-linecap="round"
+    />
+    <path
+      d="M18 32C25.732 32 32 25.732 32 18C32 12.48 28.81 7.71 24.17 5.5"
+      stroke="url(#logoRingGrad)"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-dasharray="2 4"
+    />
+
+    <!-- Monograma C + Node -->
+    <path
+      d="M23 12.5C21.6 11 19.8 10 17.5 10C13.08 10 9.5 13.58 9.5 18C9.5 22.42 13.08 26 17.5 26C19.8 26 21.6 25 23 23.5"
+      stroke="url(#logoPrimaryGrad)"
+      stroke-width="3.5"
+      stroke-linecap="round"
+    />
+
+    <!-- Checkmark -->
+    <path
+      d="M21 17.5L23.5 20L28.5 14.5"
+      stroke="url(#logoPrimaryGrad)"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <circle cx="17.5" cy="18" r="2" fill="url(#logoPrimaryGrad)" />
+  </g>
+
+  <!-- Typography: Caché -->
+  <text x="52" y="33" font-family="'Inter', sans-serif" font-weight="800" font-size="26" fill="#F4F4F5" letter-spacing="-0.03em">
+    Caché
+  </text>
+  <circle cx="140" cy="29" r="3" fill="#F29727" />
+</svg>

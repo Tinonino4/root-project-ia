@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import SkillsRadarChart360 from '~/components/dashboard/SkillsRadarChart360.vue'
+import FitCulturalCard from '~/components/profile/FitCulturalCard.vue'
 import { useProfileStore } from '~/stores/profile.store'
 import { useAuthStore } from '~/stores/auth.store'
 import { Button } from '~/components/ui/button'
@@ -353,13 +355,18 @@ const topSkill = computed(() => {
         <!-- Left Column: Skills & Contact Details -->
         <div class="lg:col-span-4 space-y-6 lg:sticky lg:top-6 self-start">
           
-          <!-- Habilidades Blandas (Radar Chart) -->
+          <!-- Habilidades Blandas (Radar Chart 360) -->
           <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
             <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
               <Award class="w-5 h-5 text-primary" />
               {{ $t('profile.softSkillsTitle') }}
             </h2>
-            <div v-if="publicProfileData.skills" class="h-72 flex items-center justify-center">
+            <div v-if="publicProfileData?.skillsMultiLayer" class="flex items-center justify-center">
+              <ClientOnly>
+                <SkillsRadarChart360 :metrics="publicProfileData.skillsMultiLayer" />
+              </ClientOnly>
+            </div>
+            <div v-else-if="publicProfileData?.skills" class="h-72 flex items-center justify-center">
               <ClientOnly>
                 <LazySkillsRadarChart :metrics="publicProfileData.skills" />
               </ClientOnly>
@@ -368,6 +375,9 @@ const topSkill = computed(() => {
               {{ $t('dashboard.noMetrics') }}
             </div>
           </div>
+
+          <!-- Fit Cultural Card -->
+          <FitCulturalCard v-if="publicProfileData?.archetype" :data="publicProfileData.archetype" />
 
           <!-- Certification Summary Card -->
           <div v-if="publicProfileData.skills" class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl space-y-5">
@@ -722,17 +732,17 @@ const topSkill = computed(() => {
               </div>
             </div>
 
-            <!-- Soft Skills Metrics Section -->
+            <!-- Soft Skills Metrics Section (360 Behavioral Model) -->
             <div style="margin-bottom: 30px;">
               <h3 class="text-sm font-black uppercase tracking-wider text-zinc-400 border-b pb-2" style="border-color: #e4e4e7; display: flex; align-items: center; margin: 0 0 16px 0;">
                 <Award class="w-4 h-4" style="color: #f29727; margin-right: 8px; display: inline-block; vertical-align: middle;" />
-                <span style="display: inline-block; vertical-align: middle;">SOFT SKILLS & COMPETENCIES</span>
+                <span style="display: inline-block; vertical-align: middle;">360° COMPETENCIES & SOFT SKILLS</span>
               </h3>
               
-              <div v-if="publicProfileData.skills" class="grid grid-cols-2 gap-x-8 gap-y-4">
+              <div v-if="publicProfileData?.skills" class="grid grid-cols-2 gap-x-8 gap-y-4">
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Teamwork</span>
+                    <span>Collaboration / Colaboración</span>
                     <span style="color: #f29727;">{{ (publicProfileData.skills.teamwork || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -746,7 +756,7 @@ const topSkill = computed(() => {
 
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Proactivity</span>
+                    <span>Autonomy / Autonomía</span>
                     <span style="color: #f29727;">{{ (publicProfileData.skills.proactivity || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -760,7 +770,7 @@ const topSkill = computed(() => {
 
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Integrity</span>
+                    <span>Rigor & Integrity / Rigor e Integridad</span>
                     <span style="color: #f29727;">{{ (publicProfileData.skills.integrity || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -774,7 +784,7 @@ const topSkill = computed(() => {
 
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Self-Confidence</span>
+                    <span>Leadership / Liderazgo</span>
                     <span style="color: #f29727;">{{ (publicProfileData.skills.selfConfidence || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -788,7 +798,7 @@ const topSkill = computed(() => {
 
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Flexibility</span>
+                    <span>Adaptability / Adaptabilidad</span>
                     <span style="color: #f29727;">{{ (publicProfileData.skills.flexibility || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -798,6 +808,41 @@ const topSkill = computed(() => {
                       style="background: linear-gradient(90deg, #f29727 0%, #f5712d 100%);"
                     ></div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Archetype & Cultural Fit Section in PDF -->
+            <div v-if="publicProfileData?.archetype" style="margin-bottom: 30px;">
+              <h3 class="text-sm font-black uppercase tracking-wider text-zinc-400 border-b pb-2" style="border-color: #e4e4e7; display: flex; align-items: center; margin: 0 0 16px 0;">
+                <span style="display: inline-block; vertical-align: middle;">BEHAVIORAL ARCHETYPE & CULTURAL FIT</span>
+              </h3>
+              
+              <div class="bg-zinc-50 border rounded-2xl p-5" style="border-color: #e4e4e7;">
+                <div style="margin-bottom: 12px;" v-if="publicProfileData.archetype.tags?.length">
+                  <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider block" style="margin-bottom: 6px;">Dominant Work Style:</span>
+                  <div class="flex flex-wrap gap-2">
+                    <span v-for="tag in publicProfileData.archetype.tags" :key="tag" class="px-2.5 py-1 bg-white border border-zinc-200 rounded-lg text-xs font-bold text-zinc-800">
+                      🏷️ {{ tag }}
+                    </span>
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 12px;" v-if="publicProfileData.archetype.topStrengths?.length">
+                  <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider block" style="margin-bottom: 6px;">Key Strengths (Forced-Choice):</span>
+                  <div class="space-y-1">
+                    <div v-for="s in publicProfileData.archetype.topStrengths" :key="s" class="text-xs font-medium text-zinc-700 flex items-center gap-1.5">
+                      <span style="color: #10b981;">✓</span> {{ s }}
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="publicProfileData.archetype.idealEnvironment">
+                  <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
+                    <span>Ideal Work Environment:</span>
+                    <span style="color: #f29727;">{{ publicProfileData.archetype.idealEnvironment.fitPercentage }}% Match</span>
+                  </div>
+                  <p class="text-xs font-bold text-zinc-900" style="margin: 0;">{{ publicProfileData.archetype.idealEnvironment.name }}</p>
                 </div>
               </div>
             </div>

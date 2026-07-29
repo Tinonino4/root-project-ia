@@ -180,24 +180,28 @@
     "ariaScore": "{score} out of 5",
     "categories": {
       "TEAMWORK": {
-        "name": "Teamwork",
-        "description": "Ability to collaborate and work effectively with other team members"
+        "name": "Collaboration",
+        "description": "Ability to collaborate and work effectively with team members"
       },
       "PROACTIVITY": {
-        "name": "Proactivity",
-        "description": "Identify an obstacle or opportunity and act to address them"
+        "name": "Autonomy",
+        "description": "Ability to act proactively and take initiative with autonomy"
       },
       "INTEGRITY": {
-        "name": "Integrity",
-        "description": "Act in accordance with beliefs and values. Does what is considered correct"
+        "name": "Rigor & Integrity",
+        "description": "Act in accordance with quality standards, rigor, and professional ethics"
       },
       "SELF_CONFIDENCE": {
-        "name": "Self-Confidence",
-        "description": "Confidence one has in oneself to make decisions or take risks"
+        "name": "Leadership",
+        "description": "Ability to lead, manage people, and influence positively"
+      },
+      "LEADERSHIP": {
+        "name": "Leadership",
+        "description": "Ability to lead, manage people, and influence positively"
       },
       "FLEXIBILITY": {
-        "name": "Flexibility",
-        "description": "Adapts easily to the opinion or attitude of others. Open to changes"
+        "name": "Adaptability",
+        "description": "Ability to adapt to context changes and uncertainty"
       }
     },
     "questions": {
@@ -304,6 +308,12 @@
     "verificationBadge": "Certified Profile",
     "trustScoreDetail": "Trust Level",
     "softSkillsTitle": "Soft Skills Breakdown",
+    "archetypeTitle": "Archetype & Cultural Fit",
+    "archetypeBadge": "Behavioral",
+    "dominantStyle": "Dominant Work Style:",
+    "topStrengthsTitle": "Top Strengths (Forced Choice):",
+    "idealEnvironmentTitle": "Ideal Work Environment:",
+    "matchPercentage": "{percent}% Match",
     "experiencesTitle": "Work History",
     "referencesTitle": "Validated References",
     "visibility": {

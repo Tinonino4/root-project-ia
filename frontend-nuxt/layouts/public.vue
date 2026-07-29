@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
+import Logo from '~/components/ui/Logo.vue'
+import LanguageSwitcher from '~/components/ui/LanguageSwitcher.vue'
 import { useAuthStore } from '~/stores/auth.store'
 
-const { locale, setLocale } = useI18n()
 const mobileMenuOpen = ref(false)
 const authStore = useAuthStore()
-
-const currentLocale = computed(() => locale.value)
-
-const changeLang = (lang: 'es' | 'en') => {
-  setLocale(lang)
-}
 
 const navLinks = [
   { translationKey: 'navbar.howItWorks', to: '/#como-funciona' },
@@ -33,7 +28,7 @@ const navLinks = [
         <div class="flex items-center justify-between h-16">
           
           <NuxtLink to="/" class="flex items-center">
-            <NuxtImg src="/logo-cache.png" alt="Caché" format="webp" loading="eager" class="h-9 w-auto object-contain" />
+            <Logo variant="full" size="md" interactive />
           </NuxtLink>
 
           <nav class="hidden md:flex items-center gap-6">
@@ -48,22 +43,7 @@ const navLinks = [
           </nav>
 
           <div class="hidden md:flex items-center gap-4">
-            <div class="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-0.5">
-              <button
-                @click="changeLang('es')"
-                class="px-2 py-0.5 text-xs font-bold rounded transition-all duration-200"
-                :class="currentLocale === 'es' ? 'bg-primary text-white shadow-sm' : 'text-zinc-400 hover:text-white'"
-              >
-                ES
-              </button>
-              <button
-                @click="changeLang('en')"
-                class="px-2 py-0.5 text-xs font-bold rounded transition-all duration-200"
-                :class="currentLocale === 'en' ? 'bg-primary text-white shadow-sm' : 'text-zinc-400 hover:text-white'"
-              >
-                EN
-              </button>
-            </div>
+            <LanguageSwitcher theme="dark" variant="pill" />
 
             <template v-if="!authStore.isAuthenticated">
               <NuxtLink
@@ -74,8 +54,8 @@ const navLinks = [
               </NuxtLink>
               <NuxtLink
                 to="/register"
-                class="text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-all duration-200
-                       px-4 py-2 rounded-lg hover:shadow-[0_0_16px_rgba(242,151,39,0.4)] hover:-translate-y-px"
+                class="text-sm font-semibold text-white bg-primary hover:bg-primary/90 btn-glow
+                       px-4 py-2 rounded-lg"
               >
                 {{ $t('navbar.startFree') }}
               </NuxtLink>
@@ -83,8 +63,8 @@ const navLinks = [
             <template v-else>
               <NuxtLink
                 to="/dashboard"
-                class="text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-all duration-200
-                       px-4 py-2 rounded-lg hover:shadow-[0_0_16px_rgba(242,151,39,0.4)] hover:-translate-y-px"
+                class="text-sm font-semibold text-white bg-primary hover:bg-primary/90 btn-glow
+                       px-4 py-2 rounded-lg"
               >
                 {{ $t('navbar.dashboard') }}
               </NuxtLink>
@@ -92,22 +72,7 @@ const navLinks = [
           </div>
 
           <div class="flex md:hidden items-center gap-3">
-            <div class="flex items-center gap-0.5 bg-white/5 border border-white/10 rounded-lg p-0.5">
-              <button
-                @click="changeLang('es')"
-                class="px-1.5 py-0.5 text-[10px] font-bold rounded"
-                :class="currentLocale === 'es' ? 'bg-primary text-white' : 'text-zinc-400'"
-              >
-                ES
-              </button>
-              <button
-                @click="changeLang('en')"
-                class="px-1.5 py-0.5 text-[10px] font-bold rounded"
-                :class="currentLocale === 'en' ? 'bg-primary text-white' : 'text-zinc-400'"
-              >
-                EN
-              </button>
-            </div>
+            <LanguageSwitcher theme="dark" variant="compact" />
 
             <button
               @click="mobileMenuOpen = !mobileMenuOpen"
@@ -162,7 +127,7 @@ const navLinks = [
 
     <footer class="border-t border-white/5 py-10 mt-20">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-        <NuxtImg src="/logo-cache.png" alt="Caché" format="webp" loading="lazy" class="h-8 w-auto object-contain opacity-70" />
+        <Logo variant="full" size="sm" class="opacity-80" />
         <p class="text-xs text-[hsl(220,10%,40%)] text-center">
           © 2025 Caché. {{ $t('footer.tagline') }}
         </p>

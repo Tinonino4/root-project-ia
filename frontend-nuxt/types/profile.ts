@@ -48,6 +48,31 @@ export interface Experience {
   updatedAt?: string
 }
 
+export interface RoleSkillsMetrics {
+  teamwork?: number
+  proactivity?: number
+  integrity?: number
+  selfConfidence?: number
+  flexibility?: number
+  averageScore?: number
+}
+
+export interface MultiLayerSkillsMetrics {
+  global?: RoleSkillsMetrics
+  managers?: RoleSkillsMetrics
+  peers?: RoleSkillsMetrics
+  subordinates?: RoleSkillsMetrics
+}
+
+export interface ArchetypeData {
+  tags: string[]
+  topStrengths: string[]
+  idealEnvironment: {
+    name: string
+    fitPercentage: number
+  }
+}
+
 export interface UserProfile {
   id?: number | string
   userId?: number | string
@@ -62,6 +87,8 @@ export interface UserProfile {
   avatarUrl?: string
   totalReferencesCount?: number
   skills?: SkillsMetrics
+  skillsMultiLayer?: MultiLayerSkillsMetrics
+  archetype?: ArchetypeData
   experiences?: Experience[]
   experienceMetrics?: ExperienceMetric[]
 }

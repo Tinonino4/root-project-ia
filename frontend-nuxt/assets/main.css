@@ -118,6 +118,41 @@
            placeholder:text-[hsl(220,10%,42%)]
            focus:border-primary focus:ring-2 focus:ring-primary/30;
   }
+
+  .logo-glow {
+    filter: drop-shadow(0 0 10px rgba(242, 151, 39, 0.45));
+  }
+
+  .brand-text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-500 via-primary to-orange-600;
+  }
+
+  .btn-glow {
+    @apply transition-all duration-300 hover:shadow-[0_0_24px_rgba(242,151,39,0.45)] hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  .glow-card {
+    @apply transition-all duration-300 hover:border-primary/40 hover:shadow-[0_8px_30px_rgba(242,151,39,0.12)];
+  }
+}
+
+/* Custom Minimalist Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(242, 151, 39, 0.5);
 }
 
 .route-fade-enter-active,

@@ -176,7 +176,7 @@ export async function $api<T = unknown>(
           useCookie('user', USER_COOKIE_OPTIONS).value = null
           navigateTo('/login')
         }
-      } else {
+      } else if (import.meta.client) {
         const serverMessage = response._data?.message || response._data?.error || null
         if (status === 400) {
           toast.error('Solicitud incorrecta', { description: serverMessage || 'Revisa los datos enviados.' })

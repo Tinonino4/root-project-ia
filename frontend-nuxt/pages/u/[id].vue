@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { Briefcase, Calendar, Award, ArrowLeft, Download, ShieldCheck, Eye } from 'lucide-vue-next'
+import { Briefcase, Calendar, Award, ArrowLeft, Download, ShieldCheck, Eye, QrCode, Share2, Check } from 'lucide-vue-next'
+import TrustBadgeStack from '~/components/profile/TrustBadgeStack.vue'
+import QrCodeModal from '~/components/profile/QrCodeModal.vue'
 import { useAuthStore } from '~/stores/auth.store'
 import type { UserProfile, ExperienceMetric, TopSkill } from '~/types'
 
@@ -27,6 +29,37 @@ const userId = computed(() => profileData.value?.userId || null)
 
 const isExporting = ref(false)
 const isGeneratingPDF = ref(false)
+const showQrModal = ref(false)
+const isCopiedLink = ref(false)
+
+const publicProfileUrl = computed(() => {
+  if (!import.meta.client) return ''
+  return `${window.location.origin}/u/${idOrSlug.value}`
+})
+
+const copyPublicLink = async () => {
+  if (!import.meta.client || !publicProfileUrl.value) return
+  try {
+    await navigator.clipboard.writeText(publicProfileUrl.value)
+    isCopiedLink.value = true
+    setTimeout(() => {
+      isCopiedLink.value = false
+    }, 2500)
+  } catch (e) {
+    console.error('Error al copiar enlace:', e)
+  }
+}
+
+const relationshipTypesList = computed(() => {
+  if (!profile.value?.experienceMetrics) return []
+  const types = new Set<string>()
+  profile.value.experienceMetrics.forEach((m: ExperienceMetric) => {
+    if (m.relationshipCounts) {
+      Object.keys(m.relationshipCounts).forEach(rel => types.add(rel))
+    }
+  })
+  return Array.from(types)
+})
 
 const expandedExperiences = ref<Record<string | number, boolean>>({})
 
@@ -70,7 +103,7 @@ const profileFullName = computed(() => {
 const requestUrl = useRequestURL()
 
 const getAbsoluteImageUrl = (url?: string) => {
-  if (!url) return `${requestUrl.origin}/logo-cache.png`
+  if (!url) return `${requestUrl.origin}/logo.svg`
   if (url.startsWith('http://') || url.startsWith('https://')) return url
   return `${requestUrl.origin}${url.startsWith('/') ? '' : '/'}${url}`
 }
@@ -252,24 +285,45 @@ const goBack = () => {
     <!-- Profile Content -->
     <div v-else-if="profile" class="space-y-8 animate-in fade-in-50 duration-500">
       
-      <!-- Header Actions (Sólo visibles para el propio usuario dueño del perfil) -->
-      <div v-if="isOwnProfile" class="flex items-center justify-between gap-3 w-full">
+      <!-- Header Actions (Visible para todos los visitantes) -->
+      <div class="flex flex-wrap items-center justify-between gap-3 w-full">
         <button 
           @click="goBack"
-          class="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[hsl(228,15%,9%)] border border-white/5 text-zinc-400 hover:text-white hover:bg-[hsl(228,15%,12%)] transition-all duration-200 text-xs sm:text-sm font-semibold whitespace-nowrap"
+          class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-[hsl(228,15%,9%)] border border-white/10 text-zinc-300 hover:text-white hover:bg-[hsl(228,15%,12%)] transition-all duration-200 text-xs sm:text-sm font-semibold"
         >
           <ArrowLeft class="w-4 h-4 flex-shrink-0" />
           {{ $t('common.back') }}
         </button>
         
-        <button 
-          @click="exportPDF"
-          :disabled="isExporting"
-          class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-200 text-xs sm:text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-        >
-          <Download class="w-4 h-4 flex-shrink-0" :class="{'animate-bounce': isExporting}" />
-          {{ isExporting ? 'PDF...' : 'PDF' }}
-        </button>
+        <div class="flex items-center gap-2">
+          <button 
+            @click="showQrModal = true"
+            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700/60 text-zinc-200 hover:text-white hover:bg-zinc-800 transition-all duration-200 text-xs sm:text-sm font-semibold shadow-sm"
+            title="Mostrar Código QR"
+          >
+            <QrCode class="w-4 h-4 text-primary flex-shrink-0" />
+            <span class="hidden sm:inline">Compartir</span> QR
+          </button>
+
+          <button 
+            @click="copyPublicLink"
+            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700/60 text-zinc-200 hover:text-white hover:bg-zinc-800 transition-all duration-200 text-xs sm:text-sm font-semibold shadow-sm"
+            title="Copiar Enlace Directo"
+          >
+            <Check v-if="isCopiedLink" class="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <Share2 v-else class="w-4 h-4 flex-shrink-0" />
+            <span class="hidden sm:inline">{{ isCopiedLink ? 'Copiado!' : 'Enlace' }}</span>
+          </button>
+
+          <button 
+            @click="exportPDF"
+            :disabled="isExporting"
+            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 btn-glow transition-all duration-200 text-xs sm:text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+          >
+            <Download class="w-4 h-4 flex-shrink-0" :class="{'animate-bounce': isExporting}" />
+            {{ isExporting ? 'PDF...' : 'Descargar PDF' }}
+          </button>
+        </div>
       </div>
 
       <!-- Candidate Read Only Banner -->
@@ -293,24 +347,39 @@ const goBack = () => {
         </div>
       </div>
 
-      <!-- Hero Banner -->
-      <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl relative">
-        <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
-          <div class="w-32 h-32 rounded-full bg-[hsl(228,15%,15%)] flex items-center justify-center text-4xl font-bold text-primary border-2 border-white/10 shadow-inner flex-shrink-0">
-            <img v-if="profile.photoUrl" :src="profile.photoUrl" alt="Avatar" loading="lazy" class="w-full h-full rounded-full object-cover" />
-            <span v-else>{{ profile.name?.charAt(0) }}{{ profile.surname?.charAt(0) }}</span>
+      <!-- Hero Banner Rediseñado -->
+      <div class="bg-[hsl(228,15%,9%)] border border-white/10 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl relative overflow-hidden glow-card">
+        <div class="absolute -top-16 -right-16 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="flex flex-col md:flex-row gap-6 items-center md:items-start relative z-10">
+          <div class="relative flex-shrink-0">
+            <div class="w-32 h-32 rounded-full bg-[hsl(228,15%,15%)] flex items-center justify-center text-4xl font-bold text-primary border-2 border-primary/40 shadow-xl overflow-hidden">
+              <img v-if="profile.photoUrl" :src="profile.photoUrl" alt="Avatar" loading="lazy" class="w-full h-full rounded-full object-cover" />
+              <span v-else>{{ profile.name?.charAt(0) }}{{ profile.surname?.charAt(0) }}</span>
+            </div>
+            <span class="absolute bottom-1 right-1 p-1 bg-emerald-500 text-white rounded-full ring-4 ring-[hsl(228,15%,9%)] shadow-md" title="Perfil Verificado">
+              <ShieldCheck class="w-4 h-4" />
+            </span>
           </div>
 
-          <div class="flex-1 text-center md:text-left space-y-2">
-            <h1 class="text-3xl font-bold text-white tracking-tight">{{ profile.name }} {{ profile.surname }}</h1>
-            <p class="text-lg text-primary font-semibold flex flex-wrap items-center justify-center md:justify-start gap-3">
-              <span>{{ profile.jobTitle || $t('sidebar.professionalRole') }}</span>
-              <span v-if="(profile.totalReferencesCount ?? 0) > 0" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-lg select-none">
-                <ShieldCheck class="w-3.5 h-3.5 mr-1 text-emerald-400" />
-                {{ profile.totalReferencesCount }} {{ profile.totalReferencesCount === 1 ? $t('extraProfile.certifiedReference') : $t('extraProfile.certifiedReferences') }}
-              </span>
-            </p>
-            <p class="text-[hsl(220,10%,75%)] mt-4 max-w-2xl text-balance">
+          <div class="flex-1 text-center md:text-left space-y-3">
+            <div class="space-y-1">
+              <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{{ profile.name }} {{ profile.surname }}</h1>
+              <p class="text-base sm:text-lg text-primary font-bold">
+                {{ profile.jobTitle || $t('sidebar.professionalRole') }}
+              </p>
+            </div>
+
+            <!-- Trust Badge Stack -->
+            <div class="pt-1 flex justify-center md:justify-start">
+              <TrustBadgeStack
+                :total-references="profile.totalReferencesCount"
+                :trust-score="profile.skills?.averageScore"
+                :relationship-types="relationshipTypesList"
+              />
+            </div>
+
+            <p class="text-[hsl(220,10%,75%)] text-sm sm:text-base leading-relaxed max-w-2xl text-balance pt-2">
               {{ profile.aboutMe || $t('profile.noBio') }}
             </p>
           </div>
@@ -325,11 +394,16 @@ const goBack = () => {
           
           <!-- Skills (Radar Chart) -->
           <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
-            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <Award class="w-5 h-5 text-primary" />
               {{ $t('profile.softSkillsTitle') }}
             </h2>
-            <div v-if="profile.skills" class="h-80 flex items-center justify-center">
+            <div v-if="profile.skillsMultiLayer" class="flex items-center justify-center">
+              <ClientOnly>
+                <SkillsRadarChart360 :metrics="profile.skillsMultiLayer" />
+              </ClientOnly>
+            </div>
+            <div v-else-if="profile.skills" class="h-80 flex items-center justify-center">
               <ClientOnly>
                 <LazySkillsRadarChart :metrics="profile.skills" />
               </ClientOnly>
@@ -338,6 +412,9 @@ const goBack = () => {
               {{ $t('dashboard.noFeedbackYet') }}
             </div>
           </div>
+
+          <!-- Fit Cultural Card -->
+          <FitCulturalCard v-if="profile.archetype" :data="profile.archetype" />
 
           <!-- Certification Summary Card -->
           <div v-if="profile.skills" class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl space-y-5">
@@ -522,6 +599,8 @@ const goBack = () => {
           </div>
         </div>
 
+        </div>
+
       </div>
 
     </div>
@@ -593,17 +672,17 @@ const goBack = () => {
               </div>
             </div>
 
-            <!-- Soft Skills Metrics Section -->
+            <!-- Soft Skills Metrics Section (360 Behavioral Model) -->
             <div style="margin-bottom: 30px;">
               <h3 class="text-sm font-black uppercase tracking-wider text-zinc-400 border-b pb-2" style="border-color: #e4e4e7; display: flex; align-items: center; margin: 0 0 16px 0;">
                 <Award class="w-4 h-4" style="color: #f29727; margin-right: 8px; display: inline-block; vertical-align: middle;" />
-                <span style="display: inline-block; vertical-align: middle;">SOFT SKILLS & COMPETENCIES</span>
+                <span style="display: inline-block; vertical-align: middle;">360° COMPETENCIES & SOFT SKILLS</span>
               </h3>
               
               <div v-if="profile?.skills" class="grid grid-cols-2 gap-x-8 gap-y-4">
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Teamwork</span>
+                    <span>Collaboration / Colaboración</span>
                     <span style="color: #f29727;">{{ (profile?.skills?.teamwork || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -617,7 +696,7 @@ const goBack = () => {
 
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Proactivity</span>
+                    <span>Autonomy / Autonomía</span>
                     <span style="color: #f29727;">{{ (profile?.skills?.proactivity || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -631,7 +710,7 @@ const goBack = () => {
 
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Integrity</span>
+                    <span>Rigor & Integrity / Rigor e Integridad</span>
                     <span style="color: #f29727;">{{ (profile?.skills?.integrity || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -645,7 +724,7 @@ const goBack = () => {
 
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Self-Confidence</span>
+                    <span>Leadership / Liderazgo</span>
                     <span style="color: #f29727;">{{ (profile?.skills?.selfConfidence || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -659,7 +738,7 @@ const goBack = () => {
 
                 <div>
                   <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
-                    <span>Flexibility</span>
+                    <span>Adaptability / Adaptabilidad</span>
                     <span style="color: #f29727;">{{ (profile?.skills?.flexibility || 0).toFixed(1) }} / 5.0</span>
                   </div>
                   <div class="w-full bg-zinc-100 rounded-full h-2.5" style="background-color: #f4f4f5; border: 1px solid #e4e4e7; overflow: hidden;">
@@ -669,6 +748,41 @@ const goBack = () => {
                       style="background: linear-gradient(90deg, #f29727 0%, #f5712d 100%);"
                     ></div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Archetype & Cultural Fit Section in PDF -->
+            <div v-if="profile?.archetype" style="margin-bottom: 30px;">
+              <h3 class="text-sm font-black uppercase tracking-wider text-zinc-400 border-b pb-2" style="border-color: #e4e4e7; display: flex; align-items: center; margin: 0 0 16px 0;">
+                <span style="display: inline-block; vertical-align: middle;">BEHAVIORAL ARCHETYPE & CULTURAL FIT</span>
+              </h3>
+              
+              <div class="bg-zinc-50 border rounded-2xl p-5" style="border-color: #e4e4e7;">
+                <div style="margin-bottom: 12px;" v-if="profile.archetype.tags?.length">
+                  <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider block" style="margin-bottom: 6px;">Dominant Work Style:</span>
+                  <div class="flex flex-wrap gap-2">
+                    <span v-for="tag in profile.archetype.tags" :key="tag" class="px-2.5 py-1 bg-white border border-zinc-200 rounded-lg text-xs font-bold text-zinc-800">
+                      🏷️ {{ tag }}
+                    </span>
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 12px;" v-if="profile.archetype.topStrengths?.length">
+                  <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider block" style="margin-bottom: 6px;">Key Strengths (Forced-Choice):</span>
+                  <div class="space-y-1">
+                    <div v-for="s in profile.archetype.topStrengths" :key="s" class="text-xs font-medium text-zinc-700 flex items-center gap-1.5">
+                      <span style="color: #10b981;">✓</span> {{ s }}
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="profile.archetype.idealEnvironment">
+                  <div class="flex justify-between items-center text-xs font-bold text-zinc-800" style="margin-bottom: 4px;">
+                    <span>Ideal Work Environment:</span>
+                    <span style="color: #f29727;">{{ profile.archetype.idealEnvironment.fitPercentage }}% Match</span>
+                  </div>
+                  <p class="text-xs font-bold text-zinc-900" style="margin: 0;">{{ profile.archetype.idealEnvironment.name }}</p>
                 </div>
               </div>
             </div>
@@ -741,5 +855,11 @@ const goBack = () => {
       </div>
     </div>
 
-  </div>
+    <!-- QrCode Modal -->
+    <QrCodeModal
+      :is-open="showQrModal"
+      :url="publicProfileUrl"
+      :profile-name="profileFullName"
+      @close="showQrModal = false"
+    />
 </template>

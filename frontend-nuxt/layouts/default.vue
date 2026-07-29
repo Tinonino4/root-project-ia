@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import Logo from '~/components/ui/Logo.vue'
+import LanguageSwitcher from '~/components/ui/LanguageSwitcher.vue'
 import {
   LayoutDashboard,
   User,
@@ -58,27 +60,12 @@ const navigation = computed(() => [
     <header class="md:hidden flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-30">
       <div class="flex items-center gap-2">
         <NuxtLink to="/dashboard">
-          <NuxtImg src="/logo-cache.png" alt="Caché Logo" format="webp" loading="eager" class="h-8 w-auto object-contain" />
+          <Logo variant="full" size="sm" interactive />
         </NuxtLink>
       </div>
       
       <div class="flex items-center gap-2">
-        <div class="flex items-center gap-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-0.5">
-          <button
-            @click="changeLang('es')"
-            class="px-1.5 py-0.5 text-[10px] font-bold rounded"
-            :class="currentLocale === 'es' ? 'bg-primary text-white' : 'text-zinc-400'"
-          >
-            ES
-          </button>
-          <button
-            @click="changeLang('en')"
-            class="px-1.5 py-0.5 text-[10px] font-bold rounded"
-            :class="currentLocale === 'en' ? 'bg-primary text-white' : 'text-zinc-400'"
-          >
-            EN
-          </button>
-        </div>
+        <LanguageSwitcher theme="light" variant="compact" />
 
         <button @click="toggleMobileMenu" class="text-zinc-600 dark:text-zinc-300 hover:text-primary transition-colors focus:outline-none">
           <Menu v-if="!isMobileMenuOpen" class="w-6 h-6" />
@@ -97,7 +84,7 @@ const navigation = computed(() => [
       <div class="flex flex-col h-full overflow-hidden">
         <div class="hidden md:flex items-center gap-2 p-6 border-b border-zinc-100 dark:border-zinc-800 flex-shrink-0">
           <NuxtLink to="/dashboard">
-            <NuxtImg src="/logo-cache.png" alt="Caché Logo" format="webp" loading="eager" class="h-8 w-auto object-contain" />
+            <Logo variant="full" size="md" interactive />
           </NuxtLink>
         </div>
 
@@ -126,36 +113,28 @@ const navigation = computed(() => [
         </nav>
 
         <div class="p-4 border-t border-zinc-100 dark:border-zinc-800 flex-shrink-0 bg-white dark:bg-zinc-900 flex flex-col gap-3">
-          <div class="flex items-center justify-between px-3 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
+          <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800/80">
             <span class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">{{ $t('sidebar.language') }}</span>
-            <div class="flex items-center gap-0.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-md p-0.5">
-              <button
-                @click="changeLang('es')"
-                class="px-2 py-0.5 text-[10px] font-bold rounded transition-all duration-200"
-                :class="currentLocale === 'es' ? 'bg-primary text-white shadow-sm' : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'"
-              >
-                ES
-              </button>
-              <button
-                @click="changeLang('en')"
-                class="px-2 py-0.5 text-[10px] font-bold rounded transition-all duration-200"
-                :class="currentLocale === 'en' ? 'bg-primary text-white shadow-sm' : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'"
-              >
-                EN
-              </button>
-            </div>
+            <LanguageSwitcher theme="light" variant="compact" />
           </div>
 
-          <div class="flex items-center gap-3 px-3 py-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/50">
-            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-primary font-bold">
-              {{ authStore.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+          <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800/60 transition-all hover:border-zinc-200 dark:hover:border-zinc-700">
+            <div class="relative flex-shrink-0">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-primary/30 to-amber-500/20 border border-primary/30 flex items-center justify-center text-primary font-extrabold text-sm shadow-sm">
+                {{ authStore.user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+              </div>
+              <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900" title="Verificado / En línea"></span>
             </div>
             <div class="flex-1 min-w-0 overflow-hidden">
-              <p class="text-sm font-semibold text-zinc-900 dark:text-white truncate">{{ authStore.user?.name || $t('sidebar.userFallback') }}</p>
-              <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate">{{ displayRole }}</p>
+              <p class="text-xs font-bold text-zinc-900 dark:text-white truncate leading-snug">{{ authStore.user?.name || $t('sidebar.userFallback') }}</p>
+              <p class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 truncate">{{ displayRole }}</p>
             </div>
-            <button @click="handleLogout" class="text-zinc-400 hover:text-red-500 transition-colors p-1" :title="$t('sidebar.logout')">
-              <LogOut class="w-5 h-5" />
+            <button
+              @click="handleLogout"
+              class="text-zinc-400 hover:text-red-500 hover:bg-red-500/10 transition-all p-1.5 rounded-lg"
+              :title="$t('sidebar.logout')"
+            >
+              <LogOut class="w-4 h-4" />
             </button>
           </div>
         </div>

@@ -18,7 +18,7 @@ definePageMeta({
 
 const { t } = useI18n()
 const requestUrl = useRequestURL()
-const logoUrl = computed(() => `${requestUrl.origin}/logo-cache.png`)
+const logoUrl = computed(() => `${requestUrl.origin}/logo.svg`)
 
 useSeoMeta({
   title: () => t('seo.defaultTitle'),

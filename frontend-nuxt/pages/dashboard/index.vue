@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import SkillsRadarChart360 from '~/components/dashboard/SkillsRadarChart360.vue'
+import FitCulturalCard from '~/components/profile/FitCulturalCard.vue'
+import type { UserProfile } from '~/types'
 import { useProfileStore } from '~/stores/profile.store'
 import { useExperienceStore } from '~/stores/experience.store'
 import { useAnalyticsStore } from '~/stores/analytics.store'
@@ -37,6 +40,7 @@ const authStore = useAuthStore()
 const { t } = useI18n()
 
 const isCopied = ref(false)
+const publicProfileData = ref<UserProfile | null>(null)
 
 onMounted(async () => {
   if (import.meta.client) {
@@ -46,6 +50,14 @@ onMounted(async () => {
       analyticsStore.fetchMetrics(),
       feedbackStore.fetchRequests()
     ])
+    const userId = authStore.user?.id
+    if (userId) {
+      try {
+        publicProfileData.value = await $api<UserProfile>(`/public/profile/${userId}`)
+      } catch (e) {
+        console.error('Error fetching dashboard public profile:', e)
+      }
+    }
   }
 })
 
@@ -484,36 +496,42 @@ const getTrustLabel = (score: number) => {
 
           </div>
 
-          <div class="lg:col-span-5 bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md relative overflow-hidden shadow-sm order-1 lg:order-2">
-            <div class="absolute -top-12 -left-12 w-40 h-40 bg-primary/10 dark:bg-primary/5 rounded-full blur-2xl pointer-events-none"></div>
-            
-            <div class="space-y-4 mb-6">
-              <div class="flex items-center gap-2">
-                <span class="p-1.5 rounded-lg bg-primary/10 text-primary">
-                  <ShieldCheck class="w-5 h-5" />
-                </span>
-                <span class="text-sm font-bold tracking-wide uppercase text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.radarTitle') }}</span>
-              </div>
-              <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                {{ $t('dashboard.radarSubtitle') }}
-              </p>
-            </div>
-
-            <div class="w-full relative aspect-square flex items-center justify-center p-2 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-white/[0.02]">
-              <ClientOnly>
-                <LazySkillsRadarChart v-if="metrics" :metrics="metrics" />
-                <div v-else class="text-center py-20 text-zinc-500 text-sm italic">
-                  {{ $t('dashboard.noFeedbackYet') }}
+          <div class="lg:col-span-5 space-y-6 order-1 lg:order-2">
+            <div class="bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-md relative overflow-hidden shadow-sm">
+              <div class="absolute -top-12 -left-12 w-40 h-40 bg-primary/10 dark:bg-primary/5 rounded-full blur-2xl pointer-events-none"></div>
+              
+              <div class="space-y-4 mb-6">
+                <div class="flex items-center gap-2">
+                  <span class="p-1.5 rounded-lg bg-primary/10 text-primary">
+                    <ShieldCheck class="w-5 h-5" />
+                  </span>
+                  <span class="text-sm font-bold tracking-wide uppercase text-zinc-500 dark:text-zinc-400">{{ $t('dashboard.radarTitle') }}</span>
                 </div>
-              </ClientOnly>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                  {{ $t('dashboard.radarSubtitle') }}
+                </p>
+              </div>
+
+              <div class="w-full relative flex items-center justify-center p-2 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-white/[0.02]">
+                <ClientOnly>
+                  <SkillsRadarChart360 v-if="publicProfileData?.skillsMultiLayer" :metrics="publicProfileData.skillsMultiLayer" />
+                  <LazySkillsRadarChart v-else-if="metrics" :metrics="metrics" />
+                  <div v-else class="text-center py-20 text-zinc-500 text-sm italic">
+                    {{ $t('dashboard.noFeedbackYet') }}
+                  </div>
+                </ClientOnly>
+              </div>
+
+              <div class="mt-6 flex items-start gap-2.5 bg-primary/5 dark:bg-primary/[0.03] border border-primary/10 p-3 rounded-xl" v-if="metrics">
+                <HelpCircle class="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                  <strong>{{ $t('extraFeedback.didYouKnow') }}</strong> {{ $t('extraFeedback.didYouKnowPdf') }}
+                </p>
+              </div>
             </div>
 
-            <div class="mt-6 flex items-start gap-2.5 bg-primary/5 dark:bg-primary/[0.03] border border-primary/10 p-3 rounded-xl" v-if="metrics">
-              <HelpCircle class="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-              <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                <strong>{{ $t('extraFeedback.didYouKnow') }}</strong> {{ $t('extraFeedback.didYouKnowPdf') }}
-              </p>
-            </div>
+            <!-- Fit Cultural Card en Dashboard -->
+            <FitCulturalCard v-if="publicProfileData?.archetype" :data="publicProfileData.archetype" />
           </div>
 
         </div>

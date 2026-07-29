@@ -180,24 +180,28 @@
     "ariaScore": "{score} sobre 5",
     "categories": {
       "TEAMWORK": {
-        "name": "Trabajo en equipo",
+        "name": "Colaboración",
         "description": "Capacidad de colaborar y trabajar eficazmente con otros miembros del equipo"
       },
       "PROACTIVITY": {
-        "name": "Proactividad",
-        "description": "Identificar un obstáculo u oportunidad y actuar para dar respuesta a los mismos"
+        "name": "Autonomía",
+        "description": "Capacidad de actuar proactivamente y tomar la iniciativa con autonomía"
       },
       "INTEGRITY": {
-        "name": "Integridad",
-        "description": "Actuar en consonancia con creencias y valores. Hace aquello que considera correcto"
+        "name": "Rigor e Integridad",
+        "description": "Actuar en consonancia con estándares de calidad, rigor y ética profesional"
       },
       "SELF_CONFIDENCE": {
-        "name": "Autoconfianza",
-        "description": "Seguridad que alguien tiene en sí mismo para tomar decisiones o afrontar riesgos"
+        "name": "Liderazgo",
+        "description": "Capacidad de liderar, gestionar personas e influir positivamente"
+      },
+      "LEADERSHIP": {
+        "name": "Liderazgo",
+        "description": "Capacidad de liderar, gestionar personas e influir positivamente"
       },
       "FLEXIBILITY": {
-        "name": "Flexibilidad",
-        "description": "Se adapta con facilidad a la opinión o actitud de otros. Susceptible de cambios"
+        "name": "Adaptabilidad",
+        "description": "Capacidad de adaptarse a los cambios de contexto e incertidumbre"
       }
     },
     "questions": {
@@ -304,6 +308,12 @@
     "verificationBadge": "Perfil Certificado",
     "trustScoreDetail": "Nivel de Confianza",
     "softSkillsTitle": "Desglose de Competencias",
+    "archetypeTitle": "Arquetipo & Fit Cultural",
+    "archetypeBadge": "Conductual",
+    "dominantStyle": "Estilo de Trabajo Dominante:",
+    "topStrengthsTitle": "Fortalezas Principales (Elección Forzada):",
+    "idealEnvironmentTitle": "Entorno Ideal de Trabajo:",
+    "matchPercentage": "{percent}% Match",
     "experiencesTitle": "Trayectoria Laboral",
     "referencesTitle": "Referencias Validadas",
     "visibility": {
