@@ -73,6 +73,7 @@ const relationshipLabels = computed<Record<string, string>>(() => ({
 const categoryLabels = computed<Record<string, string>>(() => ({
   TEAMWORK: t('questionnaire.categories.TEAMWORK.name'),
   SELF_CONFIDENCE: t('questionnaire.categories.SELF_CONFIDENCE.name'),
+  LEADERSHIP: t('questionnaire.categories.LEADERSHIP.name'),
   PROACTIVITY: t('questionnaire.categories.PROACTIVITY.name'),
   INTEGRITY: t('questionnaire.categories.INTEGRITY.name'),
   FLEXIBILITY: t('questionnaire.categories.FLEXIBILITY.name')

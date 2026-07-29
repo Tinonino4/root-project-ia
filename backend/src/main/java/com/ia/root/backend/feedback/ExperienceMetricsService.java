@@ -30,17 +30,32 @@ public class ExperienceMetricsService {
      * Calcula y devuelve el desglose de métricas específicas por experiencia profesional.
      */
     public List<ExperienceMetricsDTO> getExperienceMetrics(UUID userId) {
-        // Query 1: Experiencias, número de referencias, media de puntuación total y de confianza
+        // Query 1: Experiencias, número de referencias y media de confianza
         String mainSql = """
-            SELECT cr.experience_id, COUNT(DISTINCT cr.id) as ref_count, AVG(fr.rating) as avg_rating, AVG(cr.trust_score) as avg_trust
+            SELECT cr.experience_id, COUNT(DISTINCT cr.id) as ref_count, AVG(cr.trust_score) as avg_trust
             FROM cache_requests cr
-            LEFT JOIN feedback_responses fr ON fr.cache_request_id = cr.id
             WHERE cr.user_id = ? AND cr.finished = true AND cr.is_visible = true
             GROUP BY cr.experience_id
         """;
 
-        // Query 2: Desglose de categorías por experiencia
-        String categorySql = """
+        // Query 2a: Desglose de categorías conductuales 360° por experiencia
+        String behavioralCategorySql = """
+            SELECT 
+                cr.experience_id,
+                AVG(bqo.teamwork_pts) as avg_teamwork,
+                AVG(bqo.proactivity_pts) as avg_proactivity,
+                AVG(bqo.flexibility_pts) as avg_flexibility,
+                AVG(bqo.integrity_pts) as avg_integrity,
+                AVG(bqo.leadership_pts) as avg_leadership
+            FROM behavioral_responses br
+            JOIN behavioral_question_options bqo ON bqo.id = br.selected_option_id
+            JOIN cache_requests cr ON cr.id = br.cache_request_id
+            WHERE cr.user_id = ? AND cr.finished = true AND cr.is_visible = true
+            GROUP BY cr.experience_id
+        """;
+
+        // Query 2b: Legacy feedback responses fallback
+        String legacyCategorySql = """
             SELECT cr.experience_id, sc.code, AVG(fr.rating) as avg_rating
             FROM feedback_responses fr
             JOIN skill_questions sq ON sq.id = fr.question_id
@@ -60,11 +75,27 @@ public class ExperienceMetricsService {
         """;
 
         java.util.Map<UUID, java.util.Map<String, Double>> categoriesMap = new java.util.HashMap<>();
-        jdbcTemplate.query(categorySql, rs -> {
+
+        // Populate from behavioral responses (scaled to 0-5.0 range by dividing by 20.0)
+        jdbcTemplate.query(behavioralCategorySql, rs -> {
             UUID expId = (UUID) rs.getObject("experience_id");
-            String code = rs.getString("code");
-            double avgRating = rs.getDouble("avg_rating");
-            categoriesMap.computeIfAbsent(expId, k -> new java.util.HashMap<>()).put(code, avgRating);
+            java.util.Map<String, Double> map = new java.util.HashMap<>();
+            map.put("TEAMWORK", rs.getDouble("avg_teamwork") / 20.0);
+            map.put("PROACTIVITY", rs.getDouble("avg_proactivity") / 20.0);
+            map.put("FLEXIBILITY", rs.getDouble("avg_flexibility") / 20.0);
+            map.put("INTEGRITY", rs.getDouble("avg_integrity") / 20.0);
+            map.put("SELF_CONFIDENCE", rs.getDouble("avg_leadership") / 20.0);
+            categoriesMap.put(expId, map);
+        }, userId);
+
+        // Fallback for experiences not present in behavioral responses (legacy ratings)
+        jdbcTemplate.query(legacyCategorySql, rs -> {
+            UUID expId = (UUID) rs.getObject("experience_id");
+            if (!categoriesMap.containsKey(expId)) {
+                String code = rs.getString("code");
+                double avgRating = rs.getDouble("avg_rating");
+                categoriesMap.computeIfAbsent(expId, k -> new java.util.HashMap<>()).put(code, avgRating);
+            }
         }, userId);
 
         java.util.Map<UUID, java.util.Map<String, Long>> rolesMap = new java.util.HashMap<>();
@@ -105,10 +136,13 @@ public class ExperienceMetricsService {
         jdbcTemplate.query(mainSql, rs -> {
             UUID expId = (UUID) rs.getObject("experience_id");
             long refCount = rs.getLong("ref_count");
-            double avgRating = rs.getDouble("avg_rating");
             double avgTrust = rs.getDouble("avg_trust");
 
             java.util.Map<String, Double> catAverages = categoriesMap.getOrDefault(expId, java.util.Map.of());
+            double avgRating = catAverages.values().isEmpty() 
+                ? 0.0 
+                : catAverages.values().stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+
             java.util.Map<String, Long> relCounts = rolesMap.getOrDefault(expId, java.util.Map.of());
             List<TestimonialDTO> testimonials = testimonialsMap.getOrDefault(expId, java.util.List.of());
 
