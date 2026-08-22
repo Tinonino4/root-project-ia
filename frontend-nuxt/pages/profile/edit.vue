@@ -6,12 +6,14 @@ import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { ArrowLeft, Save } from 'lucide-vue-next'
 import AvatarUploader from '~/components/profile/AvatarUploader.vue'
+import { toast } from 'vue-sonner'
 
 definePageMeta({
   layout: 'default'
 })
 
 const profileStore = useProfileStore()
+const { t } = useI18n()
 
 const formData = ref<Record<string, any>>({
   name: '',
@@ -29,7 +31,6 @@ const formData = ref<Record<string, any>>({
 })
 
 const frontendUrl = ref('')
-const successMessage = ref('')
 const localError = ref('')
 
 onMounted(async () => {
@@ -50,7 +51,6 @@ onMounted(async () => {
 })
 
 const handleSave = async () => {
-  successMessage.value = ''
   localError.value = ''
   
   const usernameRegex = /^[a-z0-9-_]+$/
@@ -59,21 +59,24 @@ const handleSave = async () => {
     formData.value.username = cleanUsername
     if (!usernameRegex.test(cleanUsername)) {
       localError.value = 'El nombre de usuario solo puede contener letras minúsculas, números, guiones y guiones bajos (sin espacios ni acentos)'
+      toast.error(localError.value)
       return
     }
   } else {
     localError.value = 'El nombre de usuario es obligatorio para tu enlace amigable'
+    toast.error(localError.value)
     return
   }
   
   try {
     await profileStore.updateProfile(formData.value)
-    successMessage.value = 'Perfil actualizado exitosamente.'
+    toast.success(t('profileEdit.success', '¡Perfil actualizado correctamente!'))
     setTimeout(() => {
       navigateTo('/profile')
-    }, 1500)
-  } catch (error) {
+    }, 1000)
+  } catch (error: any) {
     console.error('Error updating profile:', error)
+    toast.error(error?.message || t('errors.generic', 'Error al actualizar el perfil.'))
   }
 }
 </script>
@@ -122,7 +125,7 @@ const handleSave = async () => {
               <Input id="name" v-model="formData.name" required class="focus:ring-primary" />
             </div>
             <div class="space-y-2">
-              <Label for="surname">Apellidos</Label>
+              <Label for="surname">{{ $t('profileEdit.surname', 'Apellidos') }}</Label>
               <Input id="surname" v-model="formData.surname" class="focus:ring-primary" />
             </div>
             <div class="space-y-2">
@@ -133,15 +136,15 @@ const handleSave = async () => {
               </p>
             </div>
             <div class="space-y-2">
-              <Label for="contactEmail">Email</Label>
+              <Label for="contactEmail">{{ $t('profileEdit.contactEmail', 'Email de Contacto') }}</Label>
               <Input id="contactEmail" type="email" v-model="formData.contactEmail" required class="focus:ring-primary" />
             </div>
             <div class="space-y-2">
-              <Label for="phoneNumber">Teléfono</Label>
+              <Label for="phoneNumber">{{ $t('profileEdit.phone', 'Teléfono') }}</Label>
               <Input id="phoneNumber" type="tel" v-model="formData.phoneNumber" class="focus:ring-primary" />
             </div>
             <div class="space-y-2">
-              <Label for="birthday">Fecha de Nacimiento</Label>
+              <Label for="birthday">{{ $t('profileEdit.dateOfBirth', 'Fecha de Nacimiento') }}</Label>
               <Input id="birthday" type="date" v-model="formData.birthday" class="focus:ring-primary" />
             </div>
           </div>
@@ -157,7 +160,7 @@ const handleSave = async () => {
               <Input id="city" v-model="formData.city" class="focus:ring-primary" :placeholder="$t('profileEdit.locationPlaceholder')" />
             </div>
             <div class="space-y-2">
-              <Label for="zipcode">Código Postal</Label>
+              <Label for="zipcode">{{ $t('profileEdit.zipcode', 'Código Postal') }}</Label>
               <Input id="zipcode" v-model="formData.zipcode" class="focus:ring-primary" />
             </div>
           </div>

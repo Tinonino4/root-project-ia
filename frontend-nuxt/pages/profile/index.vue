@@ -42,6 +42,7 @@ const error = ref<string | null>(null)
 const isExporting = ref(false)
 const isGeneratingPDF = ref(false)
 const isCopied = ref(false)
+const mobileProfileTab = ref<'identity' | 'trajectory'>('identity')
 
 const expandedExperiences = ref<Record<string | number, boolean>>({})
 
@@ -127,11 +128,13 @@ const copyProfileLink = () => {
     const url = `${window.location.origin}/u/${slugOrId}`
     navigator.clipboard.writeText(url).then(() => {
       isCopied.value = true
+      toast.success(t('dashboard.linkCopied', 'Enlace público copiado al portapapeles'))
       setTimeout(() => {
         isCopied.value = false
       }, 2500)
     }).catch(err => {
       console.error('Error copying link:', err)
+      toast.error('No se pudo copiar el enlace')
     })
   }
 }
@@ -349,11 +352,39 @@ const topSkill = computed(() => {
           </div>
         </div>
       </div>
+      <!-- Mobile Segmented Tabs (Solo visible en pantallas móviles < lg) -->
+      <div class="block lg:hidden w-full">
+        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-white/[0.04] border border-white/10 shadow-lg backdrop-blur-xl">
+          <button 
+            @click="mobileProfileTab = 'identity'"
+            :class="mobileProfileTab === 'identity' ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-zinc-950 font-black shadow-md' : 'text-zinc-400 hover:text-white font-medium hover:bg-white/[0.04]'"
+            class="flex-1 py-2.5 px-3 text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5"
+          >
+            <span>🧬</span>
+            <span>{{ $t('extraProfile.tabIdentity', 'ADN & Identidad') }}</span>
+          </button>
+          <button 
+            @click="mobileProfileTab = 'trajectory'"
+            :class="mobileProfileTab === 'trajectory' ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-zinc-950 font-black shadow-md' : 'text-zinc-400 hover:text-white font-medium hover:bg-white/[0.04]'"
+            class="flex-1 py-2.5 px-3 text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5"
+          >
+            <span>💼</span>
+            <span>{{ $t('extraProfile.tabTrajectory', 'Trayectoria & Puestos') }}</span>
+            <span v-if="publicProfileData.experiences?.length" class="ml-1 px-1.5 py-0.5 rounded-full text-[10px]" :class="mobileProfileTab === 'trajectory' ? 'bg-zinc-950/20 text-zinc-950 font-extrabold' : 'bg-white/10 text-zinc-300'">
+              {{ publicProfileData.experiences.length }}
+            </span>
+          </button>
+        </div>
+      </div>
+
       <!-- Grid: Skills/Contact and Experience -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         <!-- Left Column: Sticky Consolidated Talent Identity Rail -->
-        <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-6 self-start">
+        <div 
+          class="lg:col-span-5 space-y-6 lg:sticky lg:top-6 self-start"
+          :class="{ 'hidden lg:block': mobileProfileTab !== 'identity' }"
+        >
           
           <!-- Habilidades Blandas (ADN Conductual 360) -->
           <div class="w-full">
@@ -413,7 +444,10 @@ const topSkill = computed(() => {
         </div>
 
         <!-- Right Column: Experience Timeline -->
-        <div class="lg:col-span-7">
+        <div 
+          class="lg:col-span-7"
+          :class="{ 'hidden lg:block': mobileProfileTab !== 'trajectory' }"
+        >
           <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-5 sm:p-7 backdrop-blur-xl shadow-xl">
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-white flex items-center gap-2">
@@ -437,13 +471,14 @@ const topSkill = computed(() => {
                 <div class="absolute left-2.5 top-2.5 w-3 h-3 rounded-full bg-primary -translate-x-1/2 group-hover:scale-125 transition-transform duration-200"></div>
                 
                 <!-- Action Controls (Floating top right) -->
-                <div class="absolute right-0 top-0 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                <div class="absolute right-0 top-0 flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
                   <button 
                     @click="navigateTo(`/feedback/new?experienceId=${exp.id}`)"
-                    class="p-1.5 text-zinc-400 hover:text-primary hover:bg-white/5 rounded-lg transition-colors"
-                    :title="$t('feedback.createTitle')"
+                    class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-lg transition-all"
+                    :title="$t('extraProfile.certifyRole', 'Solicitar Certificación 360° para este puesto')"
                   >
-                    <Star class="w-4 h-4 text-amber-500 fill-current" />
+                    <ShieldCheck class="w-3.5 h-3.5 text-amber-400" />
+                    <span class="text-[11px]">{{ $t('feedback.createTitle', 'Certificar') }}</span>
                   </button>
                   <button 
                     @click="navigateTo(`/experiences/${exp.id}/edit`)"

@@ -529,9 +529,11 @@
     "saving": "Guardando...",
     "cancel": "Cancelar",
     "success": "¡Perfil actualizado correctamente!",
+    "surname": "Apellidos",
     "contactEmail": "Correo de Contacto",
     "phone": "Teléfono",
     "city": "Ubicación / Ciudad",
+    "zipcode": "Código Postal",
     "education": "Formación",
     "dateOfBirth": "Fecha de Nacimiento"
   },
@@ -665,6 +667,9 @@
     "processingDesc": "Estamos configurando tu sesión de forma segura. Un momento, por favor..."
   },
   "extraProfile": {
+    "tabIdentity": "ADN & Identidad 360°",
+    "tabTrajectory": "Trayectoria & Puestos",
+    "certifyRole": "Solicitar Certificación 360° para este puesto",
     "softSkillsRole": "Habilidades blandas en este rol",
     "evaluatorsDistribution": "Distribución de evaluadores",
     "reviewsReceived": "Opiniones y comentarios recibidos",

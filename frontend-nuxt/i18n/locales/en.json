@@ -499,9 +499,11 @@
     "saving": "Saving...",
     "cancel": "Cancel",
     "success": "Profile updated successfully!",
+    "surname": "Surname / Last Name",
     "contactEmail": "Contact Email",
     "phone": "Phone Number",
     "city": "Location / City",
+    "zipcode": "Zip Code",
     "education": "Education",
     "dateOfBirth": "Date of Birth"
   },
@@ -635,6 +637,9 @@
     "processingDesc": "Setting up your session securely. One moment please..."
   },
   "extraProfile": {
+    "tabIdentity": "360° DNA & Identity",
+    "tabTrajectory": "Career & Positions",
+    "certifyRole": "Request 360° Certification for this position",
     "softSkillsRole": "Soft skills in this role",
     "evaluatorsDistribution": "Evaluators distribution",
     "reviewsReceived": "Reviews & comments received",
