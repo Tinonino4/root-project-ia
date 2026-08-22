@@ -349,132 +349,62 @@ const topSkill = computed(() => {
           </div>
         </div>
       </div>
-
       <!-- Grid: Skills/Contact and Experience -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- Left Column: Skills & Contact Details -->
-        <div class="lg:col-span-4 space-y-6 lg:sticky lg:top-6 self-start">
+        <!-- Left Column: Sticky Consolidated Talent Identity Rail -->
+        <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-6 self-start">
           
-          <!-- Habilidades Blandas (Radar Chart 360) -->
-          <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
-            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <Award class="w-5 h-5 text-primary" />
-              {{ $t('profile.softSkillsTitle') }}
-            </h2>
-            <div v-if="publicProfileData?.skillsMultiLayer" class="flex items-center justify-center">
-              <ClientOnly>
-                <SkillsRadarChart360 :metrics="publicProfileData.skillsMultiLayer" />
-              </ClientOnly>
-            </div>
-            <div v-else-if="publicProfileData?.skills" class="h-72 flex items-center justify-center">
-              <ClientOnly>
-                <LazySkillsRadarChart :metrics="publicProfileData.skills" />
-              </ClientOnly>
-            </div>
-            <div v-else class="text-center py-20 text-zinc-500 text-sm italic">
-              {{ $t('dashboard.noMetrics') }}
-            </div>
+          <!-- Habilidades Blandas (ADN Conductual 360) -->
+          <div class="w-full">
+            <ClientOnly>
+              <SkillsRadarChart360 :metrics="publicProfileData?.skillsMultiLayer" :archetype="publicProfileData?.archetype" />
+            </ClientOnly>
           </div>
 
           <!-- Fit Cultural Card -->
           <FitCulturalCard v-if="publicProfileData?.archetype" :data="publicProfileData.archetype" />
 
-          <!-- Certification Summary Card -->
-          <div v-if="publicProfileData.skills" class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl space-y-5">
-            <h3 class="text-lg font-bold text-white border-b border-white/5 pb-3 flex items-center gap-2">
-              <ShieldCheck class="w-5 h-5 text-emerald-400" />
-              {{ $t('profile.verificationBadge') }}
-            </h3>
-            <div class="space-y-4">
-              <!-- Global Average -->
-              <div class="flex items-center justify-between">
-                <span class="text-zinc-400 text-sm">{{ $t('dashboard.metrics.trustScore') }}</span>
-                <div class="flex items-center text-amber-400 gap-1.5">
-                  <span class="text-sm font-bold text-white">{{ publicProfileData.skills.averageScore?.toFixed(1) || '0.0' }}</span>
-                  <div class="flex items-center">
-                    <svg v-for="star in 5" :key="star" class="w-3.5 h-3.5" :class="star <= Math.round(publicProfileData.skills.averageScore || 0) ? 'fill-current' : 'text-zinc-700'" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <!-- References Count -->
-              <div class="flex items-center justify-between">
-                <span class="text-zinc-400 text-sm">{{ $t('dashboard.metrics.verifiedSkills') }}</span>
-                <span class="text-sm font-bold text-white flex items-center gap-1">
-                  <ShieldCheck class="w-4 h-4 text-emerald-400" />
-                  {{ publicProfileData.totalReferencesCount || 0 }}
-                </span>
-              </div>
-
-              <!-- Top Skill -->
-              <div class="flex items-center justify-between" v-if="topSkill">
-                <span class="text-zinc-400 text-sm">Top Skill</span>
-                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20">
-                  {{ $t('questionnaire.categories.' + topSkill.categoryKey + '.name') }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Información de Contacto -->
-          <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl relative group">
+          <!-- Información de Contacto Consolidada -->
+          <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-5 backdrop-blur-xl shadow-xl relative group">
             <button 
               @click="navigateTo('/profile/edit')"
               class="absolute top-4 right-4 p-2 rounded-lg bg-white/5 border border-white/5 text-zinc-400 hover:text-white hover:bg-white/10 transition-all duration-200"
               :title="$t('profileEdit.title')"
             >
-              <Edit class="w-4.5 h-4.5" />
+              <Edit class="w-4 h-4" />
             </button>
 
-            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <UserIcon class="w-5 h-5 text-primary" />
+            <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+              <UserIcon class="w-4 h-4 text-primary" />
               {{ $t('extraProfile.infoPersonal') }}
             </h2>
             
-            <div class="space-y-4">
-              <div class="flex items-start gap-3 text-zinc-300">
-                <Mail class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
-                <div class="space-y-0.5">
-                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.contactEmail') }}</span>
-                  <span class="text-sm break-all font-medium">{{ (privateProfile as any)?.contactEmail || publicProfileData.contactEmail || '-' }}</span>
+            <div class="space-y-3">
+              <div class="flex items-start gap-2.5 text-zinc-300">
+                <Mail class="w-4 h-4 text-zinc-500 mt-0.5 flex-shrink-0" />
+                <div class="space-y-0.5 min-w-0">
+                  <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.contactEmail') }}</span>
+                  <span class="text-xs break-all font-medium text-zinc-300">{{ (privateProfile as any)?.contactEmail || publicProfileData.contactEmail || '-' }}</span>
                 </div>
               </div>
 
-              <div class="flex items-start gap-3 text-zinc-300">
-                <Phone class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
-                <div class="space-y-0.5">
-                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.phone') }}</span>
-                  <span class="text-sm font-medium">{{ (privateProfile as any)?.phoneNumber || '-' }}</span>
+              <div class="flex items-start gap-2.5 text-zinc-300">
+                <Phone class="w-4 h-4 text-zinc-500 mt-0.5 flex-shrink-0" />
+                <div class="space-y-0.5 min-w-0">
+                  <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.phone') }}</span>
+                  <span class="text-xs font-medium text-zinc-300">{{ (privateProfile as any)?.phoneNumber || '-' }}</span>
                 </div>
               </div>
 
-              <div class="flex items-start gap-3 text-zinc-300">
-                <MapPin class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
-                <div class="space-y-0.5">
-                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.city') }}</span>
-                  <span class="text-sm font-medium">
+              <div class="flex items-start gap-2.5 text-zinc-300">
+                <MapPin class="w-4 h-4 text-zinc-500 mt-0.5 flex-shrink-0" />
+                <div class="space-y-0.5 min-w-0">
+                  <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.city') }}</span>
+                  <span class="text-xs font-medium text-zinc-300">
                     {{ (privateProfile as any)?.city || '-' }} 
                     <span class="text-zinc-500" v-if="(privateProfile as any)?.zipcode">({{ (privateProfile as any).zipcode }})</span>
                   </span>
-                </div>
-              </div>
-
-              <div class="flex items-start gap-3 text-zinc-300" v-if="(privateProfile as any)?.education">
-                <GraduationCap class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
-                <div class="space-y-0.5">
-                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('profileEdit.education') }}</span>
-                  <span class="text-sm font-medium">{{ (privateProfile as any).education }}</span>
-                </div>
-              </div>
-
-              <div class="flex items-start gap-3 text-zinc-300" v-if="(privateProfile as any)?.birthday">
-                <Calendar class="w-5 h-5 text-zinc-500 mt-0.5 flex-shrink-0" />
-                <div class="space-y-0.5">
-                  <span class="text-xs text-zinc-500 font-bold uppercase tracking-wider block">{{ $t('extraProfile.birthdayLabel') }}</span>
-                  <span class="text-sm font-medium">{{ formatBirthday((privateProfile as any).birthday) }}</span>
                 </div>
               </div>
             </div>
@@ -483,8 +413,8 @@ const topSkill = computed(() => {
         </div>
 
         <!-- Right Column: Experience Timeline -->
-        <div class="lg:col-span-8">
-          <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
+        <div class="lg:col-span-7">
+          <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-5 sm:p-7 backdrop-blur-xl shadow-xl">
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-white flex items-center gap-2">
                 <Briefcase class="w-5 h-5 text-primary" />
@@ -493,7 +423,7 @@ const topSkill = computed(() => {
               <Button 
                 @click="navigateTo('/experiences/new')"
                 size="sm" 
-                class="bg-primary hover:bg-primary/95 text-white flex items-center gap-1 px-3"
+                class="bg-gradient-to-r from-primary to-orange-500 hover:brightness-110 text-white flex items-center gap-1 px-3.5 rounded-xl shadow-lg shadow-primary/20"
               >
                 <Plus class="w-4 h-4" />
                 {{ $t('extraProfile.addExperience') }}
@@ -531,52 +461,40 @@ const topSkill = computed(() => {
                   </button>
                 </div>
 
-                <div class="space-y-1">
-                  <h3 class="text-lg font-semibold text-white group-hover:text-primary transition-colors duration-200 pr-20 sm:pr-24">{{ exp.position }}</h3>
-                  <p class="text-[hsl(220,10%,70%)] text-sm font-medium pr-20 sm:pr-24">{{ exp.companyName }} <span v-if="exp.department">· {{ exp.department }}</span></p>
-                  <div class="flex items-center gap-2 text-xs text-[hsl(220,10%,50%)]">
-                    <Calendar class="w-3.5 h-3.5" />
-                    <span>{{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Present' }}</span>
+                <div class="space-y-2">
+                  <div class="pr-20 sm:pr-24">
+                    <h3 class="text-lg font-bold text-white group-hover:text-primary transition-colors duration-200">{{ exp.position }}</h3>
+                    <p class="text-[hsl(220,10%,75%)] text-sm font-medium">{{ exp.companyName }} <span v-if="exp.department">· {{ exp.department }}</span></p>
+                    <div class="flex items-center gap-2 text-xs text-zinc-500 mt-0.5">
+                      <Calendar class="w-3.5 h-3.5" />
+                      <span>{{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Present' }}</span>
+                    </div>
                   </div>
-                  <p class="text-sm text-[hsl(220,10%,60%)] mt-2 leading-relaxed whitespace-pre-wrap">{{ exp.functions || exp.description }}</p>
 
-                  <!-- Experience Rating Breakdown (Showable/Hideable) -->
-                  <div v-if="getMetricsForExperience(exp.id)" class="mt-4 p-4 rounded-xl bg-white/[0.01] border border-white/5 space-y-4">
-                    <div class="flex flex-wrap items-center justify-between gap-3">
-                      <!-- Rating and Reference Count -->
-                      <div class="flex items-center gap-2">
+                  <!-- Verified 360° Banner (Celebrated at top of experience) -->
+                  <div v-if="getMetricsForExperience(exp.id)" class="mt-3 p-3.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-emerald-500/5 to-transparent border border-amber-500/25 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2.5">
+                      <!-- Badge & Stars -->
+                      <div class="flex items-center gap-2.5">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                          <ShieldCheck class="w-3.5 h-3.5 text-amber-400" />
+                          <span>{{ getMetricsForExperience(exp.id).referencesCount }} {{ getMetricsForExperience(exp.id).referencesCount === 1 ? 'Referencia Verificada' : 'Referencias Verificadas' }}</span>
+                        </span>
+                        
                         <div class="flex items-center text-amber-400">
-                          <span class="text-sm font-bold text-white mr-1.5">
+                          <span class="text-xs font-extrabold text-white mr-1">
                             {{ getMetricsForExperience(exp.id).averageScore?.toFixed(1) }}
                           </span>
-                          <svg v-for="star in 5" :key="star" class="w-3.5 h-3.5" :class="star <= Math.round(getMetricsForExperience(exp.id).averageScore || 0) ? 'fill-current' : 'text-zinc-700'" viewBox="0 0 20 20" fill="currentColor">
+                          <svg v-for="star in 5" :key="star" class="w-3 h-3" :class="star <= Math.round(getMetricsForExperience(exp.id).averageScore || 0) ? 'fill-current' : 'text-zinc-700'" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                           </svg>
                         </div>
-                        <span class="text-xs text-[hsl(220,10%,55%)]">
-                          ({{ getMetricsForExperience(exp.id).referencesCount }})
-                        </span>
-                      </div>
-
-                      <!-- Trust Level Badge -->
-                      <div class="flex items-center gap-1.5">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold"
-                          :class="{
-                            'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': getMetricsForExperience(exp.id).averageTrustScore >= 80,
-                            'bg-amber-500/10 text-amber-400 border border-amber-500/20': getMetricsForExperience(exp.id).averageTrustScore >= 50 && getMetricsForExperience(exp.id).averageTrustScore < 80,
-                            'bg-orange-500/10 text-orange-400 border border-orange-500/20': getMetricsForExperience(exp.id).averageTrustScore >= 30 && getMetricsForExperience(exp.id).averageTrustScore < 50,
-                            'bg-rose-500/10 text-rose-400 border border-rose-500/20': getMetricsForExperience(exp.id).averageTrustScore < 30
-                          }"
-                        >
-                          <ShieldCheck class="w-3 h-3 mr-1" />
-                          {{ $t('extraProfile.trustLevelTag', { level: getTrustLevelLabel(getMetricsForExperience(exp.id).averageTrustScore) }) }}
-                        </span>
                       </div>
 
                       <!-- Action Toggle -->
                       <button 
                         @click="toggleExperienceBreakdown(exp.id)"
-                        class="text-xs text-primary hover:text-primary-hover font-semibold flex items-center gap-1 transition-all duration-200"
+                        class="text-xs text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 transition-all"
                       >
                         <span>{{ expandedExperiences[exp.id] ? $t('extraProfile.hideBreakdown') : $t('extraProfile.viewBreakdown') }}</span>
                         <Eye class="w-3.5 h-3.5" />
@@ -584,11 +502,11 @@ const topSkill = computed(() => {
                     </div>
 
                     <!-- Details Section (Accordion) -->
-                    <div v-if="expandedExperiences[exp.id]" class="mt-4 pt-4 border-t border-white/5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div v-if="expandedExperiences[exp.id]" class="pt-3 border-t border-amber-500/15 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                       <!-- Soft Skills breakdown bars -->
-                      <div class="space-y-3">
-                        <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ $t('extraProfile.softSkillsRole') }}</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                      <div class="space-y-2.5">
+                        <h4 class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest">{{ $t('extraProfile.softSkillsRole') }}</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
                           <div v-for="(val, skill) in getMetricsForExperience(exp.id).categoryAverages" :key="skill" class="space-y-1">
                             <div class="flex justify-between text-xs font-medium">
                               <span class="text-zinc-400">{{ categoryLabels[skill] || skill }}</span>
@@ -596,7 +514,7 @@ const topSkill = computed(() => {
                             </div>
                             <div class="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
                               <div 
-                                class="h-full bg-gradient-to-r from-primary to-orange-500 rounded-full transition-all duration-500" 
+                                class="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-500" 
                                 :style="{ width: (val * 20) + '%' }"
                               ></div>
                             </div>
@@ -604,29 +522,14 @@ const topSkill = computed(() => {
                         </div>
                       </div>
 
-                      <!-- Evaluators roles distribution -->
-                      <div v-if="getMetricsForExperience(exp.id).relationshipCounts && Object.keys(getMetricsForExperience(exp.id).relationshipCounts).length > 0" class="pt-3 border-t border-white/5">
-                        <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2.5">{{ $t('extraProfile.evaluatorsDistribution') }}</h4>
-                        <div class="flex flex-wrap gap-2">
-                          <span 
-                            v-for="(count, role) in getMetricsForExperience(exp.id).relationshipCounts" 
-                            :key="role" 
-                            class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs bg-white/[0.02] border border-white/5 text-zinc-300 font-medium select-none"
-                          >
-                            <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2 shadow-sm"></span>
-                            {{ relationshipLabels[role] || role }}: <strong class="text-white ml-1 font-bold">{{ count }}</strong>
-                          </span>
-                        </div>
-                      </div>
-
                       <!-- Testimonials -->
-                      <div v-if="getMetricsForExperience(exp.id).testimonials && getMetricsForExperience(exp.id).testimonials.length > 0" class="pt-4 border-t border-white/5 space-y-3">
-                        <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ $t('extraProfile.reviewsReceived') }}</h4>
-                        <div class="space-y-3">
+                      <div v-if="getMetricsForExperience(exp.id).testimonials && getMetricsForExperience(exp.id).testimonials.length > 0" class="pt-3 border-t border-white/5 space-y-2.5">
+                        <h4 class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest">{{ $t('extraProfile.reviewsReceived') }}</h4>
+                        <div class="space-y-2">
                           <div 
                             v-for="t in getMetricsForExperience(exp.id).testimonials" 
                             :key="t.createdAt"
-                            class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2 relative"
+                            class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5 relative"
                           >
                             <div class="flex items-center justify-between text-xs flex-wrap gap-2">
                               <span class="font-bold text-zinc-300">
@@ -653,6 +556,8 @@ const topSkill = computed(() => {
                       </div>
                     </div>
                   </div>
+
+                  <p class="text-sm text-[hsl(220,10%,65%)] pt-1 leading-relaxed whitespace-pre-wrap">{{ exp.functions || exp.description }}</p>
                 </div>
               </div>
             </div>

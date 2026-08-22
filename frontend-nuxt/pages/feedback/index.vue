@@ -155,6 +155,18 @@ const closeAnswersModal = () => {
   selectedRequest.value = null
 }
 
+const openWhatsAppReminder = (req: any) => {
+  if (!import.meta.client) return
+  const token = req.token || req.urlToken || req.id
+  const url = `${window.location.origin}/q/${token}`
+  const targetName = req.targetName || 'Compañero'
+  const company = req.experience?.companyName || req.companyName || 'nuestra etapa profesional'
+  const text = encodeURIComponent(
+    `¡Hola ${targetName}! 👋 Te recuerdo si pudieras certificar mi referencia 360° en Mi Caché para ${company}. Te llevará menos de 60 segundos de forma 100% anónima: ${url}`
+  )
+  window.open(`https://wa.me/?text=${text}`, '_blank')
+}
+
 const relationshipIdLabels = computed<Record<number, string>>(() => ({
   0: t('feedback.relationships.SUPERVISOR'),
   1: t('feedback.relationships.PEER'),
@@ -167,70 +179,76 @@ const relationshipIdLabels = computed<Record<number, string>>(() => ({
 <template>
   <div class="min-h-screen bg-zinc-50 dark:bg-[hsl(228,16%,7%)] font-sans relative pb-24 transition-colors duration-300">
     
-    <!-- HEADER -->
-    <div class="h-40 w-full bg-gradient-to-tr from-primary/90 via-primary/80 to-primary/60 dark:from-primary/60 dark:via-primary/40 dark:to-primary/20 relative overflow-hidden">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between relative z-10">
+    <!-- HEADER DARK GLASS -->
+    <div class="py-10 w-full bg-gradient-to-r from-zinc-900/95 via-[hsl(228,15%,10%)] to-amber-950/25 border-b border-zinc-200/20 dark:border-white/10 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-80 h-80 bg-primary/10 dark:bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
         <div class="flex items-center space-x-3 sm:space-x-4">
           <button 
             @click="goBack" 
-            class="p-2 sm:p-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all duration-300 shadow-lg group"
+            class="p-2 sm:p-2.5 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 text-white hover:bg-white/10 transition-all duration-200 shadow-md group"
             aria-label="Volver"
           >
             <ArrowLeft class="w-4.5 h-4.5 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
           </button>
           <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">{{ $t('feedback.listTitle') }}</h1>
-            <p class="text-white/80 text-xs sm:text-sm mt-0.5">{{ $t('feedback.listSubtitle') }}</p>
+            <div class="flex items-center gap-2">
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-heading">{{ $t('feedback.listTitle') }}</h1>
+              <span class="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] font-bold">360° Audit</span>
+            </div>
+            <p class="text-zinc-400 text-xs sm:text-sm mt-0.5">{{ $t('feedback.listSubtitle') }}</p>
           </div>
         </div>
 
         <Button 
           @click="goToCreate"
-          class="bg-gradient-to-r from-primary to-orange-500 hover:scale-[1.02] active:scale-[0.98] transition-all text-white border-0 rounded-xl px-3 sm:px-5 h-10 flex items-center gap-1.5 shadow-lg shadow-primary/20 flex-shrink-0"
+          class="bg-gradient-to-r from-amber-400 via-primary to-orange-500 hover:brightness-110 text-zinc-950 border-0 rounded-xl px-4 sm:px-5 h-10 flex items-center gap-1.5 shadow-lg shadow-primary/20 flex-shrink-0 font-black text-xs transition-all"
         >
-          <Plus class="w-4.5 h-4.5" />
-          <span class="text-xs sm:text-sm hidden xs:inline">{{ $t('experience.add') }}</span>
+          <Plus class="w-4 h-4" />
+          <span>{{ $t('feedback.createTitle', 'Certificar mi Caché') }}</span>
         </Button>
       </div>
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="max-w-5xl mx-auto px-3 sm:px-6 -mt-10 relative z-20">
+    <div class="max-w-5xl mx-auto px-3 sm:px-6 mt-8 relative z-20 space-y-6">
       
-      <div class="flex space-x-1 bg-zinc-200/50 dark:bg-zinc-800/40 p-1 rounded-xl mb-6 max-w-md border border-zinc-200/30 dark:border-zinc-800/20 backdrop-blur-md">
+      <!-- TABS -->
+      <div class="flex space-x-1 bg-zinc-200/60 dark:bg-zinc-800/60 p-1.5 rounded-2xl max-w-md border border-zinc-200/50 dark:border-white/5 backdrop-blur-md">
         <button
           @click="activeTab = 'all'"
-          class="flex-1 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-1.5"
+          class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5"
           :class="activeTab === 'all' 
-            ? 'bg-white dark:bg-zinc-900 text-primary dark:text-white shadow-sm border border-zinc-100 dark:border-zinc-800/50' 
+            ? 'bg-white dark:bg-zinc-900 text-primary dark:text-white shadow-sm border border-zinc-100 dark:border-zinc-800' 
             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'"
         >
           <span>{{ $t('feedback.tabs.all') }}</span>
-          <span class="px-1.5 py-0.5 text-[10px] rounded-md bg-zinc-150 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-bold">
+          <span class="px-1.5 py-0.2 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[10px] font-bold">
             {{ requests.length }}
           </span>
         </button>
         <button
           @click="activeTab = 'completed'"
-          class="flex-1 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-1.5"
+          class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5"
           :class="activeTab === 'completed' 
-            ? 'bg-white dark:bg-zinc-900 text-primary dark:text-white shadow-sm border border-zinc-100 dark:border-zinc-800/50' 
+            ? 'bg-white dark:bg-zinc-900 text-primary dark:text-white shadow-sm border border-zinc-100 dark:border-zinc-800' 
             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'"
         >
           <span>{{ $t('feedback.status.COMPLETED') }}</span>
-          <span class="px-1.5 py-0.5 text-[10px] rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">
+          <span class="px-1.5 py-0.2 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
             {{ completedCount }}
           </span>
         </button>
         <button
           @click="activeTab = 'pending'"
-          class="flex-1 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-1.5"
+          class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5"
           :class="activeTab === 'pending' 
-            ? 'bg-white dark:bg-zinc-900 text-primary dark:text-white shadow-sm border border-zinc-100 dark:border-zinc-800/50' 
+            ? 'bg-white dark:bg-zinc-900 text-primary dark:text-white shadow-sm border border-zinc-100 dark:border-zinc-800' 
             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'"
         >
           <span>{{ $t('feedback.status.PENDING') }}</span>
-          <span class="px-1.5 py-0.5 text-[10px] rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold">
+          <span class="px-1.5 py-0.2 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
             {{ pendingCount }}
           </span>
         </button>
@@ -240,88 +258,105 @@ const relationshipIdLabels = computed<Record<number, string>>(() => ({
         <div 
           v-for="i in 4" 
           :key="i"
-          class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 space-y-4 animate-pulse"
+          class="bg-white dark:bg-[hsl(228,15%,9%)] border border-zinc-200 dark:border-white/5 rounded-3xl p-6 space-y-4 animate-pulse"
         >
           <div class="flex justify-between items-start">
             <div class="space-y-2 flex-1">
               <div class="h-5 bg-zinc-200 dark:bg-zinc-800 rounded w-2/3"></div>
+              <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-1/3"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <div v-else-if="filteredRequests.length === 0" class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-3xl p-12 text-center shadow-[0_20px_50px_rgba(0,0,0,0.05)]">
+      <div v-else-if="filteredRequests.length === 0" class="backdrop-blur-xl bg-white/80 dark:bg-[hsl(228,15%,9%)] border border-zinc-200/60 dark:border-white/10 rounded-3xl p-12 text-center shadow-xl">
         <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <Mail class="w-8 h-8 text-primary" />
         </div>
         <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">
           {{ activeTab === 'pending' ? 'No hay solicitudes pendientes' : activeTab === 'completed' ? 'No hay valoraciones completadas' : 'No hay solicitudes aún' }}
         </h3>
-        <Button v-if="activeTab === 'all' || activeTab === 'pending'" @click="goToCreate" class="bg-primary hover:bg-primary-hover text-white rounded-xl mt-4">
-          Crear una solicitud
+        <p class="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mb-6">
+          Invita a tus compañeros y supervisores para que certifiquen tus superpotencias anónimamente.
+        </p>
+        <Button v-if="activeTab === 'all' || activeTab === 'pending'" @click="goToCreate" class="bg-primary hover:bg-primary-hover text-white rounded-xl">
+          {{ $t('feedback.createTitle', 'Certificar mi Caché') }}
         </Button>
       </div>
 
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
         <div 
           v-for="req in filteredRequests" 
           :key="req.id"
-          class="backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-white/5 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col justify-between"
+          class="backdrop-blur-xl bg-white dark:bg-[hsl(228,15%,9%)] border border-zinc-200/60 dark:border-white/10 rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col justify-between h-full min-h-[220px] transition-all hover:border-white/20"
         >
-          <div>
-            <div class="flex justify-between items-start mb-4">
-              <div>
-                <h3 class="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">
-                  {{ req.targetName }} {{ req.targetSurname }}
-                </h3>
-                <p class="text-sm text-zinc-500 dark:text-zinc-400 flex items-center mt-0.5">
-                  <Mail class="w-3.5 h-3.5 mr-1" />
-                  {{ req.targetEmail }}
-                </p>
+          <!-- Top Card Meta -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-start gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500/20 to-orange-500/10 border border-amber-500/30 flex items-center justify-center font-extrabold text-amber-300 text-base flex-shrink-0">
+                  {{ (req.targetName || 'R').charAt(0) }}
+                </div>
+                <div class="space-y-0.5 min-w-0">
+                  <h3 class="text-base font-extrabold text-zinc-900 dark:text-white truncate">
+                    {{ req.targetName }} {{ req.targetSurname || '' }}
+                  </h3>
+                  <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate flex items-center">
+                    <Mail class="w-3 h-3 mr-1 text-zinc-500 flex-shrink-0" />
+                    {{ req.targetEmail }}
+                  </p>
+                </div>
               </div>
               
+              <!-- Status Pill -->
               <span 
                 v-if="req.finished" 
-                class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0"
               >
-                <CheckCircle2 class="w-4 h-4 flex-shrink-0" />
-                <span class="ml-1 hidden sm:inline">{{ $t('feedback.status.COMPLETED') }}</span>
+                <CheckCircle2 class="w-3.5 h-3.5 mr-1" />
+                <span>{{ $t('feedback.status.COMPLETED') }}</span>
               </span>
               <span 
                 v-else 
-                class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0"
               >
-                <Clock class="w-4 h-4 flex-shrink-0" />
-                <span class="ml-1 hidden sm:inline">{{ $t('feedback.status.PENDING') }}</span>
+                <Clock class="w-3.5 h-3.5 mr-1 animate-pulse" />
+                <span>{{ $t('feedback.status.PENDING') }}</span>
               </span>
             </div>
 
-            <div class="space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
-              <div class="flex justify-between">
-                <span>{{ $t('feedback.date') }}:</span>
+            <!-- Date & Relationship context -->
+            <div class="pt-2 flex flex-wrap items-center justify-between gap-2 text-xs border-t border-zinc-100 dark:border-white/5">
+              <div class="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
                 <span class="font-medium">{{ formatDate(req.createdAt || '') }}</span>
+                <span v-if="req.relationship !== undefined" class="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/5 text-zinc-300 font-semibold text-[10px]">
+                  {{ relationshipIdLabels[req.relationship] || 'Referente' }}
+                </span>
               </div>
-              <div v-if="req.finished" class="flex justify-between items-center pt-1.5 border-t border-zinc-100 dark:border-zinc-800/40 mt-1.5">
-                <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $t('feedback.referralTrust') }}:</span>
+
+              <!-- Trust score if finished -->
+              <div v-if="req.finished">
                 <span 
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border"
+                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold border"
                   :class="{
-                    'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20': (req.trustScore ?? 0) >= 80,
-                    'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20': (req.trustScore ?? 0) >= 50 && (req.trustScore ?? 0) < 80,
-                    'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20': (req.trustScore ?? 0) >= 30 && (req.trustScore ?? 0) < 50,
-                    'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20': (req.trustScore ?? 0) < 30
+                    'bg-emerald-500/10 text-emerald-400 border-emerald-500/20': (req.trustScore ?? 0) >= 80,
+                    'bg-amber-500/10 text-amber-400 border-amber-500/20': (req.trustScore ?? 0) >= 50 && (req.trustScore ?? 0) < 80,
+                    'bg-orange-500/10 text-orange-400 border-orange-500/20': (req.trustScore ?? 0) >= 30 && (req.trustScore ?? 0) < 50,
+                    'bg-rose-500/10 text-rose-400 border-rose-500/20': (req.trustScore ?? 0) < 30
                   }"
                 >
-                  <ShieldCheck class="w-3.5 h-3.5 mr-1" />
+                  <ShieldCheck class="w-3 h-3 mr-1" />
                   {{ getTrustLabel(req.trustScore ?? 0) }} ({{ req.trustScore ?? 0 }}%)
                 </span>
               </div>
             </div>
           </div>
 
-          <div class="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-            <div v-if="req.finished" class="flex items-center space-x-2">
-              <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{{ $t('feedback.publicProfile') }}:</span>
+          <!-- Bottom Action Buttons (Aligned) -->
+          <div class="mt-4 pt-3.5 border-t border-zinc-100 dark:border-white/5 flex items-center justify-between gap-2">
+            
+            <!-- Visibility toggle (finished) or waiting message -->
+            <div v-if="req.finished" class="flex items-center space-x-2" title="Incluir en el cálculo público de tu Caché">
               <label :for="'toggle-' + req.id" class="inline-flex items-center cursor-pointer select-none">
                 <input 
                   type="checkbox" 
@@ -330,43 +365,58 @@ const relationshipIdLabels = computed<Record<number, string>>(() => ({
                   :checked="req.visible"
                   @change="handleToggleVisibility(req.id, ($event.target as HTMLInputElement).checked)"
                 >
-                <div class="w-9 h-5 bg-zinc-200 dark:bg-zinc-800 rounded-full relative peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                <div class="w-8 h-4.5 bg-zinc-200 dark:bg-zinc-800 rounded-full relative peer peer-checked:after:translate-x-3.5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-emerald-500"></div>
               </label>
+              <span class="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">{{ $t('feedback.publicProfile') }}</span>
             </div>
-            <div v-else class="text-xs text-zinc-400 dark:text-zinc-500 italic">
+            
+            <div v-else class="text-[11px] text-zinc-500 italic">
               {{ $t('feedback.waitingResponse') }}
             </div>
 
-            <div class="flex items-center gap-2">
-              <Button 
-                v-if="!req.finished"
-                variant="outline"
-                class="text-xs border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg h-9 text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5"
-                @click="handleRemind(req.id)"
-                :disabled="loading"
-              >
-                <Send class="w-3.5 h-3.5" />
-                <span>{{ $t('feedback.actions.resend') }}</span>
-              </Button>
-              <Button 
-                v-if="!req.finished"
-                variant="ghost"
-                class="text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg h-9 flex items-center gap-1.5"
-                @click="confirmDelete(req.id)"
-                :disabled="loading"
-              >
-                <Trash2 class="w-3.5 h-3.5" />
-                <span>{{ $t('feedback.actions.cancel') }}</span>
-              </Button>
-              <Button 
-                v-else
-                variant="ghost"
-                class="text-xs text-primary hover:text-primary-hover rounded-lg h-9"
-                @click="openAnswersModal(req)"
-              >
-                {{ $t('feedback.viewAnswers') }}
-              </Button>
+            <!-- Action Buttons Group -->
+            <div class="flex items-center gap-1.5">
+              <template v-if="!req.finished">
+                <button 
+                  @click="openWhatsAppReminder(req)"
+                  class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-bold transition-all shadow-sm"
+                  title="Enviar recordatorio amistoso por WhatsApp"
+                >
+                  <span>WhatsApp</span>
+                </button>
+
+                <Button 
+                  variant="outline"
+                  class="text-xs border-white/10 hover:bg-white/5 rounded-xl h-8 text-zinc-300 flex items-center gap-1 px-2.5"
+                  @click="handleRemind(req.id)"
+                  :disabled="loading"
+                  title="Reenviar recordatorio por Email"
+                >
+                  <Send class="w-3 h-3" />
+                  <span class="hidden sm:inline">{{ $t('feedback.actions.resend') }}</span>
+                </Button>
+
+                <Button 
+                  variant="ghost"
+                  class="text-xs text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl h-8 px-2 flex items-center"
+                  @click="confirmDelete(req.id)"
+                  :disabled="loading"
+                  title="Cancelar solicitud"
+                >
+                  <Trash2 class="w-3.5 h-3.5" />
+                </Button>
+              </template>
+
+              <template v-else>
+                <Button 
+                  class="text-xs bg-white/5 hover:bg-white/10 border border-white/10 text-amber-300 font-bold rounded-xl h-8 px-3 transition-all"
+                  @click="openAnswersModal(req)"
+                >
+                  {{ $t('feedback.viewAnswers') }}
+                </Button>
+              </template>
             </div>
+
           </div>
         </div>
       </div>

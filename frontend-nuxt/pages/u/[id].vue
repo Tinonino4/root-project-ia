@@ -393,24 +393,12 @@ const goBack = () => {
         <!-- Left Column: Sticky Radar Chart & Verification Summary -->
         <div class="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-6 self-start">
           
-          <!-- Skills (Radar Chart) -->
-          <div class="bg-[hsl(228,15%,9%)] border border-white/5 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl">
-            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <Award class="w-5 h-5 text-primary" />
-              {{ $t('profile.softSkillsTitle') }}
-            </h2>
-            <div v-if="profile.skillsMultiLayer" class="flex items-center justify-center">
+          <!-- Skills (Behavioral DNA 360) -->
+          <div class="space-y-4">
+            <div class="w-full">
               <ClientOnly>
-                <SkillsRadarChart360 :metrics="profile.skillsMultiLayer" />
+                <SkillsRadarChart360 :metrics="profile.skillsMultiLayer" :archetype="profile.archetype" />
               </ClientOnly>
-            </div>
-            <div v-else-if="profile.skills" class="h-80 flex items-center justify-center">
-              <ClientOnly>
-                <LazySkillsRadarChart :metrics="profile.skills" />
-              </ClientOnly>
-            </div>
-            <div v-else class="text-center py-20 text-[hsl(220,10%,40%)]">
-              {{ $t('dashboard.noFeedbackYet') }}
             </div>
           </div>
 
