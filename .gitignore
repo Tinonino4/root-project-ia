@@ -16,3 +16,12 @@ dist/
 # Test reports
 playwright-report/
 test-results/
+
+# Agent & Local Configuration
+.config/
+.gemini/
+.hermes/
+
+# Database dumps
+*.sql
+
