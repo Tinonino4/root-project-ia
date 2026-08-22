@@ -26,74 +26,136 @@
   },
   "home": {
     "hero": {
-      "evolution": "The evolution of the resume",
-      "headlinePrefix": "Your professional reputation,",
-      "headlineHighlight": "your greatest asset.",
-      "subheadline": "Caché is the platform where professionals build trust. Gather validated references from your work environment and show what a CV cannot tell.",
-      "ctaBuild": "Start building your Caché",
-      "ctaDiscover": "Discover how it works"
+      "evolution": "360° Certification Protocol",
+      "headlinePrefix": "Your real talent doesn't fit on a CV.",
+      "headlineHighlight": "Prove it with your Caché.",
+      "subheadline": "360° professional references protected by forced-choice questions. No empty letters of recommendation: verified behavioral data from those who have worked with you.",
+      "ctaBuild": "Build my Caché for Free",
+      "ctaRecruiters": "Search Verified Talent",
+      "ctaDiscover": "Discover how it works",
+      "demoLabel": "See what your professional fingerprint looks like:",
+      "roles": {
+        "builder": {
+          "btn": "🚀 Builder / Executor",
+          "title": "Product Catalyst (0 to 1)",
+          "tagline": "High resilience, rapid execution, and autonomy in environments with high uncertainty.",
+          "strength": "High autonomy in greenfield projects (0 to 1)"
+        },
+        "leader": {
+          "btn": "👑 Leader / Coach",
+          "title": "Facilitating Leader & Coach",
+          "tagline": "Focused on unblocking the team, concise communication, and fostering positive culture.",
+          "strength": "Generates a climate of trust and good humor in the team even under pressure."
+        },
+        "specialist": {
+          "btn": "🎯 Technical Specialist",
+          "title": "High-Rigor Architect",
+          "tagline": "Methodological excellence, top technical standards, and complex problem resolution.",
+          "strength": "Is a technical/professional benchmark to turn to when things get complicated."
+        }
+      },
+      "quadrants": {
+        "leader": "Coach Leader",
+        "leaderSub": "Autonomy + Team",
+        "builder": "Builder (0 to 1)",
+        "builderSub": "Autonomy + Rigor",
+        "collaborator": "Agile Collaborator",
+        "collaboratorSub": "Consensus + Execution",
+        "specialist": "Technical Specialist",
+        "specialistSub": "Rigor + Tech Focus"
+      },
+      "interactiveCard": {
+        "title": "360° Talent Fingerprint",
+        "subtitle": "Calibrated Multi-Layer Verification",
+        "dominantArchetype": "Dominant Archetype",
+        "axisYTop": "▲ High Autonomy / Proactivity",
+        "axisYBottom": "▼ Guided Execution",
+        "axisXLeft": "◄ Consensus & Team",
+        "axisXRight": "Rigor & Standards ►",
+        "recognizedVirtue": "Most Recognized Superpower:",
+        "anonymousBadge": "100% Anonymous for the evaluator",
+        "antiFraudBadge": "IP & relationship anti-fraud"
+      }
     },
     "features": {
-      "badge": "More than LinkedIn recommendations",
-      "tagline": "Unlike generic endorsements, Caché collects structured and actionable feedback on your true competencies.",
+      "badge": "More than generic recommendations",
+      "tagline": "Unlike empty endorsements, Caché collects Forced-Choice evaluations protected against inflation to map your Behavioral DNA.",
       "item1": {
-        "title": "360° Verification",
-        "desc": "Cross-referenced endorsements from former colleagues, managers, and clients to build an unbreakable profile."
+        "title": "Bias-Free 360° Verification",
+        "desc": "Forced-Choice questionnaires that require prioritizing real strengths from managers, peers, and direct reports."
       },
       "item2": {
-        "title": "Culture Fit Match",
-        "desc": "Find companies that align not only with your skills, but also with your working values."
+        "title": "2D Matrix & Behavioral DNA",
+        "desc": "Objective cartesian positioning: Autonomy vs Collaboration and Pragmatic Execution vs Methodical Analysis."
       },
       "item3": {
-        "title": "Stand out from the CV",
-        "desc": "Demonstrate your real soft skills validated by professionals you have collaborated with."
+        "title": "Superpowers & Cultural Fit",
+        "desc": "Consolidated identification of your validated top strengths and direct compatibility with your ideal environment."
       }
     },
     "skillsSection": {
-      "title": "The 5 Key Soft Skills",
-      "subtitle": "Our structured and secure questionnaires evaluate the behavioral competencies most in demand in high-performance teams.",
+      "title": "360° Behavioral DNA Pillars",
+      "subtitle": "Cartesian positioning axes and Forced-Choice questionnaires revealing your true professional identity.",
       "items": {
-        "teamwork": {
-          "title": "Teamwork",
-          "desc": "Active collaboration, fluid interpersonal communication, and contributing to a positive group climate."
+        "autonomyVsTeam": {
+          "title": "Autonomy vs Teamwork",
+          "desc": "Y Axis: Measures the orientation toward independent self-driven leadership vs team facilitation."
         },
-        "selfConfidence": {
-          "title": "Self-Confidence",
-          "desc": "Confidence in decision-making, personal initiative, and professional assertiveness."
+        "executionVsAnalysis": {
+          "title": "Direct Execution vs Analysis",
+          "desc": "X Axis: Measures pragmatic delivery speed under uncertainty vs structured analytical rigor."
         },
-        "proactivity": {
-          "title": "Proactivity",
-          "desc": "Anticipating needs, drive when facing obstacles, and search for continuous improvement."
+        "forcedChoice": {
+          "title": "Forced-Choice (Bias-Free)",
+          "desc": "Algorithm preventing inflated 5/5 ratings by forcing selection between real behavioral trade-offs."
         },
-        "integrity": {
-          "title": "Integrity",
-          "desc": "Responsibility, professional ethics, honesty, and fulfillment of agreements."
+        "superpowers": {
+          "title": "Validated Superpowers",
+          "desc": "Consolidation of the top 3 strengths demonstrated in work environments and verified by references."
         },
-        "flexibility": {
-          "title": "Flexibility",
-          "desc": "Adaptability in the face of organizational changes, openness to new ideas, and rapid learning."
+        "culturalFit": {
+          "title": "Cultural Fit Archetype",
+          "desc": "Compatibility and work style assessment tailored for high-performance team environments."
         }
       }
     },
-    "howItWorks": {
-      "titlePrefix": "Designed to",
-      "titleHighlight": "boost your career",
-      "desc": "The process is simple, transparent, and designed to extract maximum value from your professional network without causing inconvenience to your contacts.",
-      "steps": {
-        "step1": {
-          "title": "Create your Caché profile",
-          "desc": "Sign up and fill out your professional experience."
+      "howItWorks": {
+        "titlePrefix": "Designed to",
+        "titleHighlight": "boost your career",
+        "desc": "The process is simple, transparent, and designed to extract maximum value from your professional network without causing inconvenience to your contacts.",
+        "steps": {
+          "step1": {
+            "title": "Create your Caché profile",
+            "desc": "Sign up and fill out your professional experience."
+          },
+          "step2": {
+            "title": "Certify your Caché",
+            "desc": "Activate the 360° validation protocol with your key contacts."
+          },
+          "step3": {
+            "title": "Increase your Value",
+            "desc": "Use your validated profile to stand out in selection processes."
+          }
         },
-        "step2": {
-          "title": "Request Feedback",
-          "desc": "Send structured requests to your professional contacts."
-        },
-        "step3": {
-          "title": "Increase your Value",
-          "desc": "Use your validated profile to stand out in selection processes."
+        "interactive": {
+          "tab1": "1. Invitation",
+          "tab2": "2. Forced Choice",
+          "tab3": "3. 360° Passport",
+          "step1Badge": "Step 01: Cryptographic Activation",
+          "step1Security": "Single-Use Secure Token",
+          "step1Cta": "See how the evaluator responds in Step 2",
+          "step2Badge": "Step 02: Bias-Free Evaluation",
+          "step2AntiBias": "No 5/5 Inflated Ratings",
+          "questionTitle": "What best describes their behavior when facing an unexpected technical bottleneck?",
+          "optionA": "Proposes agile workarounds and quickly unblocks delivery.",
+          "optionB": "Thoroughly analyzes root cause and prioritizes architectural rigor.",
+          "forcedChoiceNotice": "Forced choice guarantees objective behavioral data without courtesy bias.",
+          "step2Cta": "See the generated Passport and Badge in Step 3",
+          "step3Badge": "Step 03: Certified Passport Ready",
+          "step3Audit": "Audited & Verified",
+          "step3Cta": "Restart workflow demo"
         }
-      }
-    },
+      },
     "trustProtocol": {
       "securityBadge": "Let's Trust Security",
       "chartTitle": "Referent Reliability Metrics",
@@ -101,6 +163,7 @@
       "metric2": "Domain Matching with Company",
       "metric3": "Referent Registered on the Platform",
       "metric4": "Verified Contact Phone",
+      "validators": "verified references",
       "level1": "Excellent (>=80)",
       "level2": "High (50-79)",
       "level3": "Medium (30-49)",
@@ -143,6 +206,31 @@
       "case4": {
         "title": "HR & Managers",
         "desc": "Standardize and automate the bureaucratic process of asking final candidates' former colleagues for references in just one click."
+      }
+    },
+    "faq": {
+      "badge": "Frequently Asked Questions",
+      "title": "Everything you need to know about Caché",
+      "subtitle": "We answer your questions about the 360° validation protocol, privacy, and using your verified profile.",
+      "item1": {
+        "q": "How is the anonymity of my evaluators guaranteed?",
+        "a": "Your evaluators' responses are processed in an aggregated and confidential manner using single-use cryptographic tokens. You will never see who submitted a specific response or individual score, ensuring 100% honest and compromise-free feedback."
+      },
+      "item2": {
+        "q": "How does Caché differ from LinkedIn recommendations?",
+        "a": "LinkedIn recommendations suffer from 'courtesy inflation' (almost all are 5/5 stars or superficial text). Caché uses Forced-Choice methodology, requiring evaluators to prioritize real behavioral strengths and cross-verifying them with an audited anti-fraud algorithm."
+      },
+      "item3": {
+        "q": "What happens if a reference tries to harm my score?",
+        "a": "Our algorithm automatically detects and filters out statistical outliers or malicious responses. Furthermore, certifications are only issued when mathematical consistency across multiple layers (managers, peers, and team) is confirmed."
+      },
+      "item4": {
+        "q": "How do I share my profile with recruiters and on my resume?",
+        "a": "You get a personalized public link (e.g. cache.io/u/your-name) and verification code that you can include on your resume, portfolio, or LinkedIn profile so employers can verify your talent passport in real-time."
+      },
+      "item5": {
+        "q": "Is there any cost for candidates and professionals?",
+        "a": "No. Creating your profile, requesting references from your network, and receiving your 360° Talent Passport is 100% free for all professionals."
       }
     },
     "bottomCta": {
@@ -237,7 +325,7 @@
     "recruiterSearch": "Talent Search",
     "profile": "My Profile",
     "experiences": "My Experiences",
-    "feedbackRequests": "Feedback Requests",
+    "feedbackRequests": "Caché Certifications",
     "language": "Language",
     "professionalRole": "Professional",
     "adminRole": "Administrator",
@@ -247,31 +335,31 @@
   },
   "dashboard": {
     "welcome": "Welcome back, {name}",
-    "subtitle": "Manage your professional reputation, request references, and showcase your verified soft skills.",
+    "subtitle": "Manage your professional reputation, certify your references, and showcase your 360° talent fingerprint.",
     "onboarding": {
       "badge": "First Steps",
       "titlePrefix": "Your reputation is not told,",
       "titleHighlight": "it is proven.",
-      "welcomeText": "Welcome to <strong>Caché</strong>! You are a few steps away from unlocking an interactive 360° soft skills radar based on real, 100% anonymous feedback from your peers. Zero spam, pure professional value.",
-      "planTitle": "Your Reputation Plan",
+      "welcomeText": "Welcome to <strong>Caché</strong>! You are a few steps away from unlocking your <strong>360° Talent Fingerprint</strong> based on real, 100% anonymous feedback from your peers. Zero spam, pure professional value.",
+      "planTitle": "Your Certification Plan",
       "step": "Step {num}",
       "statusCompleted": "Completed",
       "statusRequired": "Required",
       "statusPending": "Pending",
       "step1Title": "Complete your Professional Profile",
-      "step1Desc": "Define your current title, education, and photo so colleagues know exactly who they are evaluating.",
+      "step1Desc": "Define your current title, education, and photo so colleagues know exactly who they are certifying.",
       "editProfile": "Edit Profile",
       "createProfile": "Create Profile",
       "step2Title": "Add your Work History",
-      "step2Desc": "Register past or current jobs. Feedback from peers will be linked to these work experiences.",
+      "step2Desc": "Register past or current jobs. Certifications from peers will be linked to these work experiences.",
       "addExperience": "Add Experience",
-      "step3Title": "Request your First Feedback",
-      "step3Desc": "Send dynamic requests to former colleagues to rate your interpersonal soft skills in a couple of clicks.",
-      "requestFeedback": "Request Feedback",
+      "step3Title": "Activate your First Certification",
+      "step3Desc": "Send dynamic requests to former colleagues to certify your superpowers and work style in a couple of clicks.",
+      "requestFeedback": "Certify my Caché",
       "liveDemo": "Live Demo",
       "futureTitle": "Your Future Professional Caché",
-      "futureDesc": "Once you receive references, your 5 Soft Skill pillars will instantly consolidate into this interactive radar.",
-      "didYouKnow": "<strong>Did you know?</strong> The radar protects your privacy. We never reveal who gave you which score to guarantee honest, high-quality responses."
+      "futureDesc": "Once you receive certifications, your validated strengths will consolidate into this interactive Talent Fingerprint.",
+      "didYouKnow": "<strong>Did you know?</strong> The protocol protects referee privacy. We never reveal individual scores to guarantee honest, high-quality responses."
     },
     "publicProfileLink": "Your Public Profile Link",
     "copyLink": "Copy link",
@@ -279,22 +367,56 @@
     "openPublic": "View Public Profile",
     "metrics": {
       "verifiedSkills": "Verified Soft Skills",
-      "completedFeedback": "Completed References",
+      "completedFeedback": "360° Certifications",
       "trustScore": "Trust Rating",
       "pendingRequests": "Pending Requests"
     },
     "quickActions": {
       "title": "Quick Actions",
-      "requestFeedback": "Request Feedback",
+      "requestFeedback": "Certify my Caché",
       "addExperience": "Add Experience",
       "editProfile": "Edit Profile"
     },
-    "radarTitle": "Soft Skills Radar",
-    "radarSubtitle": "Average ratings evaluated by former managers, peers, and clients",
-    "pendingTitle": "Pending Feedback Requests",
-    "recentFeedback": "Recent References",
+    "radarTitle": "Behavioral DNA & 360° Profile",
+    "radarSubtitle": "Talent identity profile and 2D behavioral positioning matrix",
+    "switcher": {
+      "title": "Visual Mode",
+      "option1": "Option 1: Behavioral DNA Card",
+      "option2": "Option 2: Polarized Asymmetric Radar"
+    },
+    "behavioralDna": {
+      "title": "Behavioral DNA Card",
+      "subtitle": "Talent identity profile and 2D work positioning matrix",
+      "badge": "Behavioral DNA",
+      "heroTag": "THE PRAGMATIC EXECUTOR",
+      "heroDesc": "Excels in agile execution under uncertainty with direct communication aimed at unblocking team delivery.",
+      "alignmentTitle": "360° Alignment Score",
+      "alignmentDesc": "High coherence between Managers and Team feedback",
+      "matrixTitle": "2D Work Positioning Matrix",
+      "matrixXLeft": "Structured & Analytical",
+      "matrixXRight": "Direct & Fast Execution",
+      "matrixYTop": "High Autonomy",
+      "matrixYBottom": "Team Collaboration",
+      "superpowersTitle": "Top 3 Validated Superpowers",
+      "validatedBy": "Validated by {count} 360° references",
+      "legendYTitle": "Y Axis (Autonomy):",
+      "legendYDesc": "Independent leadership orientation vs collaborative team work.",
+      "legendXTitle": "X Axis (Execution):",
+      "legendXDesc": "Pragmatic delivery speed vs structured analysis."
+    },
+    "polarizedRadar": {
+      "title": "Polarized Strengths Radar",
+      "subtitle": "Relative prioritization index from Forced-Choice evaluations",
+      "badge": "Polarized Index",
+      "harmonyTitle": "360° Harmony Score",
+      "harmonyDesc": "Coherence index across hierarchical perspectives",
+      "peakTitle": "Dominant Peak:",
+      "valleyTitle": "Secondary Area:"
+    },
+    "pendingTitle": "Pending Certification Requests",
+    "recentFeedback": "Recent Certifications",
     "noExperiencesYet": "No work experiences registered yet.",
-    "noFeedbackYet": "No completed references received yet."
+    "noFeedbackYet": "No completed certifications received yet."
   },
   "profile": {
     "title": "My Profile",
@@ -314,6 +436,26 @@
     "topStrengthsTitle": "Top Strengths (Forced Choice):",
     "idealEnvironmentTitle": "Ideal Work Environment:",
     "matchPercentage": "{percent}% Match",
+    "archetypeTags": {
+      "Respondedor Pragmático": "Pragmatic Responder",
+      "Comunicador Sintético": "Concise Communicator",
+      "Liderazgo Coach": "Coach Leadership"
+    },
+    "strengths": {
+      "Calma y resolución bajo picos de alta presión": "Calmness and resolution under high-pressure peaks",
+      "Alta autonomía en proyectos desde cero (0 a 1)": "High autonomy in greenfield projects (0 to 1)",
+      "Genera un clima de confianza y buen humor en el equipo incluso bajo presión.": "Generates a climate of trust and good humor in the team even under pressure.",
+      "Tiene una capacidad de trabajo y volumen de ejecución muy alto.": "Has a very high work capacity and execution volume.",
+      "Es una referencia técnica/profesional a la que acudir cuando algo se complica.": "Is a technical/professional benchmark to turn to when things get complicated.",
+      "Es extremadamente riguroso/a con la calidad del producto final.": "Is extremely rigorous regarding final product quality.",
+      "Se adapta sin quejarse cuando cambian las reglas del juego a mitad de camino.": "Adapts smoothly when project goals change mid-way."
+    },
+    "environments": {
+      "Startup / Scaleup (Ritmo ágil y alta autonomía)": "Startup / Scaleup (Agile pace & high autonomy)",
+      "Equipos multidisciplinares muy unidos que trabajan en constante lluvia de ideas.": "Tight-knit multidisciplinary teams working in continuous brainstorming.",
+      "Equipos autónomos donde cada especialista tiene su área de responsabilidad clara.": "Autonomous teams where each specialist has a clear area of ownership.",
+      "Equipos altamente técnicos donde se premia la excelencia y el rigor por encima de la velocidad.": "Highly technical teams prioritizing excellence and rigor over speed."
+    },
     "experiencesTitle": "Work History",
     "referencesTitle": "Validated References",
     "visibility": {
@@ -389,8 +531,8 @@
     "confirmDelete": "Are you sure you want to delete this experience?"
   },
   "feedback": {
-    "createTitle": "Request Feedback",
-    "createSubtitle": "Select an experience and invite a former manager or peer to evaluate your soft skills.",
+    "createTitle": "Certify Professional Caché",
+    "createSubtitle": "Select an experience and invite a former manager or peer to certify your 360° work performance.",
     "selectExperience": "Select Work Experience",
     "refereeName": "Referent's Full Name",
     "refereeEmail": "Referent's Email",
@@ -405,13 +547,13 @@
     },
     "personalNote": "Personal Note (Optional)",
     "personalNotePlaceholder": "Add a friendly message to your contact...",
-    "submitRequest": "Send Feedback Request",
+    "submitRequest": "Send Certification Request",
     "sending": "Sending...",
-    "listTitle": "Feedback Requests",
-    "listSubtitle": "Track all feedback requests sent and received.",
+    "listTitle": "Caché Certifications",
+    "listSubtitle": "Track all 360° certifications requested and received.",
     "tabs": {
       "all": "All Requests",
-      "received": "Received References",
+      "received": "Received Certifications",
       "pending": "Pending Requests",
       "sent": "Sent Requests"
     },
