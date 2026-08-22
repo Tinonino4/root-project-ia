@@ -23,11 +23,13 @@ import {
   HelpCircle,
   Clock,
   Copy,
-  ExternalLink,
+  ExternalLink, 
   ArrowUpRight,
-  Check
+  Check,
+  Send
 } from 'lucide-vue-next'
 import { Button } from '~/components/ui/button'
+import { toast } from 'vue-sonner'
 
 definePageMeta({
   layout: 'default'
@@ -114,25 +116,29 @@ const copyProfileLink = () => {
     const url = `${window.location.origin}/u/${publicSlug.value}`
     navigator.clipboard.writeText(url).then(() => {
       isCopied.value = true
+      toast.success(t('dashboard.linkCopied', 'Enlace copiado al portapapeles'))
       setTimeout(() => {
         isCopied.value = false
       }, 2500)
     }).catch(err => {
       console.error('Error copying link:', err)
+      toast.error('No se pudo copiar el enlace')
     })
   }
 }
 
-const sendWhatsAppReminder = (req: any) => {
-  if (!import.meta.client) return
-  const token = req.token || req.id
-  const url = `${window.location.origin}/q/${token}`
-  const targetName = req.targetName || 'Compañero'
-  const company = req.experience?.companyName || req.companyName || 'nuestra etapa profesional'
-  const text = encodeURIComponent(
-    `¡Hola ${targetName}! 👋 Te recuerdo si pudieras certificar mi referencia 360° en Mi Caché para ${company}. Te llevará menos de 60 segundos de forma 100% anónima: ${url}`
-  )
-  window.open(`https://wa.me/?text=${text}`, '_blank')
+const remindingId = ref<string | number | null>(null)
+
+const handleSendEmailReminder = async (req: any) => {
+  try {
+    remindingId.value = req.id
+    await feedbackStore.remindRequest(req.id)
+    toast.success(t('feedback.toast.remind', 'Recordatorio oficial enviado por email con éxito.'))
+  } catch (err: any) {
+    toast.error(err?.message || t('errors.generic', 'No se pudo enviar el recordatorio. Por favor, reintenta.'))
+  } finally {
+    remindingId.value = null
+  }
 }
 
 const getTrustLabel = (score: number) => {
@@ -510,11 +516,13 @@ const getTrustLabel = (score: number) => {
 
                     <template v-else>
                       <button 
-                        @click="sendWhatsAppReminder(req)"
-                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-bold transition-all"
-                        title="Recordar por WhatsApp"
+                        @click="handleSendEmailReminder(req)"
+                        :disabled="remindingId === req.id"
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold transition-all disabled:opacity-50"
+                        :title="$t('feedback.actions.resend', 'Reenviar recordatorio oficial por email')"
                       >
-                        <span>WhatsApp</span>
+                        <Send class="w-3 h-3 text-amber-400" />
+                        <span>{{ remindingId === req.id ? 'Enviando...' : $t('feedback.actions.resend', 'Reenviar Email') }}</span>
                       </button>
                       <span class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20">
                         {{ $t('feedback.status.PENDING') }}

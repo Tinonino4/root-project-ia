@@ -201,7 +201,7 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
               class="py-2.5 px-1 sm:px-3 text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-1 text-center"
             >
               <Zap class="w-3 h-3 shrink-0" />
-              <span class="truncate">Builder</span>
+              <span class="truncate">{{ $t('home.hero.roles.builder.btn', 'Builder') }}</span>
             </button>
             <button 
               @click="selectedRole = 'leader'"
@@ -209,7 +209,7 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
               class="py-2.5 px-1 sm:px-3 text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-1 text-center"
             >
               <Target class="w-3 h-3 shrink-0" />
-              <span class="truncate">Líder</span>
+              <span class="truncate">{{ $t('home.hero.roles.leader.btn', 'Leader') }}</span>
             </button>
             <button 
               @click="selectedRole = 'specialist'"
@@ -217,7 +217,7 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
               class="py-2.5 px-1 sm:px-3 text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-1 text-center"
             >
               <Layers class="w-3 h-3 shrink-0" />
-              <span class="truncate">Especialista</span>
+              <span class="truncate">{{ $t('home.hero.roles.specialist.btn', 'Specialist') }}</span>
             </button>
           </div>
         </div>

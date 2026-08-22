@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useFeedbackStore } from '~/stores/feedback.store'
 import { ArrowLeft, Plus, Mail, Clock, CheckCircle2, ShieldCheck, Send, Trash2, AlertTriangle } from 'lucide-vue-next'
 import { Button } from '~/components/ui/button'
+import { toast } from 'vue-sonner'
 
 definePageMeta({
   layout: 'default'
@@ -32,34 +33,26 @@ const filteredRequests = computed(() => {
   return reqs
 })
 
-const toastState = ref({
-  show: false,
-  message: ''
-})
-
-const triggerToast = (message: string) => {
-  toastState.value.message = message
-  toastState.value.show = true
-  setTimeout(() => {
-    toastState.value.show = false
-  }, 4000)
-}
-
 const handleToggleVisibility = async (requestId: string | number, visible: boolean) => {
   try {
     await feedbackStore.toggleRequestVisibility(requestId, visible)
-    triggerToast(visible ? t('feedback.toast.visible') : t('feedback.toast.hidden'))
-  } catch (err) {
-    triggerToast(t('errors.generic'))
+    toast.success(visible ? t('feedback.toast.visible') : t('feedback.toast.hidden'))
+  } catch (err: any) {
+    toast.error(err?.message || t('errors.generic'))
   }
 }
 
+const remindingId = ref<string | number | null>(null)
+
 const handleRemind = async (requestId: string | number) => {
   try {
+    remindingId.value = requestId
     await feedbackStore.remindRequest(requestId)
-    triggerToast(t('feedback.toast.remind'))
-  } catch (err) {
-    triggerToast(t('errors.generic'))
+    toast.success(t('feedback.toast.remind', 'Recordatorio oficial enviado por email con éxito.'))
+  } catch (err: any) {
+    toast.error(err?.message || t('errors.generic', 'No se pudo enviar el recordatorio.'))
+  } finally {
+    remindingId.value = null
   }
 }
 
@@ -75,9 +68,9 @@ const executeDelete = async () => {
   if (requestToDelete.value) {
     try {
       await feedbackStore.deleteRequest(requestToDelete.value)
-      triggerToast(t('feedback.toast.deleted'))
-    } catch (err) {
-      triggerToast(t('errors.generic'))
+      toast.success(t('feedback.toast.deleted', 'Solicitud eliminada con éxito.'))
+    } catch (err: any) {
+      toast.error(err?.message || t('errors.generic'))
     } finally {
       showDeleteModal.value = false
       requestToDelete.value = null
@@ -377,23 +370,15 @@ const relationshipIdLabels = computed<Record<number, string>>(() => ({
             <!-- Action Buttons Group -->
             <div class="flex items-center gap-1.5">
               <template v-if="!req.finished">
-                <button 
-                  @click="openWhatsAppReminder(req)"
-                  class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-bold transition-all shadow-sm"
-                  title="Enviar recordatorio amistoso por WhatsApp"
-                >
-                  <span>WhatsApp</span>
-                </button>
-
                 <Button 
                   variant="outline"
-                  class="text-xs border-white/10 hover:bg-white/5 rounded-xl h-8 text-zinc-300 flex items-center gap-1 px-2.5"
+                  class="text-xs border-amber-500/30 hover:bg-amber-500/10 text-amber-300 rounded-xl h-8 flex items-center gap-1.5 px-3 font-semibold transition-all disabled:opacity-50"
                   @click="handleRemind(req.id)"
-                  :disabled="loading"
-                  title="Reenviar recordatorio por Email"
+                  :disabled="remindingId === req.id"
+                  :title="$t('feedback.actions.resend', 'Reenviar recordatorio oficial por email')"
                 >
-                  <Send class="w-3 h-3" />
-                  <span class="hidden sm:inline">{{ $t('feedback.actions.resend') }}</span>
+                  <Send class="w-3 h-3 text-amber-400" />
+                  <span>{{ remindingId === req.id ? 'Enviando...' : $t('feedback.actions.resend', 'Reenviar Email') }}</span>
                 </Button>
 
                 <Button 
@@ -492,10 +477,5 @@ const relationshipIdLabels = computed<Record<number, string>>(() => ({
       </div>
     </div>
 
-    <!-- TOAST -->
-    <div v-if="toastState.show" class="fixed bottom-6 right-6 z-50 flex items-center p-4 space-x-3 text-white bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl">
-      <div class="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-xs font-bold text-white">✓</div>
-      <p class="text-sm font-medium">{{ toastState.message }}</p>
-    </div>
   </div>
 </template>
