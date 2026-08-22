@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import { 
   ShieldCheck, 
   Target, 
@@ -9,8 +10,13 @@ import {
   Briefcase, 
   Zap, 
   Fingerprint, 
-  RefreshCw 
+  RefreshCw,
+  ChevronDown,
+  HelpCircle
 } from 'lucide-vue-next'
+
+import HeroShowcase from '~/components/landing/HeroShowcase.vue'
+import HowItWorksInteractiveCard from '~/components/landing/HowItWorksInteractiveCard.vue'
 
 definePageMeta({
   layout: 'public'
@@ -34,6 +40,19 @@ useSeoMeta({
   ogSiteName: 'Caché',
   twitterCard: 'summary_large_image',
 })
+
+const openFaq = ref<number | null>(0)
+function toggleFaq(idx: number) {
+  openFaq.value = openFaq.value === idx ? null : idx
+}
+
+const faqs = [
+  { qKey: 'home.faq.item1.q', aKey: 'home.faq.item1.a' },
+  { qKey: 'home.faq.item2.q', aKey: 'home.faq.item2.a' },
+  { qKey: 'home.faq.item3.q', aKey: 'home.faq.item3.a' },
+  { qKey: 'home.faq.item4.q', aKey: 'home.faq.item4.a' },
+  { qKey: 'home.faq.item5.q', aKey: 'home.faq.item5.a' }
+]
 
 const features = [
   {
@@ -61,8 +80,8 @@ const steps = [
   },
   {
     num: '02',
-    title: 'Solicita Feedback',
-    description: 'Envía peticiones estructuradas a tus contactos profesionales.'
+    title: 'Certifica tu Caché',
+    description: 'Activa el protocolo de validación 360° con tus contactos clave.'
   },
   {
     num: '03',
@@ -73,7 +92,7 @@ const steps = [
 
 const softSkills = [
   {
-    translationKey: 'home.skillsSection.items.teamwork',
+    translationKey: 'home.skillsSection.items.autonomyVsTeam',
     icon: Users,
     iconBg: 'bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500/20',
     iconBlurBg: 'bg-indigo-500/40',
@@ -82,8 +101,8 @@ const softSkills = [
     borderClass: 'hover:border-indigo-500/30 hover:shadow-[0_0_30px_rgba(99,102,241,0.15)]'
   },
   {
-    translationKey: 'home.skillsSection.items.selfConfidence',
-    icon: Award,
+    translationKey: 'home.skillsSection.items.executionVsAnalysis',
+    icon: Zap,
     iconBg: 'bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20',
     iconBlurBg: 'bg-amber-500/40',
     glowBg: 'from-amber-600/30 to-yellow-600/5',
@@ -91,8 +110,8 @@ const softSkills = [
     borderClass: 'hover:border-amber-500/30 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)]'
   },
   {
-    translationKey: 'home.skillsSection.items.proactivity',
-    icon: Zap,
+    translationKey: 'home.skillsSection.items.forcedChoice',
+    icon: Target,
     iconBg: 'bg-rose-500/10 text-rose-400 group-hover:bg-rose-500/20',
     iconBlurBg: 'bg-rose-500/40',
     glowBg: 'from-rose-600/30 to-orange-600/5',
@@ -100,8 +119,8 @@ const softSkills = [
     borderClass: 'hover:border-rose-500/30 hover:shadow-[0_0_30px_rgba(244,63,94,0.15)]'
   },
   {
-    translationKey: 'home.skillsSection.items.integrity',
-    icon: Fingerprint,
+    translationKey: 'home.skillsSection.items.superpowers',
+    icon: Award,
     iconBg: 'bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500/20',
     iconBlurBg: 'bg-emerald-500/40',
     glowBg: 'from-emerald-600/30 to-teal-600/5',
@@ -109,8 +128,8 @@ const softSkills = [
     borderClass: 'hover:border-emerald-500/30 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)]'
   },
   {
-    translationKey: 'home.skillsSection.items.flexibility',
-    icon: RefreshCw,
+    translationKey: 'home.skillsSection.items.culturalFit',
+    icon: Fingerprint,
     iconBg: 'bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20',
     iconBlurBg: 'bg-cyan-500/40',
     glowBg: 'from-cyan-600/30 to-sky-600/5',
@@ -121,46 +140,11 @@ const softSkills = [
 </script>
 
 <template>
-  <main class="pt-16 selection:bg-primary/30">
+  <div class="selection:bg-primary/30">
     
-    <!-- Hero Section -->
-    <section class="relative overflow-hidden pt-20 pb-32">
-      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-primary/5 blur-[120px] pointer-events-none"></div>
-      <div class="absolute -top-32 right-0 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-[100px] pointer-events-none"></div>
-
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-          <span class="text-sm font-medium text-primary">{{ $t('home.hero.evolution') }}</span>
-        </div>
-
-        <h1 class="text-5xl md:text-7xl font-bold font-heading text-white mb-8 tracking-tight leading-tight animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
-          {{ $t('home.hero.headlinePrefix') }}<br />
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary">
-            {{ $t('home.hero.headlineHighlight') }}
-          </span>
-        </h1>
-
-        <p class="text-lg md:text-xl text-[hsl(220,10%,65%)] max-w-2xl mx-auto mb-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-          {{ $t('home.hero.subheadline') }}
-        </p>
-
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300">
-          <NuxtLink
-            to="/register"
-            class="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-white bg-primary hover:bg-primary/90 transition-all duration-300
-                   hover:shadow-[0_0_30px_rgba(242,151,39,0.3)] hover:-translate-y-1"
-          >
-            {{ $t('home.hero.ctaBuild') }}
-          </NuxtLink>
-          <a
-            href="#como-funciona"
-            class="w-full sm:w-auto px-8 py-4 rounded-xl font-semibold text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300"
-          >
-            {{ $t('home.hero.ctaDiscover') }}
-          </a>
-        </div>
-      </div>
+    <!-- Hero Showcase Section (Interactivo con Efecto WOW) -->
+    <section class="relative overflow-hidden">
+      <HeroShowcase />
     </section>
 
     <!-- Features Section -->
@@ -261,24 +245,10 @@ const softSkills = [
           </div>
 
           <div class="w-full md:w-1/2 relative">
-            <div class="aspect-square max-w-md mx-auto relative">
-              <div class="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full blur-3xl"></div>
-              <div class="relative h-full w-full glass-dark rounded-3xl border border-white/10 shadow-2xl p-6 flex flex-col overflow-hidden">
-                <div class="flex items-center gap-4 border-b border-white/10 pb-4 mb-4">
-                  <div class="w-12 h-12 rounded-full bg-primary/20"></div>
-                  <div>
-                    <div class="h-4 w-32 bg-white/20 rounded mb-2"></div>
-                    <div class="h-3 w-24 bg-white/10 rounded"></div>
-                  </div>
-                </div>
-                <div class="flex-1 space-y-4">
-                  <div class="h-8 w-full bg-white/5 rounded-lg border border-white/5 flex items-center px-4"><span class="text-xs text-primary font-bold">Feedback #124</span></div>
-                  <div class="h-24 w-full bg-white/5 rounded-lg border border-white/5 p-4">
-                     <div class="h-2 w-full bg-white/20 rounded mb-3"></div>
-                     <div class="h-2 w-5/6 bg-white/20 rounded mb-3"></div>
-                     <div class="h-2 w-4/6 bg-white/20 rounded"></div>
-                  </div>
-                </div>
+            <div class="w-full max-w-lg mx-auto relative">
+              <div class="absolute inset-0 bg-gradient-to-tr from-amber-500/20 via-primary/20 to-violet-600/20 rounded-3xl blur-3xl pointer-events-none"></div>
+              <div class="relative z-10">
+                <HowItWorksInteractiveCard />
               </div>
             </div>
           </div>
@@ -451,6 +421,52 @@ const softSkills = [
       </div>
     </section>
 
+    <!-- FAQ Section -->
+    <section id="faq" class="py-24 bg-[hsl(228,15%,9%)] border-t border-white/5 relative">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
+            <HelpCircle class="w-3.5 h-3.5" />
+            <span>{{ $t('home.faq.badge') }}</span>
+          </div>
+          <h2 class="text-3xl md:text-4xl font-bold text-white tracking-tight">
+            {{ $t('home.faq.title') }}
+          </h2>
+          <p class="text-[hsl(220,10%,60%)] text-base">
+            {{ $t('home.faq.subtitle') }}
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <div 
+            v-for="(faq, idx) in faqs" 
+            :key="idx"
+            class="rounded-2xl border transition-all duration-300 overflow-hidden"
+            :class="openFaq === idx ? 'bg-white/[0.04] border-amber-500/30 shadow-lg' : 'bg-white/[0.02] border-white/5 hover:border-white/15'"
+          >
+            <button 
+              @click="toggleFaq(idx)"
+              class="w-full p-5 text-left flex items-center justify-between gap-4 transition-colors"
+            >
+              <span class="text-base font-bold text-white">{{ $t(faq.qKey) }}</span>
+              <ChevronDown 
+                class="w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-300"
+                :class="{ 'rotate-180 text-amber-400': openFaq === idx }"
+              />
+            </button>
+            <div 
+              v-show="openFaq === idx"
+              class="px-5 pb-5 text-sm text-[hsl(220,10%,70%)] leading-relaxed border-t border-white/5 pt-3 animate-in fade-in duration-300"
+            >
+              {{ $t(faq.aKey) }}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- Bottom CTA -->
     <section class="py-32 relative overflow-hidden">
       <div class="absolute inset-0 bg-primary/5"></div>
@@ -473,5 +489,5 @@ const softSkills = [
       </div>
     </section>
 
-  </main>
+  </div>
 </template>
