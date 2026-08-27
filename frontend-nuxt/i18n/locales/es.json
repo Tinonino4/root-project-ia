@@ -487,6 +487,7 @@
       "Equipos altamente técnicos donde se premia la excelencia y el rigor por encima de la velocidad.": "Equipos altamente técnicos donde se premia la excelencia y el rigor por encima de la velocidad."
     },
     "experiencesTitle": "Trayectoria Laboral",
+    "requestFeedbackForExp": "Pedir referencias a ex-compañeros de {company}",
     "referencesTitle": "Referencias Validadas",
     "visibility": {
       "public": "Pública",

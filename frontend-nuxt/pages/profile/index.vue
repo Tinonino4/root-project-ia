@@ -13,6 +13,7 @@ import {
   GraduationCap, 
   Edit, 
   User as UserIcon, 
+  UserPlus,
   Calendar, 
   Award, 
   Download, 
@@ -470,44 +471,39 @@ const topSkill = computed(() => {
                 <!-- Timeline dot -->
                 <div class="absolute left-2.5 top-2.5 w-3 h-3 rounded-full bg-primary -translate-x-1/2 group-hover:scale-125 transition-transform duration-200"></div>
                 
-                <!-- Action Controls (Floating top right) -->
-                <div class="absolute right-0 top-0 flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
-                  <button 
-                    @click="navigateTo(`/feedback/new?experienceId=${exp.id}`)"
-                    class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-lg transition-all"
-                    :title="$t('extraProfile.certifyRole', 'Solicitar Certificación 360° para este puesto')"
-                  >
-                    <ShieldCheck class="w-3.5 h-3.5 text-amber-400" />
-                    <span class="text-[11px]">{{ $t('feedback.createTitle', 'Certificar') }}</span>
-                  </button>
-                  <button 
-                    @click="navigateTo(`/experiences/${exp.id}/edit`)"
-                    class="p-1.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                    :title="$t('experience.editTitle')"
-                  >
-                    <Edit class="w-4 h-4" />
-                  </button>
-                  <button 
-                    @click="confirmDelete(exp.id)"
-                    class="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-white/5 rounded-lg transition-colors"
-                    :title="$t('experience.delete')"
-                  >
-                    <Trash2 class="w-4 h-4" />
-                  </button>
-                </div>
+                <div class="space-y-3">
+                  <!-- Experience Header: Title & Action Controls -->
+                  <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                    <div class="space-y-0.5">
+                      <h3 class="text-lg font-bold text-white group-hover:text-primary transition-colors duration-200">{{ exp.position }}</h3>
+                      <p class="text-[hsl(220,10%,75%)] text-sm font-medium">{{ exp.companyName }} <span v-if="exp.department">· {{ exp.department }}</span></p>
+                      <div class="flex items-center gap-2 text-xs text-zinc-500 mt-0.5">
+                        <Calendar class="w-3.5 h-3.5" />
+                        <span>{{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Present' }}</span>
+                      </div>
+                    </div>
 
-                <div class="space-y-2">
-                  <div class="pr-20 sm:pr-24">
-                    <h3 class="text-lg font-bold text-white group-hover:text-primary transition-colors duration-200">{{ exp.position }}</h3>
-                    <p class="text-[hsl(220,10%,75%)] text-sm font-medium">{{ exp.companyName }} <span v-if="exp.department">· {{ exp.department }}</span></p>
-                    <div class="flex items-center gap-2 text-xs text-zinc-500 mt-0.5">
-                      <Calendar class="w-3.5 h-3.5" />
-                      <span>{{ formatDate(exp.startDate) }} - {{ exp.finishDate ? formatDate(exp.finishDate) : 'Present' }}</span>
+                    <!-- Management Controls (Edit / Delete) -->
+                    <div class="flex items-center gap-1 self-end sm:self-start flex-shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        @click="navigateTo(`/experiences/${exp.id}/edit`)"
+                        class="p-1.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                        :title="$t('experience.editTitle')"
+                      >
+                        <Edit class="w-4 h-4" />
+                      </button>
+                      <button 
+                        @click="confirmDelete(exp.id)"
+                        class="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-white/5 rounded-lg transition-colors"
+                        :title="$t('experience.delete')"
+                      >
+                        <Trash2 class="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
 
-                  <!-- Verified 360° Banner (Celebrated at top of experience) -->
-                  <div v-if="getMetricsForExperience(exp.id)" class="mt-3 p-3.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-emerald-500/5 to-transparent border border-amber-500/25 space-y-3">
+                  <!-- Verified 360° Banner (Celebrated if has references) -->
+                  <div v-if="getMetricsForExperience(exp.id)" class="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-emerald-500/5 to-transparent border border-amber-500/25 space-y-3">
                     <div class="flex flex-wrap items-center justify-between gap-2.5">
                       <!-- Badge & Stars -->
                       <div class="flex items-center gap-2.5">
@@ -592,7 +588,19 @@ const topSkill = computed(() => {
                     </div>
                   </div>
 
-                  <p class="text-sm text-[hsl(220,10%,65%)] pt-1 leading-relaxed whitespace-pre-wrap">{{ exp.functions || exp.description }}</p>
+                  <!-- Functions / Description -->
+                  <p v-if="exp.functions || exp.description" class="text-sm text-[hsl(220,10%,65%)] leading-relaxed whitespace-pre-wrap">{{ exp.functions || exp.description }}</p>
+
+                  <!-- Dedicated Call-To-Action: Solicitar Feedback a Ex-Compañeros -->
+                  <div class="pt-1">
+                    <button 
+                      @click="navigateTo(`/feedback/new?experienceId=${exp.id}`)"
+                      class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all hover:scale-[1.01] active:scale-[0.99] group/btn shadow-sm"
+                    >
+                      <UserPlus class="w-4 h-4 text-amber-400 transition-transform group-hover/btn:scale-110" />
+                      <span>{{ $t('profile.requestFeedbackForExp', { company: exp.companyName }) }}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
