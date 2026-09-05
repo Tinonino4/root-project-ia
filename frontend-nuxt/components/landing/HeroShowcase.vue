@@ -109,15 +109,45 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
 
         <!-- Subtítulo Prescriptivo -->
         <p class="text-base sm:text-xl text-[hsl(220,10%,70%)] max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed animate-in fade-in slide-in-from-bottom-5 duration-700 delay-200">
-          {{ $t('home.hero.subheadline', 'Referencias profesionales 360° blindadas con preguntas de elección forzada. Sin cartas de recomendación vacías: datos conductuales verificados por quienes han colaborado contigo.') }}
+          {{ $t('home.hero.subheadline') }}
         </p>
+
+        <!-- Botones de Acción Primaria (CTAs en Mobile - Inmediatamente después del subtítulo para evitar scroll) -->
+        <div class="flex lg:hidden flex-col items-center gap-3 pt-2 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-250">
+          <div class="w-full flex flex-col sm:flex-row items-center justify-center gap-3">
+            <NuxtLink
+              to="/register"
+              class="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-xl font-black text-zinc-950 bg-gradient-to-r from-amber-400 via-primary to-orange-500 hover:brightness-110 transition-all duration-300 shadow-[0_0_35px_rgba(242,151,39,0.4)] flex items-center justify-center gap-2 group text-base"
+            >
+              <span>{{ $t('home.hero.ctaBuild', 'Crear mi perfil gratis') }}</span>
+              <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </NuxtLink>
+            
+            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 text-xs font-semibold text-zinc-300">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>{{ $t('home.hero.ctaEstimate', 'Sin tarjeta • Listo en 2 min') }}</span>
+            </div>
+          </div>
+
+          <!-- Indicadores de Confianza y Privacidad (Mobile) -->
+          <div class="flex flex-wrap items-center justify-center gap-4 text-zinc-400 text-xs font-medium">
+            <div class="flex items-center gap-1.5">
+              <ShieldCheck class="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>{{ $t('home.hero.trustItem1', '100% anónimo para tus evaluadores') }}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <CheckCircle2 class="w-4 h-4 text-amber-400 shrink-0" />
+              <span>{{ $t('home.hero.trustItem2', 'Sin registro requerido') }}</span>
+            </div>
+          </div>
+        </div>
 
         <!-- Selector Rápido de Demostración en Tiempo Real (Solo visible en Desktop) -->
         <div class="hidden lg:block space-y-3 pt-2 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300">
           <div class="flex items-center gap-2">
             <Sparkles class="w-3.5 h-3.5 text-amber-400" />
             <span class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
-              {{ $t('home.hero.demoLabel', 'Prueba cómo se ve tu huella profesional:') }}
+              {{ $t('home.hero.demoLabel', 'Simula cómo te verían tus ex-compañeros:') }}
             </span>
           </div>
           
@@ -150,33 +180,32 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
         </div>
 
         <!-- Botones de Acción Primaria (CTAs en Desktop) -->
-        <div class="hidden lg:flex flex-row items-center justify-start gap-4 pt-2 animate-in fade-in slide-in-from-bottom-7 duration-700 delay-400">
-          <NuxtLink
-            to="/register"
-            class="px-8 py-4 rounded-xl font-black text-zinc-950 bg-gradient-to-r from-amber-400 via-primary to-orange-500 hover:brightness-110 transition-all duration-300 shadow-[0_0_35px_rgba(242,151,39,0.4)] hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2 group text-base"
-          >
-            <span>{{ $t('home.hero.ctaBuild', 'Crear mi Caché Gratis') }}</span>
-            <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </NuxtLink>
-
-          <NuxtLink
-            to="/recruiter/search"
-            class="px-7 py-4 rounded-xl font-bold text-white bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2 text-base"
-          >
-            <Search class="w-4 h-4 text-zinc-400" />
-            <span>{{ $t('home.hero.ctaRecruiters', 'Buscar Talento Verificado') }}</span>
-          </NuxtLink>
-        </div>
-
-        <!-- Indicadores de Confianza y Privacidad (Desktop) -->
-        <div class="hidden lg:flex flex-wrap items-center justify-start gap-6 pt-4 text-zinc-400 text-xs font-medium border-t border-white/5">
-          <div class="flex items-center gap-1.5">
-            <ShieldCheck class="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>{{ $t('home.hero.interactiveCard.anonymousBadge', '100% Anónimo para el evaluador') }}</span>
+        <div class="hidden lg:flex flex-col items-start gap-3 pt-2 animate-in fade-in slide-in-from-bottom-7 duration-700 delay-400">
+          <div class="flex items-center gap-4">
+            <NuxtLink
+              to="/register"
+              class="px-8 py-4 rounded-xl font-black text-zinc-950 bg-gradient-to-r from-amber-400 via-primary to-orange-500 hover:brightness-110 transition-all duration-300 shadow-[0_0_35px_rgba(242,151,39,0.4)] hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2 group text-base"
+            >
+              <span>{{ $t('home.hero.ctaBuild', 'Crear mi perfil gratis') }}</span>
+              <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </NuxtLink>
+            
+            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 text-xs font-semibold text-zinc-300">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>{{ $t('home.hero.ctaEstimate', 'Sin tarjeta • Listo en 2 min') }}</span>
+            </div>
           </div>
-          <div class="flex items-center gap-1.5">
-            <CheckCircle2 class="w-4 h-4 text-amber-400 shrink-0" />
-            <span>{{ $t('home.hero.interactiveCard.antiFraudBadge', 'Anti-fraude de IP y relación') }}</span>
+
+          <!-- Indicadores de Confianza y Privacidad (Desktop) -->
+          <div class="flex flex-wrap items-center gap-5 pt-2 text-zinc-400 text-xs font-medium">
+            <div class="flex items-center gap-1.5">
+              <ShieldCheck class="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>{{ $t('home.hero.trustItem1', '100% anónimo para tus evaluadores') }}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <CheckCircle2 class="w-4 h-4 text-amber-400 shrink-0" />
+              <span>{{ $t('home.hero.trustItem2', 'Sin registro requerido para ellos') }}</span>
+            </div>
           </div>
         </div>
 
@@ -266,7 +295,7 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
           </div>
 
           <!-- Plano Cartesiano 2D Reactivo con 4 Cuadrantes Iluminados y Crosshair Láser -->
-          <div class="relative w-full h-56 sm:h-64 rounded-xl sm:rounded-2xl bg-black/70 border border-white/15 p-2 sm:p-3 overflow-hidden shadow-inner flex flex-col justify-between select-none">
+          <div class="relative w-full min-h-[290px] sm:min-h-[270px] rounded-xl sm:rounded-2xl bg-black/70 border border-white/15 p-2 sm:p-3 overflow-hidden shadow-inner flex flex-col justify-between select-none">
             <!-- Rejilla de Fondo -->
             <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:1.25rem_1.25rem] pointer-events-none"></div>
 
@@ -290,7 +319,10 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
                     {{ $t('home.hero.quadrants.leader', 'Líder Facilitador') }}
                   </span>
                 </div>
-                <span class="text-[8px] sm:text-[9px] text-zinc-400 font-mono">{{ $t('home.hero.quadrants.leaderSub', 'Autonomía + Equipo') }}</span>
+                <span 
+                  :class="selectedRole === 'leader' ? 'block' : 'hidden sm:block'"
+                  class="text-[8px] sm:text-[9px] text-zinc-400 font-mono"
+                >{{ $t('home.hero.quadrants.leaderSub', 'Autonomía + Equipo') }}</span>
               </div>
 
               <!-- Cuadrante 1 (Top-Right): Builder / Innovador -->
@@ -307,14 +339,17 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
                   </span>
                   <span class="text-xs">🚀</span>
                 </div>
-                <span class="text-[8px] sm:text-[9px] text-zinc-400 font-mono">{{ $t('home.hero.quadrants.builderSub', 'Autonomía + Rigor') }}</span>
+                <span 
+                  :class="selectedRole === 'builder' ? 'block' : 'hidden sm:block'"
+                  class="text-[8px] sm:text-[9px] text-zinc-400 font-mono"
+                >{{ $t('home.hero.quadrants.builderSub', 'Autonomía + Rigor') }}</span>
               </div>
 
               <!-- Cuadrante 3 (Bottom-Left): Colaborador Ágil -->
               <div 
                 class="rounded-xl border bg-white/[0.015] border-white/5 opacity-40 p-2 flex flex-col justify-between transition-all duration-500"
               >
-                <span class="text-[8px] sm:text-[9px] text-zinc-400 font-mono">{{ $t('home.hero.quadrants.collaboratorSub', 'Consenso + Ejecución') }}</span>
+                <span class="hidden sm:block text-[8px] sm:text-[9px] text-zinc-400 font-mono">{{ $t('home.hero.quadrants.collaboratorSub', 'Consenso + Ejecución') }}</span>
                 <div class="flex items-center gap-1">
                   <span class="text-xs">🤝</span>
                   <span class="text-zinc-400 font-semibold text-[9px] sm:text-[11px] tracking-tight uppercase">
@@ -328,7 +363,10 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
                 :class="selectedRole === 'specialist' ? 'bg-emerald-500/15 border-emerald-500/40 shadow-[inset_0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-400/30' : 'bg-white/[0.015] border-white/5 opacity-40'"
                 class="rounded-xl border p-2 flex flex-col justify-between items-end text-right transition-all duration-500"
               >
-                <span class="text-[8px] sm:text-[9px] text-zinc-400 font-mono">{{ $t('home.hero.quadrants.specialistSub', 'Rigor + Foco Técnico') }}</span>
+                <span 
+                  :class="selectedRole === 'specialist' ? 'block' : 'hidden sm:block'"
+                  class="text-[8px] sm:text-[9px] text-zinc-400 font-mono"
+                >{{ $t('home.hero.quadrants.specialistSub', 'Rigor + Foco Técnico') }}</span>
                 <div class="flex items-center gap-1">
                   <span 
                     :class="selectedRole === 'specialist' ? 'text-emerald-300 font-extrabold' : 'text-zinc-400 font-semibold'"
@@ -342,12 +380,12 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
             </div>
 
             <!-- Eje Y Superior -->
-            <div class="text-center text-[9px] sm:text-[10px] font-black text-amber-400/90 uppercase tracking-widest relative z-10 pointer-events-none">
+            <div class="hidden sm:block text-center text-[9px] sm:text-[10px] font-black text-amber-400/90 uppercase tracking-widest relative z-10 pointer-events-none">
               ▲ {{ $t('home.hero.interactiveCard.axisYTop', 'Alta Autonomía / Proactividad') }}
             </div>
 
             <!-- Eje X Central Minimalista -->
-            <div class="flex items-center justify-between text-[8px] sm:text-[10px] font-bold text-zinc-300 relative z-10 px-1 pointer-events-none">
+            <div class="hidden sm:flex items-center justify-between text-[8px] sm:text-[10px] font-bold text-zinc-300 relative z-10 px-1 pointer-events-none">
               <span class="bg-black/85 backdrop-blur-md px-1.5 sm:px-2 py-0.5 rounded border border-white/10 shadow-sm">
                 ◄ {{ $t('home.hero.interactiveCard.axisXLeft', 'Consenso & Equipo') }}
               </span>
@@ -357,7 +395,7 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
             </div>
 
             <!-- Eje Y Inferior -->
-            <div class="text-center text-[9px] sm:text-[10px] font-black text-sky-400/90 uppercase tracking-widest relative z-10 pointer-events-none">
+            <div class="hidden sm:block text-center text-[9px] sm:text-[10px] font-black text-sky-400/90 uppercase tracking-widest relative z-10 pointer-events-none">
               ▼ {{ $t('home.hero.interactiveCard.axisYBottom', 'Ejecución Guiada') }}
             </div>
 
@@ -415,37 +453,6 @@ const activeProfile = computed(() => roleProfiles[selectedRole.value])
             </div>
           </div>
 
-        </div>
-
-        <!-- Botones de Acción Primaria (CTAs en Mobile - Justo debajo de la tarjeta interactiva) -->
-        <div class="flex lg:hidden flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
-          <NuxtLink
-            to="/register"
-            class="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-xl font-black text-zinc-950 bg-gradient-to-r from-amber-400 via-primary to-orange-500 hover:brightness-110 transition-all duration-300 shadow-[0_0_35px_rgba(242,151,39,0.4)] flex items-center justify-center gap-2 group text-base"
-          >
-            <span>{{ $t('home.hero.ctaBuild', 'Crear mi Caché Gratis') }}</span>
-            <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </NuxtLink>
-
-          <NuxtLink
-            to="/recruiter/search"
-            class="w-full sm:w-auto px-7 py-3.5 sm:py-4 rounded-xl font-bold text-white bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2 text-base"
-          >
-            <Search class="w-4 h-4 text-zinc-400" />
-            <span>{{ $t('home.hero.ctaRecruiters', 'Buscar Talento Verificado') }}</span>
-          </NuxtLink>
-        </div>
-
-        <!-- Indicadores de Confianza y Privacidad (Mobile) -->
-        <div class="flex lg:hidden flex-wrap items-center justify-center gap-4 pt-2 text-zinc-400 text-xs font-medium border-t border-white/5">
-          <div class="flex items-center gap-1.5">
-            <ShieldCheck class="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>{{ $t('home.hero.interactiveCard.anonymousBadge', '100% Anónimo para el evaluador') }}</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <CheckCircle2 class="w-4 h-4 text-amber-400 shrink-0" />
-            <span>{{ $t('home.hero.interactiveCard.antiFraudBadge', 'Anti-fraude de IP y relación') }}</span>
-          </div>
         </div>
 
       </div>

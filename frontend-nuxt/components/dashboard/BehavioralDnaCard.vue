@@ -133,7 +133,7 @@ const topStrengths = computed(() => {
       </div>
 
       <!-- Plano Cartesiano 2D -->
-      <div class="relative w-full min-h-[240px] sm:min-h-[260px] rounded-xl bg-black/70 border border-white/15 p-2.5 sm:p-3 flex flex-col justify-between overflow-hidden shadow-inner select-none">
+      <div class="relative w-full min-h-[290px] sm:min-h-[270px] rounded-xl bg-black/70 border border-white/15 p-2.5 sm:p-3 flex flex-col justify-between overflow-hidden shadow-inner select-none">
         <!-- Rejilla de Fondo -->
         <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:1.25rem_1.25rem] pointer-events-none"></div>
 
@@ -157,7 +157,10 @@ const topStrengths = computed(() => {
                 {{ $t('home.hero.quadrants.leader', 'Líder Facilitador') }}
               </span>
             </div>
-            <span class="text-[8px] text-zinc-400 font-mono">{{ $t('home.hero.quadrants.leaderSub', 'Autonomía + Equipo') }}</span>
+            <span 
+              :class="activeQuadrant === 'leader' ? 'block' : 'hidden sm:block'"
+              class="text-[8px] text-zinc-400 font-mono"
+            >{{ $t('home.hero.quadrants.leaderSub', 'Autonomía + Equipo') }}</span>
           </div>
 
           <!-- Cuadrante 1 (Top-Right): Builder / Innovador -->
@@ -174,7 +177,10 @@ const topStrengths = computed(() => {
               </span>
               <span class="text-xs">🚀</span>
             </div>
-            <span class="text-[8px] text-zinc-400 font-mono">{{ $t('home.hero.quadrants.builderSub', 'Autonomía + Rigor') }}</span>
+            <span 
+              :class="activeQuadrant === 'builder' ? 'block' : 'hidden sm:block'"
+              class="text-[8px] text-zinc-400 font-mono"
+            >{{ $t('home.hero.quadrants.builderSub', 'Autonomía + Rigor') }}</span>
           </div>
 
           <!-- Cuadrante 3 (Bottom-Left): Colaborador Ágil -->
@@ -182,7 +188,10 @@ const topStrengths = computed(() => {
             :class="activeQuadrant === 'collaborator' ? 'bg-indigo-500/15 border-indigo-500/40 shadow-[inset_0_0_20px_rgba(99,102,241,0.15)] ring-1 ring-indigo-400/30' : 'bg-white/[0.015] border-white/5 opacity-40'"
             class="rounded-xl border p-2 flex flex-col justify-between transition-all duration-500"
           >
-            <span class="text-[8px] text-zinc-400 font-mono">{{ $t('home.hero.quadrants.collaboratorSub', 'Consenso + Ejecución') }}</span>
+            <span 
+              :class="activeQuadrant === 'collaborator' ? 'block' : 'hidden sm:block'"
+              class="text-[8px] text-zinc-400 font-mono"
+            >{{ $t('home.hero.quadrants.collaboratorSub', 'Consenso + Ejecución') }}</span>
             <div class="flex items-center gap-1">
               <span class="text-xs">🤝</span>
               <span 
@@ -199,7 +208,10 @@ const topStrengths = computed(() => {
             :class="activeQuadrant === 'specialist' ? 'bg-emerald-500/15 border-emerald-500/40 shadow-[inset_0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-400/30' : 'bg-white/[0.015] border-white/5 opacity-40'"
             class="rounded-xl border p-2 flex flex-col justify-between items-end text-right transition-all duration-500"
           >
-            <span class="text-[8px] text-zinc-400 font-mono">{{ $t('home.hero.quadrants.specialistSub', 'Rigor + Foco Técnico') }}</span>
+            <span 
+              :class="activeQuadrant === 'specialist' ? 'block' : 'hidden sm:block'"
+              class="text-[8px] text-zinc-400 font-mono"
+            >{{ $t('home.hero.quadrants.specialistSub', 'Rigor + Foco Técnico') }}</span>
             <div class="flex items-center gap-1">
               <span 
                 :class="activeQuadrant === 'specialist' ? 'text-emerald-300 font-extrabold' : 'text-zinc-400 font-semibold'"
@@ -213,18 +225,18 @@ const topStrengths = computed(() => {
         </div>
 
         <!-- Eje Y Superior -->
-        <div class="text-center text-[9px] sm:text-[10px] font-black text-amber-400 uppercase tracking-widest relative z-10 pt-0.5 pointer-events-none">
+        <div class="hidden sm:block text-center text-[9px] sm:text-[10px] font-black text-amber-400 uppercase tracking-widest relative z-10 pt-0.5 pointer-events-none">
           ▲ {{ $t('dashboard.behavioralDna.matrixYTop') }}
         </div>
 
         <!-- Eje X Central Minimalista -->
-        <div class="flex items-center justify-between text-[8px] sm:text-[10px] font-bold text-zinc-300 relative z-10 px-1 gap-1 pointer-events-none">
+        <div class="hidden sm:flex items-center justify-between text-[8px] sm:text-[10px] font-bold text-zinc-300 relative z-10 px-1 gap-1 pointer-events-none">
           <span class="bg-black/85 backdrop-blur-md px-1.5 sm:px-2 py-0.5 rounded-lg border border-white/10 shadow-md">◄ {{ $t('dashboard.behavioralDna.matrixXLeft') }}</span>
           <span class="bg-black/85 backdrop-blur-md px-1.5 sm:px-2 py-0.5 rounded-lg border border-white/10 text-zinc-200 font-extrabold shadow-md">{{ $t('dashboard.behavioralDna.matrixXRight') }} ►</span>
         </div>
 
         <!-- Eje Y Inferior -->
-        <div class="text-center text-[9px] sm:text-[10px] font-black text-sky-400 uppercase tracking-widest relative z-10 pb-0.5 pointer-events-none">
+        <div class="hidden sm:block text-center text-[9px] sm:text-[10px] font-black text-sky-400 uppercase tracking-widest relative z-10 pb-0.5 pointer-events-none">
           ▼ {{ $t('dashboard.behavioralDna.matrixYBottom') }}
         </div>
 

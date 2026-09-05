@@ -12,28 +12,32 @@
     "skills": "Skills",
     "verification": "Verification",
     "useCases": "Use Cases",
-    "forWhom": "For whom",
+    "forWhom": "For Professionals",
+    "forRecruiters": "For Companies",
     "login": "Log in",
-    "startFree": "Get started free",
-    "dashboard": "Go to my Panel",
+    "startFree": "Start Free",
+    "dashboard": "Go to Dashboard",
     "skipToContent": "Skip to main content"
   },
   "footer": {
-    "tagline": "The professional references platform. All rights reserved.",
+    "tagline": "The professional reference platform. All rights reserved.",
     "privacy": "Privacy",
     "terms": "Terms",
     "contact": "Contact"
   },
   "home": {
     "hero": {
-      "evolution": "360° Certification Protocol",
+      "evolution": "Verified Professional Reputation",
       "headlinePrefix": "Your real talent doesn't fit on a CV.",
       "headlineHighlight": "Prove it with your Caché.",
-      "subheadline": "360° professional references protected by forced-choice questions. No empty letters of recommendation: verified behavioral data from those who have worked with you.",
-      "ctaBuild": "Build my Caché for Free",
+      "subheadline": "Get 360° anonymous, objective references from your team in 60 seconds. No empty endorsement letters or inflated scores: a verified map of how you solve problems and work in a team.",
+      "ctaBuild": "Create my free profile",
+      "ctaEstimate": "No credit card • Ready in 2 min",
       "ctaRecruiters": "Search Verified Talent",
       "ctaDiscover": "Discover how it works",
-      "demoLabel": "See what your professional fingerprint looks like:",
+      "demoLabel": "See how your former colleagues would evaluate you:",
+      "trustItem1": "100% anonymous for your evaluators",
+      "trustItem2": "No sign-up required for them",
       "roles": {
         "builder": {
           "btn": "🚀 Builder / Executor",
@@ -65,8 +69,8 @@
         "specialistSub": "Rigor + Tech Focus"
       },
       "interactiveCard": {
-        "title": "360° Talent Fingerprint",
-        "subtitle": "Calibrated Multi-Layer Verification",
+        "title": "360° Talent Passport",
+        "subtitle": "Calibrated Behavioral Profile",
         "dominantArchetype": "Dominant Archetype",
         "axisYTop": "▲ High Autonomy / Proactivity",
         "axisYBottom": "▼ Guided Execution",
@@ -79,133 +83,149 @@
     },
     "features": {
       "badge": "More than generic recommendations",
-      "tagline": "Unlike empty endorsements, Caché collects Forced-Choice evaluations protected against inflation to map your Behavioral DNA.",
+      "tagline": "Unlike empty endorsements or courtesy favors, Caché gathers honest, comparative evaluations to highlight your true workplace strengths.",
       "item1": {
-        "title": "Bias-Free 360° Verification",
-        "desc": "Forced-Choice questionnaires that require prioritizing real strengths from managers, peers, and direct reports."
+        "title": "Honest & Pressure-Free References",
+        "desc": "Agile comparative questions allowing your colleagues and managers to highlight your top virtues without wasting time."
       },
       "item2": {
-        "title": "2D Matrix & Behavioral DNA",
-        "desc": "Objective cartesian positioning: Autonomy vs Collaboration and Pragmatic Execution vs Methodical Analysis."
+        "title": "Behavioral Map & Work Style",
+        "desc": "Your profile visualizes your real balance: Autonomy vs Teamwork, and Execution Speed vs Methodical Rigor."
       },
       "item3": {
         "title": "Superpowers & Cultural Fit",
-        "desc": "Consolidated identification of your validated top strengths and direct compatibility with your ideal environment."
+        "desc": "Consolidate your 3 most recognized strengths and discover which company culture suits you best."
       }
     },
     "skillsSection": {
-      "title": "360° Behavioral DNA Pillars",
-      "subtitle": "Cartesian positioning axes and Forced-Choice questionnaires revealing your true professional identity.",
+      "badge": "Objective Behavioral Assessment",
+      "title": "How do you actually deliver value in a team?",
+      "subtitle": "Verified metrics answering the exact questions every hiring manager asks before extending an offer.",
       "items": {
         "autonomyVsTeam": {
-          "title": "Autonomy vs Teamwork",
-          "desc": "Y Axis: Measures the orientation toward independent self-driven leadership vs team facilitation."
+          "badge": "Initiative vs Facilitation",
+          "title": "Do you unblock autonomously or facilitate the team?",
+          "desc": "Measures your independent initiative to unblock projects against your talent for supporting and coordinating your teammates.",
+          "left": "Initiative & Autonomy",
+          "right": "Facilitation & Team"
         },
         "executionVsAnalysis": {
-          "title": "Direct Execution vs Analysis",
-          "desc": "X Axis: Measures pragmatic delivery speed under uncertainty vs structured analytical rigor."
+          "badge": "Pragmatism vs Rigor",
+          "title": "Do you ship fast or prioritize architectural rigor?",
+          "desc": "Assesses your balance between delivery speed under uncertainty and methodological engineering depth.",
+          "left": "Speed & Delivery",
+          "right": "Rigor & Architecture"
         },
         "forcedChoice": {
-          "title": "Forced-Choice (Bias-Free)",
-          "desc": "Algorithm preventing inflated 5/5 ratings by forcing selection between real behavioral trade-offs."
+          "title": "Forced-Choice Anti-Bias",
+          "desc": "Comparative questions that compel authentic prioritization. Impossible to inflate scores with polite 5/5 ratings."
         },
         "superpowers": {
-          "title": "Validated Superpowers",
-          "desc": "Consolidation of the top 3 strengths demonstrated in work environments and verified by references."
+          "title": "Your Top 3 Verified Superpowers",
+          "desc": "The most recognized, consistent virtues identified by people who worked directly on your projects."
         },
         "culturalFit": {
-          "title": "Cultural Fit Archetype",
-          "desc": "Compatibility and work style assessment tailored for high-performance team environments."
+          "title": "Workplace Environment Fit",
+          "desc": "Discover where you thrive most: 0 to 1 high-uncertainty startups, scaling tech companies, or mature enterprises."
         }
       }
     },
-      "howItWorks": {
-        "titlePrefix": "Designed to",
-        "titleHighlight": "boost your career",
-        "desc": "The process is simple, transparent, and designed to extract maximum value from your professional network without causing inconvenience to your contacts.",
-        "steps": {
-          "step1": {
-            "title": "Create your Caché profile",
-            "desc": "Sign up and fill out your professional experience."
-          },
-          "step2": {
-            "title": "Certify your Caché",
-            "desc": "Activate the 360° validation protocol with your key contacts."
-          },
-          "step3": {
-            "title": "Increase your Value",
-            "desc": "Use your validated profile to stand out in selection processes."
-          }
+    "howItWorks": {
+      "titlePrefix": "Designed to",
+      "titleHighlight": "boost your career",
+      "desc": "The process is simple, transparent, and designed to extract maximum value from your professional network without causing inconvenience to your contacts.",
+      "trustBadge1": "No sign-up required for your contacts",
+      "trustBadge2": "100% confidential feedback",
+      "trustBadge3": "Takes under 60 seconds",
+      "steps": {
+        "step1": {
+          "title": "Create your profile in 2 minutes",
+          "desc": "Add your key work experiences and the people you collaborated with."
         },
-        "interactive": {
-          "tab1": "1. Invitation",
-          "tab2": "2. Forced Choice",
-          "tab3": "3. 360° Passport",
-          "step1Badge": "Step 01: Cryptographic Activation",
-          "step1Security": "Single-Use Secure Token",
-          "step1Cta": "See how the evaluator responds in Step 2",
-          "step2Badge": "Step 02: Bias-Free Evaluation",
-          "step2AntiBias": "No 5/5 Inflated Ratings",
-          "questionTitle": "What best describes their behavior when facing an unexpected technical bottleneck?",
-          "optionA": "Proposes agile workarounds and quickly unblocks delivery.",
-          "optionB": "Thoroughly analyzes root cause and prioritizes architectural rigor.",
-          "forcedChoiceNotice": "Forced choice guarantees objective behavioral data without courtesy bias.",
-          "step2Cta": "See the generated Passport and Badge in Step 3",
-          "step3Badge": "Step 03: Certified Passport Ready",
-          "step3Audit": "Audited & Verified",
-          "step3Cta": "Restart workflow demo"
+        "step2": {
+          "title": "Invite trusted contacts",
+          "desc": "They receive a private link and answer 5 quick questions in under 60 seconds, 100% anonymously with no sign-up."
+        },
+        "step3": {
+          "title": "Share your Talent Passport",
+          "desc": "Include your verified link in your CV or LinkedIn to stand out against other candidates in hiring processes."
         }
       },
+      "interactive": {
+        "tab1": "1. Direct Invite",
+        "tab2": "2. Quick Questions",
+        "tab3": "3. Passport Ready",
+        "step1Badge": "Step 01: 1-Click Private Invitation",
+        "step1Security": "Secure Link - No Sign-up Required",
+        "step1Cta": "See how the evaluator responds in Step 2",
+        "step2Badge": "Step 02: Quick, Pressure-Free Evaluation",
+        "step2AntiBias": "No Clunky Forms",
+        "questionTitle": "What best describes their behavior when facing an unexpected technical bottleneck?",
+        "optionA": "Proposes agile workarounds and quickly unblocks delivery.",
+        "optionB": "Thoroughly analyzes root cause and prioritizes architectural rigor.",
+        "forcedChoiceNotice": "Agile questions ensure honest, direct feedback in under 1 minute.",
+        "step2Cta": "See the generated Passport and Badge in Step 3",
+        "step3Badge": "Step 03: Certified Passport Ready",
+        "step3Audit": "Audited & Verified",
+        "step3Cta": "Restart workflow demo"
+      }
+    },
     "trustProtocol": {
-      "securityBadge": "Let's Trust Security",
-      "chartTitle": "Referent Reliability Metrics",
-      "metric1": "Corporate / Professional Email",
-      "metric2": "Domain Matching with Company",
-      "metric3": "Referent Registered on the Platform",
-      "metric4": "Verified Contact Phone",
-      "validators": "verified references",
-      "level1": "Excellent (>=80)",
-      "level2": "High (50-79)",
-      "level3": "Medium (30-49)",
-      "level4": "Basic (<30)",
-      "titlePrefix": "A Trust System",
-      "titleHighlight": "100% Objective and Audited",
-      "desc1": "At Caché, we do not believe in empty reviews. Every reference received is processed by our Referrer Reliability Algorithm to verify its authenticity in a completely automated way.",
-      "desc2": "This incentivizes professionals to provide legitimate corporate emails and verifiable information, giving B2B recruiters an absolute guarantee against self-evaluations or falsified references."
+      "securityBadge": "Anti-Fraud Verification",
+      "cardTitle": "Certified Talent Passport",
+      "cardSubtitle": "Official Caché Verification Seal",
+      "corporateValidation": "Work Email Validation",
+      "corporateDomain": "Verified corporate domain (e.g. company.com)",
+      "consistency360": "Multi-Layer 360° Consistency",
+      "consistencyDesc": "Anti-outlier algorithm: discards skewed or anomalous responses",
+      "hashId": "Public Audited Credential",
+      "statusActive": "Active Certification",
+      "titlePrefix": "Bulletproof References",
+      "titleHighlight": "Shielded Against Fraud & Inflated CVs",
+      "desc1": "Your skills aren't empty claims on paper: they are backed by proof verified via corporate email domains and cross-evaluator mathematical consistency.",
+      "desc2": "An undeniable credential you can attach to your CV, LinkedIn, or portfolio to negotiate with greater authority and skip traditional screening hurdles.",
+      "viewExampleCta": "View sample verified profile"
     },
     "audience": {
-      "title": "Who does Caché help?",
-      "professionals": {
-        "title": "Professionals",
-        "desc": "Validate your real experience, stand out in interviews by showcasing previous references, and build a solid personal brand independent of the traditional CV.",
-        "bullet1": "Increase your negotiation power",
-        "bullet2": "Highlight proven soft skills"
+      "badge": "For Ambitious Professionals",
+      "title": "Why Top Professionals Use Caché",
+      "subtitle": "Stop competing on mere keywords in a PDF and let your verified workplace impact speak for itself.",
+      "card1": {
+        "title": "Multiply Your Negotiation Power",
+        "desc": "Arrive at final interview stages with pre-verified 360° references. Negotiate better compensation by proving your team impact up front.",
+        "bullet1": "Verified proof before the offer conversation",
+        "bullet2": "Stand out from the 95% of candidates submitting generic resumes"
       },
-      "recruiters": {
-        "title": "Recruiters & Companies",
-        "desc": "Reduce friction in hiring, verify references in a standardized way, and ensure cultural fit before hiring.",
-        "bullet1": "Shorten the hiring cycle",
-        "bullet2": "Transparent quality filter"
-      }
+      "card2": {
+        "title": "Build a Portable Professional Brand",
+        "desc": "Your achievements and endorsements belong to you, not your employer. Accumulate your reputation across your entire career path.",
+        "bullet1": "Custom public link (micache.es/u/your-name)",
+        "bullet2": "Private, continuous feedback as a career compass"
+      },
+      "recruiterNotice": "Looking to hire talent with pre-audited references?",
+      "recruiterLink": "Discover Caché for Companies & Recruiters →"
     },
-    "useCases": {
-      "title": "MiCaché Use Cases",
-      "desc": "Discover how different profiles in the network get the most out of our platform.",
+    "socialProof": {
+      "badge": "Impact Stories",
+      "title": "Professionals Who Validated Their Caché",
+      "subtitle": "Discover how senior talent leverages verified references to land higher-impact roles.",
       "case1": {
-        "title": "Active Candidate",
-        "desc": "Boost your value in the job market by attaching a link to your certified soft skills report to your traditional CV or job portal profile."
+        "name": "Elena Gómez",
+        "role": "Senior Fullstack Engineer",
+        "metric": "3 references in 24h",
+        "quote": "I asked my former tech lead and two peers for feedback without imposing on them. It took 1 minute, and in my last interview the hiring manager praised the authenticity of my profile."
       },
       "case2": {
-        "title": "Freelance & Consultant",
-        "desc": "Close new consulting contracts by demonstrating an immaculate reputation through audited feedback and a high corporate trust index."
+        "name": "Carlos Mendizábal",
+        "role": "Product Manager",
+        "metric": "+25% on final offer",
+        "quote": "Demonstrating my autonomy and cultural fit in scaleups with 360° data gave me a decisive edge in compensation discussions. No waiting for old reference calls."
       },
       "case3": {
-        "title": "Recruiters & Headhunters",
-        "desc": "Directly access the complete profile in read mode, verify the authenticity of the direct manager's email, and optimize pre-selection decisions."
-      },
-      "case4": {
-        "title": "HR & Managers",
-        "desc": "Standardize and automate the bureaucratic process of asking final candidates' former colleagues for references in just one click."
+        "name": "Lucía Barrena",
+        "role": "Tech Lead & Architect",
+        "metric": "100% verified with company email",
+        "quote": "Caché solves the bloated resume issue. Having peers authenticate your strengths through forced-choice questions eliminates all the fluff of LinkedIn recommendations."
       }
     },
     "faq": {
@@ -234,9 +254,123 @@
       }
     },
     "bottomCta": {
-      "title": "Your next job values your reputation",
-      "desc": "Don't let your talent remain hidden behind a PDF. Join Caché today.",
-      "cta": "Create my profile free"
+      "title": "Stop applying with the exact same PDF as 300 other candidates",
+      "desc": "Create your Talent Passport in 2 minutes. Invite key teammates without causing inconvenience and get a certified profile that proves how you truly work.",
+      "cta": "Get My Verified Caché — It's Free",
+      "subtext": "No credit card • 100% anonymous for your evaluators • Instant link"
+    }
+  },
+  "companies": {
+    "seo": {
+      "title": "Caché for Companies | 360° Verified References to Hire with Certainty",
+      "description": "Assess real performance and cultural fit with objective 360° references, verified with corporate emails and zero bureaucratic calls."
+    },
+    "hero": {
+      "badge": "Caché for Teams & Recruiters • 360° Verification",
+      "headlinePrefix": "Hire for how they actually work,",
+      "headlineHighlight": "not how well they write their CV.",
+      "subheadline": "Access calibrated talent reports backed by references from former managers and teammates, verified with corporate emails and forced-choice questions. Cut reference check time by 60% and eliminate cultural mis-hires.",
+      "ctaSearch": "Search Verified Talent",
+      "ctaReportDemo": "View Interactive Report",
+      "metric1Val": "-60%",
+      "metric1Label": "Verification time",
+      "metric2Val": "0",
+      "metric2Label": "Awkward phone calls",
+      "metric3Val": "100%",
+      "metric3Label": "Audited corporate domains"
+    },
+    "reportPreview": {
+      "badge": "B2B Report Simulator",
+      "title": "Inside a Caché Talent Report",
+      "subtitle": "Objective data answering what traditional interview loops can never guarantee.",
+      "candidateRole": "Lead Software Engineer",
+      "trustScoreLabel": "Audited Reliability Index",
+      "verifiedReferences": "5 cross-verified references",
+      "corporateDomainMatch": "Validated with Stripe & Cabify corporate emails",
+      "consistencyTag": "Anti-Outlier Algorithm Active",
+      "quadrantTitle": "Work Style & Leadership",
+      "archetypeDominant": "Pragmatic Builder (0 to 1)",
+      "archetypeDesc": "High resilience under uncertainty, relentless focus on unblocking delivery, and strong technical coaching capability.",
+      "dimension1Title": "Autonomy vs Facilitation",
+      "dimension1Val": "78% Independent Initiative",
+      "dimension2Title": "Speed vs Rigor",
+      "dimension2Val": "70% Pragmatic Delivery",
+      "superpowersTitle": "Team-Confirmed Superpowers",
+      "superpower1": "Unblocks critical technical bottlenecks quickly",
+      "superpower2": "Maintains positive team climate under pressure",
+      "culturalFitTitle": "Workplace Environment Fit",
+      "culturalFitMatch": "High compatibility with Startups & Scaleups",
+      "auditHash": "Cryptographic Signature: #c9a4-e7b1-4f90",
+      "actionVerify": "Verify candidate public link"
+    },
+    "comparison": {
+      "badge": "End Reference-Checking Friction",
+      "title": "Traditional Reference Checks vs. Caché",
+      "subtitle": "Why modern talent teams stopped making tedious courtesy phone calls.",
+      "colTraditional": "Traditional Reference Process",
+      "colCache": "With Caché Protocol",
+      "row1Title": "Verification Timing",
+      "row1Traditional": "End of hiring pipeline: 5 to 10 days bottleneck before offer letter.",
+      "row1Cache": "From the first screening stage: candidate provides verified link in 1 click.",
+      "row2Title": "Feedback Objectivity",
+      "row2Traditional": "Courtesy bias (cherry-picked friends giving superficial 5/5 praise).",
+      "row2Cache": "Forced-Choice Methodology: questions that force prioritization of genuine strengths.",
+      "row3Title": "HR Operational Overhead",
+      "row3Traditional": "Hours spent chasing busy ex-managers on the phone and taking subjective notes.",
+      "row3Cache": "Zero phone calls: structured, instantaneous report with mathematical consistency.",
+      "row4Title": "Risk of Mis-Hire",
+      "row4Traditional": "High: 40% of failed hires stem from cultural friction and working style mismatch.",
+      "row4Cache": "Minimal: calibrated behavioral map across multiple layers (managers, peers, reports)."
+    },
+    "howItWorks": {
+      "badge": "Instant Implementation",
+      "title": "How it works for your hiring team",
+      "subtitle": "No complex setups or steep learning curves. Start hiring with data today.",
+      "step1Title": "1. Request Caché in your job post or ATS",
+      "step1Desc": "Add an optional 'Caché Profile Link' field in Greenhouse, Lever, Workable, or your application form.",
+      "step2Title": "2. Review the Talent Passport in 60 seconds",
+      "step2Desc": "Access verified behavioral metrics on autonomy, delivery speed, and cultural fit before committing hours to technical interviews.",
+      "step3Title": "3. Extend offers with total confidence",
+      "step3Desc": "Eliminate last-minute second guessing and hire professionals proven to thrive in your team's rhythm."
+    },
+    "security": {
+      "badge": "Privacy & Security",
+      "title": "Engineered for enterprise standards",
+      "subtitle": "Strict regulatory compliance and algorithmic anti-fraud shielding.",
+      "item1Title": "100% GDPR Compliant",
+      "item1Desc": "Evaluators respond strictly anonymously and aggregately using single-use cryptographic tokens.",
+      "item2Title": "Corporate Domain Verification",
+      "item2Desc": "We automatically cross-check that evaluator email domains match the candidate's declared workplaces.",
+      "item3Title": "Anti-Fraud Detection",
+      "item3Desc": "Our algorithm discards statistical anomalies, collusion patterns, and skewed ratings to guarantee pure signal."
+    },
+    "faq": {
+      "badge": "Enterprise FAQ",
+      "title": "Common questions from talent teams",
+      "subtitle": "Complete transparency on how talent verification works.",
+      "item1": {
+        "q": "How do you prevent candidates from only selecting friendly peers?",
+        "a": "Caché enforces cross-verification using corporate email domains and checks multi-layered consistency across managers and peers. Furthermore, forced-choice questions eliminate 5/5 score inflation by requiring real relative trade-offs."
+      },
+      "item2": {
+        "q": "What if a candidate doesn't have a Caché profile yet?",
+        "a": "You can invite them to create one in 2 minutes by sharing a link. The process for their evaluators takes under 60 seconds with no registration needed, yielding response rates above 80% within 24 hours."
+      },
+      "item3": {
+        "q": "Does it integrate with our Applicant Tracking System (ATS)?",
+        "a": "Yes. Every Caché profile has a verifiable public link (e.g. micache.es/u/candidate) and verification hash that candidates can submit in any ATS including Greenhouse, Lever, Teamtailor, or Notion."
+      },
+      "item4": {
+        "q": "What does it cost for employers?",
+        "a": "Verifying candidate profile links is 100% free. For companies looking to proactively search our verified talent directory or request bulk reports, we offer flexible subscription tiers tailored to your team size."
+      }
+    },
+    "bottomCta": {
+      "title": "Stop guessing in your hiring loops",
+      "desc": "Access talent with pre-audited references or request a Caché passport from your final candidates today.",
+      "ctaPrimary": "Explore Talent Directory",
+      "ctaSecondary": "Create Employer Account",
+      "subtext": "Instant access • No credit card required • GDPR compliant"
     }
   },
   "questionnaire": {

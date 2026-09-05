@@ -32,15 +32,15 @@ const selectedAnswer = ref<'A' | 'B'>('A')
           class="flex-1 py-2 px-2 text-[11px] sm:text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5"
         >
           <Send class="w-3.5 h-3.5 shrink-0" />
-          <span class="truncate">{{ $t('home.howItWorks.interactive.tab1', '1. Invitación') }}</span>
+          <span class="truncate">{{ $t('home.howItWorks.interactive.tab1', '1. Invitación Directa') }}</span>
         </button>
         <button 
           @click="activeStep = 2"
           :class="activeStep === 2 ? 'bg-gradient-to-r from-sky-400 to-sky-500 text-zinc-950 font-black shadow-md' : 'text-zinc-400 hover:text-white font-medium hover:bg-white/[0.04]'"
           class="flex-1 py-2 px-2 text-[11px] sm:text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5"
         >
-          <Lock class="w-3.5 h-3.5 shrink-0" />
-          <span class="truncate">{{ $t('home.howItWorks.interactive.tab2', '2. Elección Forzada') }}</span>
+          <Sparkles class="w-3.5 h-3.5 shrink-0" />
+          <span class="truncate">{{ $t('home.howItWorks.interactive.tab2', '2. Preguntas Rápidas') }}</span>
         </button>
         <button 
           @click="activeStep = 3"
@@ -48,7 +48,7 @@ const selectedAnswer = ref<'A' | 'B'>('A')
           class="flex-1 py-2 px-2 text-[11px] sm:text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5"
         >
           <Award class="w-3.5 h-3.5 shrink-0" />
-          <span class="truncate">{{ $t('home.howItWorks.interactive.tab3', '3. Pasaporte 360°') }}</span>
+          <span class="truncate">{{ $t('home.howItWorks.interactive.tab3', '3. Pasaporte Listo') }}</span>
         </button>
       </div>
     </div>
@@ -57,11 +57,11 @@ const selectedAnswer = ref<'A' | 'B'>('A')
     <div v-if="activeStep === 1" class="space-y-4 animate-in fade-in zoom-in-95 duration-500">
       <div class="flex items-center justify-between">
         <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-400">
-          {{ $t('home.howItWorks.interactive.step1Badge', 'Paso 01: Activación Criptográfica') }}
+          {{ $t('home.howItWorks.interactive.step1Badge', 'Paso 01: Invitación Privada de 1 Clic') }}
         </span>
         <span class="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
           <ShieldCheck class="w-3.5 h-3.5" />
-          {{ $t('home.howItWorks.interactive.step1Security', 'Token Único de Solo Uso') }}
+          {{ $t('home.howItWorks.interactive.step1Security', 'Enlace Seguro sin Registro') }}
         </span>
       </div>
 
@@ -96,15 +96,15 @@ const selectedAnswer = ref<'A' | 'B'>('A')
       </button>
     </div>
 
-    <!-- Step 2: Cuestionario de Elección Forzada -->
+    <!-- Step 2: Cuestionario Rápido -->
     <div v-else-if="activeStep === 2" class="space-y-4 animate-in fade-in zoom-in-95 duration-500">
       <div class="flex items-center justify-between">
         <span class="text-[10px] font-extrabold uppercase tracking-widest text-sky-400">
-          {{ $t('home.howItWorks.interactive.step2Badge', 'Paso 02: Evaluación Blindada Anti-Sesgo') }}
+          {{ $t('home.howItWorks.interactive.step2Badge', 'Paso 02: Evaluación Rápida sin Compromiso') }}
         </span>
         <span class="text-[11px] text-sky-300 font-bold flex items-center gap-1">
           <Sparkles class="w-3.5 h-3.5" />
-          {{ $t('home.howItWorks.interactive.step2AntiBias', 'Sin Notas 5/5 Infladas') }}
+          {{ $t('home.howItWorks.interactive.step2AntiBias', 'Sin Formularios Pesados') }}
         </span>
       </div>
 
@@ -118,7 +118,7 @@ const selectedAnswer = ref<'A' | 'B'>('A')
           </p>
         </div>
 
-        <!-- Forced-Choice Options (Interactive) -->
+        <!-- Opciones de Respuesta Ágiles (Interactive) -->
         <div class="space-y-2 pt-1">
           <button 
             @click="selectedAnswer = 'A'"
@@ -155,7 +155,7 @@ const selectedAnswer = ref<'A' | 'B'>('A')
 
         <div class="flex items-center gap-1.5 text-[11px] text-zinc-400 pt-1">
           <CheckCircle2 class="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          <span>{{ $t('home.howItWorks.interactive.forcedChoiceNotice', 'La elección forzada garantiza datos conductuales contrastados sin sesgo de cortesía.') }}</span>
+          <span>{{ $t('home.howItWorks.interactive.forcedChoiceNotice', 'El formato de preguntas ágiles permite obtener feedback honesto y sin rodeos en menos de 1 minuto.') }}</span>
         </div>
       </div>
 
