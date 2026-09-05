@@ -7,6 +7,7 @@ export default defineNuxtRouteMiddleware((to) => {
   // Public paths
   const isPublicRoute = 
     to.path === '/' ||
+    to.path === '/empresas' ||
     to.path === '/login' ||
     to.path === '/register' ||
     to.path.startsWith('/auth/') ||

@@ -13,6 +13,7 @@ const navLinks = [
   { translationKey: 'navbar.verification', to: '/#verificacion' },
   { translationKey: 'navbar.useCases', to: '/#casos-de-uso' },
   { translationKey: 'navbar.forWhom', to: '/#para-quien' },
+  { translationKey: 'navbar.forRecruiters', to: '/empresas' },
 ]
 </script>
 
